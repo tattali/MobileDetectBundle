@@ -14,6 +14,9 @@ php:
 env:
   matrix:
     - SYMFONY_REQUIRE="4.4.*"
+    - SYMFONY_REQUIRE="5.1.*"
+    - SYMFONY_REQUIRE="5.2.*"
+    - SYMFONY_REQUIRE="5.3.*"
     - SYMFONY_REQUIRE="5.4.*"
     - SYMFONY_REQUIRE="6.0.*"
 

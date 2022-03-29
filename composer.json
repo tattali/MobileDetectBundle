@@ -33,7 +33,7 @@
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^4.4 || ^5.4 || ^6.0",
-        "friendsofphp/php-cs-fixer": "^3.8",
+        "friendsofphp/php-cs-fixer": "^3.4 || ^3.8",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan-deprecation-rules": "^0.12 || ^1.0",
         "phpstan/phpstan-nette": "^0.12 || ^1.0",
