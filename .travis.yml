@@ -5,7 +5,6 @@ cache:
     - $HOME/.composer/cache/files
 
 php:
-  - 7.1
   - 7.2
   - 7.3
   - 7.4
@@ -15,14 +14,14 @@ php:
 env:
   matrix:
     - SYMFONY_REQUIRE="4.4.*"
-    - SYMFONY_REQUIRE="5.0.*"
+    - SYMFONY_REQUIRE="5.4.*"
     - SYMFONY_REQUIRE="6.0.*"
 
 matrix:
   fast_finish: true
   exclude:
-    - php: 7.1
-      env: SYMFONY_REQUIRE="5.0.*"
+    - php: 8.1
+      env: SYMFONY_REQUIRE="6.0.*"
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available";
