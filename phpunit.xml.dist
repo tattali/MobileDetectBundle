@@ -1,36 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
          backupGlobals="false"
          colors="true"
          bootstrap="tests/bootstrap.php"
 >
-    <php>
-        <ini name="error_reporting" value="-1" />
-        <ini name="memory_limit" value="-1" />
-        <server name="SHELL_VERBOSITY" value="-1" />
-    </php>
-
-    <testsuites>
-        <testsuite name="MobileDetectBundle Test Suite">
-            <directory>tests</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src</directory>
-            <exclude>
-                <directory>src/Migrations</directory>
-            </exclude>
-        </whitelist>
-    </filter>
-
-    <logging>
-      <log type="coverage-html" target="build/coverage" />
-      <log type="coverage-xml" target="build/coverage-xml" />
-      <log type="coverage-clover" target="build/coverage.xml"/>
-    </logging>
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <report>
+      <clover outputFile="build/coverage.xml"/>
+      <html outputDirectory="build/coverage"/>
+      <xml outputDirectory="build/coverage-xml"/>
+    </report>
+  </coverage>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <ini name="memory_limit" value="-1"/>
+    <server name="SHELL_VERBOSITY" value="-1"/>
+  </php>
+  <testsuites>
+    <testsuite name="MobileDetectBundle Test Suite">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <logging/>
+  <listeners>
+    <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
+  </listeners>
 </phpunit>

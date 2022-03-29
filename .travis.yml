@@ -10,11 +10,13 @@ php:
   - 7.3
   - 7.4
   - 8.0
+  - 8.1
 
 env:
   matrix:
     - SYMFONY_REQUIRE="4.4.*"
     - SYMFONY_REQUIRE="5.0.*"
+    - SYMFONY_REQUIRE="6.0.*"
 
 matrix:
   fast_finish: true

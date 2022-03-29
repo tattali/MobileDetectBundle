@@ -28,10 +28,12 @@ class RedirectResponseWithCookie extends RedirectResponse
      * @param int    $status The status code (302 by default)
      * @param Cookie $cookie An array of Cookie objects
      */
-    public function __construct($url, $status = 302, Cookie $cookie)
+    public function __construct($url, $status = 302, Cookie $cookie = null)
     {
         parent::__construct($url, $status);
 
-        $this->headers->setCookie($cookie);
+        if ($cookie) {
+            $this->headers->setCookie($cookie);
+        }
     }
 }

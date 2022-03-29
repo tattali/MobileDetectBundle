@@ -28,7 +28,9 @@ use Symfony\Component\HttpFoundation\Response;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * {@inheritdoc}
+     * Generates the configuration tree builder.
+     *
+     * @return TreeBuilder
      */
     public function getConfigTreeBuilder()
     {

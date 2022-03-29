@@ -127,17 +127,16 @@ class DeviceDataCollector extends DataCollector
             return true;
         }
 
-        if (!isset($this->redirectConfig[$view]['is_enabled']) ||
-            false === $this->redirectConfig[$view]['is_enabled']
+        if (!isset($this->redirectConfig[$view]['is_enabled'])
+            || false === $this->redirectConfig[$view]['is_enabled']
         ) {
             return true;
         }
 
-        if (true === $this->redirectConfig[$view]['is_enabled'] &&
-            isset($this->redirectConfig[$view]['host'], $this->redirectConfig[$view]['action'])
-             &&
-            !empty($this->redirectConfig[$view]['host']) &&
-            \in_array($this->redirectConfig[$view]['action'], [RequestResponseListener::REDIRECT, RequestResponseListener::REDIRECT_WITHOUT_PATH], true)
+        if (true === $this->redirectConfig[$view]['is_enabled']
+            && isset($this->redirectConfig[$view]['host'], $this->redirectConfig[$view]['action'])
+            && !empty($this->redirectConfig[$view]['host'])
+            && \in_array($this->redirectConfig[$view]['action'], [RequestResponseListener::REDIRECT, RequestResponseListener::REDIRECT_WITHOUT_PATH], true)
         ) {
             $parseHost = parse_url($this->redirectConfig[$view]['host']);
             $redirectHost = $parseHost['scheme'].'://'.$parseHost['host'];
