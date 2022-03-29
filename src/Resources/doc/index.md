@@ -1,7 +1,7 @@
 MobileDetectBundle
 =============
 
-Symfony 2.4.x-3.0.x bundle for detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+Symfony 2.4.x-6.0.x bundle for detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
 
 
 Switch device view

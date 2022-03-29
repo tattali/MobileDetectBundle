@@ -3,9 +3,7 @@ MobileDetectBundle
 
 Symfony 4.4.x-5.0.x bundle for detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
 
-[![Build Status](https://travis-ci.org/suncat2000/MobileDetectBundle.png?branch=master)](https://travis-ci.org/suncat2000/MobileDetectBundle) [![Latest Stable Version](https://poser.pugx.org/tattali/MobileDetectBundle/v/stable.png)](https://packagist.org/packages/tattali/MobileDetectBundle) [![Total Downloads](https://poser.pugx.org/tattali/MobileDetectBundle/downloads.png)](https://packagist.org/packages/tattali/MobileDetectBundle) [![Coverage Status](https://coveralls.io/repos/github/suncat2000/MobileDetectBundle/badge.svg?branch=master)](https://coveralls.io/github/suncat2000/MobileDetectBundle?branch=master)
-
-[![knpbundles.com](http://knpbundles.com/suncat2000/MobileDetectBundle/badge-short)](http://knpbundles.com/suncat2000/MobileDetectBundle)
+[![Build Status](https://app.travis-ci.com/tattali/MobileDetectBundle.svg?branch=master)](https://app.travis-ci.com/github/tattali/MobileDetectBundle) [![Latest Stable Version](https://poser.pugx.org/tattali/MobileDetectBundle/v/stable.png)](https://packagist.org/packages/tattali/MobileDetectBundle) [![Total Downloads](https://poser.pugx.org/tattali/MobileDetectBundle/downloads.png)](https://packagist.org/packages/tattali/MobileDetectBundle)
 
 Introduction
 ------------
@@ -21,7 +19,7 @@ This Bundle use [Mobile_Detect](https://github.com/serbanghita/Mobile-Detect) cl
 
 The bulk of the documentation is stored in the `Resources/doc/index.md` file in this bundle:
 
-[Read the Documentation for master](https://github.com/suncat2000/MobileDetectBundle/blob/master/Resources/doc/index.md)
+[Read the Documentation for master](https://github.com/tattali/MobileDetectBundle/blob/master/Resources/doc/index.md)
 
 
 ## License
