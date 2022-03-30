@@ -9,7 +9,7 @@ on:
 
 jobs:
   phpunit:
-    name: Test on PHP ${{ matrix.php }} and Symfony ${{ symfony-require }}
+    name: Test on PHP ${{ matrix.php }} and Symfony ${{ matrix.symfony-require }}
     runs-on: ubuntu-latest
     env:
       SYMFONY_REQUIRE: ${{ matrix.symfony-require }}
