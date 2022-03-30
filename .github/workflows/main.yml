@@ -1,36 +1,57 @@
-# This is a basic workflow to help you get started with Actions
+name: Symfony
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  tests:
+    if: ${{ 3.4 == matrix.php }}
+    name: Test on PHP ${{ matrix.php }} and Symfony ${{ matrix.symfony }}
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    strategy:
+      matrix:
+        php: [7.2, 7.3, 7.4, 8.0, 8.1]
+        # php: [7.1, 7.2, 7.3, 7.4, 8.0, 8.1]
+        sf: [4.0, 4.1, 4.2, 4.3, 4.4, 5.0, 5.1, 5.2, 5.3, 5.4]
+        # sf: [3.4, 4.0, 4.1, 4.2, 4.3, 4.4, 5.0, 5.1, 5.2, 5.3, 5.4, 6.0]
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+# ---------------------------------
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Use PHP ${{ matrix.php }}
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: php${{ matrix.php }}-sf${{ matrix.sf }}-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          php${{ matrix.php }}-sf${{ matrix.sf }}-
+
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Execute tests (Unit and Feature tests) via PHPUnit
+      run: |
+        php vendor/bin/php-cs-fixer fix --dry-run --diff --ansi
+        php vendor/bin/phpcs --report=code
+        php vendor/bin/phpstan analyse
+        php vendor/bin/phpunit
