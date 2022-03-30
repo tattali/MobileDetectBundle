@@ -4,3 +4,5 @@ parameters:
     paths:
         - src
         - tests
+    ignoreErrors:
+        - '#^No error to ignore is reported on line .*#'
