@@ -34,7 +34,6 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4 || ^3.8",
         "phpstan/extension-installer": "^1.0",
-        "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-nette": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpstan/phpstan": "^1.0",
