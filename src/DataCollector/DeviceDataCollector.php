@@ -145,7 +145,7 @@ class DeviceDataCollector extends DataCollector
     private function generateSwitchLink(
         Request $request,
         string $view
-    ): string {
+    ): ?string {
         $requestSwitchView = $request->duplicate();
         $requestSwitchView->query->set($this->deviceView->getSwitchParam(), $view);
         $requestSwitchView->server->set(
