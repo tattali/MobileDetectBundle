@@ -617,7 +617,7 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ViewEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            HttpKernelInterface::MAIN_REQUEST ?? HttpKernelInterface::MASTER_REQUEST,
+            HttpKernelInterface::MASTER_REQUEST ?? HttpKernelInterface::MAIN_REQUEST,
             $content
         );
         $event->getRequest()->headers = new HeaderBag($headers);
@@ -639,7 +639,7 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            HttpKernelInterface::MAIN_REQUEST ?? HttpKernelInterface::MASTER_REQUEST,
+            HttpKernelInterface::MASTER_REQUEST ?? HttpKernelInterface::MAIN_REQUEST,
             $response
         );
         $event->getRequest()->headers = new HeaderBag($headers);
