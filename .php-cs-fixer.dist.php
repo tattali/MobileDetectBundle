@@ -11,8 +11,6 @@ return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@DoctrineAnnotation' => true,
-        '@PHP71Migration:risky' => true,
-        '@PHP71Migration' => true,
         '@PhpCsFixer:risky' => true,
         '@PhpCsFixer' => true,
         '@PHPUnit84Migration:risky' => true,
