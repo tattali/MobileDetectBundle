@@ -36,7 +36,7 @@ final class RequestResponseListenerTest extends TestCase
 
     private $router;
 
-    private array $config;
+    private $config;
 
     private $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
 
