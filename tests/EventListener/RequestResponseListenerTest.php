@@ -617,7 +617,6 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ViewEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            // @phpstan-ignore-next-line
             HttpKernelInterface::MAIN_REQUEST ?? HttpKernelInterface::MASTER_REQUEST,
             $content
         );
@@ -640,7 +639,6 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            // @phpstan-ignore-next-line
             HttpKernelInterface::MAIN_REQUEST ?? HttpKernelInterface::MASTER_REQUEST,
             $response
         );
