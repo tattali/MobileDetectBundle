@@ -27,20 +27,14 @@ final class RequestResponseListenerTest extends TestCase
 {
     private $mobileDetector;
 
-    private $deviceView;
-
     private $requestStack;
 
     private $request;
 
     private $router;
 
-    /**
-     * @var array
-     */
-    private $config;
+    private array $config;
 
-    private $cookieKey = DeviceView::COOKIE_KEY_DEFAULT;
     private $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
 
     protected function setUp(): void
@@ -48,7 +42,6 @@ final class RequestResponseListenerTest extends TestCase
         parent::setUp();
 
         $this->mobileDetector = $this->getMockBuilder(MobileDetector::class)->disableOriginalConstructor()->getMock();
-        $this->deviceView = $this->getMockBuilder(DeviceView::class)->disableOriginalConstructor()->getMock();
         $this->router = $this->getMockBuilder(Router::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRouteCollection'])
@@ -121,7 +114,7 @@ final class RequestResponseListenerTest extends TestCase
         static::assertFalse($listener->needsResponseModification());
 
         $response = $event->getResponse();
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         static::assertSame(sprintf(
             'http://mobilehost.com/?%s=%s&myparam=myvalue',
@@ -133,7 +126,7 @@ final class RequestResponseListenerTest extends TestCase
         $cookies = $response->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
@@ -161,14 +154,14 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
+        static::assertInstanceOf(Response::class, $modifiedResponse);
         static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Full view', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_FULL, $cookie->getValue());
@@ -196,7 +189,7 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
+        static::assertInstanceOf(Response::class, $modifiedResponse);
         static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Not mobile view', $modifiedResponse->getContent());
 
@@ -227,7 +220,7 @@ final class RequestResponseListenerTest extends TestCase
         static::assertSame(DeviceView::VIEW_TABLET, $deviceView->getViewType());
 
         $response = $getResponseEvent->getResponse();
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         static::assertSame(sprintf(
                 'http://testsite.com/some/parameters?%s=%s&some=param',
@@ -239,8 +232,7 @@ final class RequestResponseListenerTest extends TestCase
         $cookies = $response->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
-            /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
+            static::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
             }
@@ -272,7 +264,7 @@ final class RequestResponseListenerTest extends TestCase
         static::assertSame(DeviceView::VIEW_TABLET, $deviceView->getViewType());
 
         $response = $getResponseEvent->getResponse();
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         static::assertSame(sprintf(
                 'http://testsite.com/some/parameters?%s=%s&some=param',
@@ -284,7 +276,7 @@ final class RequestResponseListenerTest extends TestCase
         $cookies = $response->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
@@ -316,14 +308,14 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
+        static::assertInstanceOf(Response::class, $modifiedResponse);
         static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Tablet view', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
@@ -354,7 +346,7 @@ final class RequestResponseListenerTest extends TestCase
 
         $response = $getResponseEvent->getResponse();
 
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         static::assertSame(sprintf(
                 'http://mobilehost.com/some/parameters?%s=%s',
@@ -366,7 +358,7 @@ final class RequestResponseListenerTest extends TestCase
         $cookies = $response->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
@@ -396,7 +388,7 @@ final class RequestResponseListenerTest extends TestCase
 
         $response = $getResponseEvent->getResponse();
 
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         static::assertSame('http://testsite.com?device_view=tablet', $response->getTargetUrl());
         static::assertSame(sprintf(
@@ -409,7 +401,7 @@ final class RequestResponseListenerTest extends TestCase
         $cookies = $response->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
@@ -445,14 +437,14 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
+        static::assertInstanceOf(Response::class, $modifiedResponse);
         static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Tablet view no redirect', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
@@ -483,7 +475,7 @@ final class RequestResponseListenerTest extends TestCase
 
         $response = $getResponseEvent->getResponse();
 
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         static::assertSame(sprintf(
                 'http://testsite.com/some/parameters?%s=%s',
@@ -495,7 +487,7 @@ final class RequestResponseListenerTest extends TestCase
         $cookies = $response->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
@@ -526,7 +518,7 @@ final class RequestResponseListenerTest extends TestCase
 
         $response = $getResponseEvent->getResponse();
 
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         static::assertSame(sprintf(
                 'http://testsite.com?%s=%s',
@@ -538,7 +530,7 @@ final class RequestResponseListenerTest extends TestCase
         $cookies = $response->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
@@ -575,14 +567,14 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
+        static::assertInstanceOf(Response::class, $modifiedResponse);
         static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Mobile view no redirect', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            static::assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+            static::assertInstanceOf(Cookie::class, $cookie);
             /** @var \Symfony\Component\HttpFoundation\Cookie $cookie */
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 static::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
@@ -617,7 +609,7 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ViewEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            HttpKernelInterface::MASTER_REQUEST ?? HttpKernelInterface::MAIN_REQUEST,
+            HttpKernelInterface::MAIN_REQUEST ?? HttpKernelInterface::MASTER_REQUEST,
             $content
         );
         $event->getRequest()->headers = new HeaderBag($headers);
@@ -639,7 +631,7 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            HttpKernelInterface::MASTER_REQUEST ?? HttpKernelInterface::MAIN_REQUEST,
+            HttpKernelInterface::MAIN_REQUEST ?? HttpKernelInterface::MASTER_REQUEST,
             $response
         );
         $event->getRequest()->headers = new HeaderBag($headers);
