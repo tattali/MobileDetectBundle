@@ -6,4 +6,3 @@ parameters:
         - tests
     ignoreErrors:
         - '#^Fetching deprecated class constant MASTER_REQUEST.*#'
-        - '#Access to undefined constant Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST.#'
