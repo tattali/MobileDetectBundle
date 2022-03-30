@@ -40,7 +40,7 @@ final class DeviceViewTest extends TestCase
         $this->request->cookies = new ParameterBag();
 
         $this->requestStack->expects(static::any())
-            ->method('getMainRequest')
+            ->method(method_exists(RequestStack::class, 'getMainRequest') ? 'getMainRequest' : 'getMasterRequest')
             ->willReturn($this->request)
         ;
     }

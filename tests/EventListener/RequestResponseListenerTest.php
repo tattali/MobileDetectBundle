@@ -73,7 +73,7 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
         $this->requestStack->expects(static::any())
-            ->method('getMainRequest')
+            ->method(method_exists(RequestStack::class, 'getMainRequest') ? 'getMainRequest' : 'getMasterRequest')
             ->willReturn($this->request)
         ;
 

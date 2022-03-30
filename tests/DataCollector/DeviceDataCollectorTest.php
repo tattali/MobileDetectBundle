@@ -31,8 +31,6 @@ use Symfony\Component\HttpFoundation\ServerBag;
  */
 final class DeviceDataCollectorTest extends TestCase
 {
-    private $mobileDetector;
-
     private $requestStack;
 
     private $request;
@@ -43,7 +41,6 @@ final class DeviceDataCollectorTest extends TestCase
     {
         parent::setUp();
 
-        $this->mobileDetector = $this->getMockBuilder('MobileDetectBundle\DeviceDetector\MobileDetector')->disableOriginalConstructor()->getMock();
         $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $this->request->query = new ParameterBag();
         $this->request->cookies = new ParameterBag();
@@ -52,7 +49,7 @@ final class DeviceDataCollectorTest extends TestCase
 
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
         $this->requestStack->expects(static::any())
-            ->method('getMainRequest')
+            ->method(method_exists(RequestStack::class, 'getMainRequest') ? 'getMainRequest' : 'getMasterRequest')
             ->willReturn($this->request)
         ;
 
