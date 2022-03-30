@@ -15,6 +15,7 @@ namespace MobileDetectBundle\Helper;
 
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
@@ -28,12 +29,10 @@ class RedirectResponseWithCookie extends RedirectResponse
      * @param int    $status The status code (302 by default)
      * @param Cookie $cookie An array of Cookie objects
      */
-    public function __construct($url, $status = 302, Cookie $cookie = null)
+    public function __construct($url, $status, Cookie $cookie)
     {
         parent::__construct($url, $status);
 
-        if ($cookie) {
-            $this->headers->setCookie($cookie);
-        }
+        $this->headers->setCookie($cookie);
     }
 }

@@ -105,8 +105,8 @@ class DeviceView
 
     public function __construct(RequestStack $requestStack = null)
     {
-        $request = method_exists(RequestStack::class, 'getMainRequest') ? $requestStack->getMainRequest() : $requestStack->getMasterRequest();
-        if (!$requestStack || !$this->request = $request) {
+        $methodName = method_exists(RequestStack::class, 'getMainRequest') ? 'getMainRequest' : 'getMasterRequest';
+        if (!$requestStack || !$this->request = $requestStack->{$methodName}()) {
             $this->viewType = self::VIEW_NOT_MOBILE;
 
             return;

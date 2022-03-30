@@ -4,3 +4,5 @@ parameters:
     paths:
         - src
         - tests
+    ignoreErrors:
+        - '#^Fetching deprecated class constant MASTER_REQUEST.*#'

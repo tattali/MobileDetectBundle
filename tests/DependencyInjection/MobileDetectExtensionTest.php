@@ -16,6 +16,7 @@ use MobileDetectBundle\DependencyInjection\MobileDetectExtension;
 use MobileDetectBundle\Helper\DeviceView;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
@@ -50,9 +51,9 @@ final class MobileDetectExtensionTest extends TestCase
         $config = [];
         $this->extension->load($config, $this->container);
         static::assertSame([
-            'mobile' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
-            'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
-            'full' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
+            'mobile' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
             'detect_tablet_as_mobile' => false,
         ], $this->container->getParameter('mobile_detect.redirect'));
         static::assertTrue($this->container->getParameter('mobile_detect.switch_device_view.save_referer_path'));
@@ -88,18 +89,18 @@ final class MobileDetectExtensionTest extends TestCase
         $config = [
             'mobile_detect' => [
                 'redirect' => [
-                    'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => 302, 'action' => 'redirect'],
-                    'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
-                    'full' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
+                    'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+                    'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+                    'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
                     'detect_tablet_as_mobile' => false,
                 ],
             ],
         ];
         $this->extension->load($config, $this->container);
         static::assertSame([
-            'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => 302, 'action' => 'redirect'],
-            'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
-            'full' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
+            'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
             'detect_tablet_as_mobile' => false,
         ], $this->container->getParameter('mobile_detect.redirect'));
     }
@@ -109,18 +110,18 @@ final class MobileDetectExtensionTest extends TestCase
         $config = [
             'mobile_detect' => [
                 'redirect' => [
-                    'mobile' => ['is_enabled' => true, 'host' => 'http://testsite', 'status_code' => 302, 'action' => 'redirect'],
-                    'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
-                    'full' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
+                    'mobile' => ['is_enabled' => true, 'host' => 'http://testsite', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+                    'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+                    'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
                     'detect_tablet_as_mobile' => false,
                 ],
             ],
         ];
         $this->extension->load($config, $this->container);
         static::assertSame([
-            'mobile' => ['is_enabled' => false, 'host' => 'http://testsite', 'status_code' => 302, 'action' => 'redirect'],
-            'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
-            'full' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
+            'mobile' => ['is_enabled' => false, 'host' => 'http://testsite', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'tablet' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
             'detect_tablet_as_mobile' => false,
         ], $this->container->getParameter('mobile_detect.redirect'));
     }
@@ -130,18 +131,18 @@ final class MobileDetectExtensionTest extends TestCase
         $config = [
             'mobile_detect' => [
                 'redirect' => [
-                    'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => 302, 'action' => 'redirect'],
-                    'tablet' => ['is_enabled' => true, 'host' => 'http://testsite', 'status_code' => 302, 'action' => 'redirect'],
-                    'full' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
+                    'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+                    'tablet' => ['is_enabled' => true, 'host' => 'http://testsite', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+                    'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
                     'detect_tablet_as_mobile' => false,
                 ],
             ],
         ];
         $this->extension->load($config, $this->container);
         static::assertSame([
-            'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => 302, 'action' => 'redirect'],
-            'tablet' => ['is_enabled' => false, 'host' => 'http://testsite', 'status_code' => 302, 'action' => 'redirect'],
-            'full' => ['is_enabled' => false, 'host' => null, 'status_code' => 302, 'action' => 'redirect'],
+            'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'tablet' => ['is_enabled' => false, 'host' => 'http://testsite', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
             'detect_tablet_as_mobile' => false,
         ], $this->container->getParameter('mobile_detect.redirect'));
     }
@@ -151,18 +152,18 @@ final class MobileDetectExtensionTest extends TestCase
         $config = [
             'mobile_detect' => [
                 'redirect' => [
-                    'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => 302, 'action' => 'redirect'],
-                    'tablet' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => 302, 'action' => 'redirect'],
-                    'full' => ['is_enabled' => false, 'host' => 'http://testsite', 'status_code' => 302, 'action' => 'redirect'],
+                    'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+                    'tablet' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+                    'full' => ['is_enabled' => false, 'host' => 'http://testsite', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
                     'detect_tablet_as_mobile' => false,
                 ],
             ],
         ];
         $this->extension->load($config, $this->container);
         static::assertSame([
-            'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => 302, 'action' => 'redirect'],
-            'tablet' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => 302, 'action' => 'redirect'],
-            'full' => ['is_enabled' => false, 'host' => 'http://testsite', 'status_code' => 302, 'action' => 'redirect'],
+            'mobile' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'tablet' => ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'full' => ['is_enabled' => false, 'host' => 'http://testsite', 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
             'detect_tablet_as_mobile' => false,
         ], $this->container->getParameter('mobile_detect.redirect'));
     }

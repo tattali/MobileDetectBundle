@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace MobileDetectBundle\Tests\Helper;
 
 use MobileDetectBundle\Helper\DeviceView;
+use MobileDetectBundle\Helper\RedirectResponseWithCookie;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -243,20 +245,20 @@ final class DeviceViewTest extends TestCase
     {
         $this->request->query = new ParameterBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
-        $deviceView->setRedirectConfig([DeviceView::VIEW_MOBILE => ['status_code' => 301]]);
+        $deviceView->setRedirectConfig([DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_MOVED_PERMANENTLY]]);
         $response = $deviceView->getRedirectResponseBySwitchParam('/redirect-url');
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
-        static::assertSame(301, $response->getStatusCode());
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
+        static::assertSame(Response::HTTP_MOVED_PERMANENTLY, $response->getStatusCode());
     }
 
     public function testGetRedirectResponseBySwitchParamWithCookieViewTablet()
     {
         $this->request->query = new ParameterBag([$this->switchParam => DeviceView::VIEW_TABLET]);
         $deviceView = new DeviceView($this->requestStack);
-        $deviceView->setRedirectConfig([DeviceView::VIEW_TABLET => ['status_code' => 301]]);
+        $deviceView->setRedirectConfig([DeviceView::VIEW_TABLET => ['status_code' => Response::HTTP_MOVED_PERMANENTLY]]);
         $response = $deviceView->getRedirectResponseBySwitchParam('/redirect-url');
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
-        static::assertSame(301, $response->getStatusCode());
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
+        static::assertSame(Response::HTTP_MOVED_PERMANENTLY, $response->getStatusCode());
     }
 
     public function testGetRedirectResponseBySwitchParamWithCookieViewFullDefault()
@@ -264,8 +266,8 @@ final class DeviceViewTest extends TestCase
         $this->request->query = new ParameterBag();
         $deviceView = new DeviceView($this->requestStack);
         $response = $deviceView->getRedirectResponseBySwitchParam('/redirect-url');
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
-        static::assertSame(302, $response->getStatusCode());
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
+        static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
     }
 
     public function testModifyResponseToMobileAndCheckResponse()
@@ -291,9 +293,9 @@ final class DeviceViewTest extends TestCase
     {
         $this->request->query = new ParameterBag();
         $deviceView = new DeviceView($this->requestStack);
-        $response = $deviceView->getRedirectResponse(DeviceView::VIEW_MOBILE, 'http://mobilesite.com', 302);
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
-        static::assertSame(302, $response->getStatusCode());
+        $response = $deviceView->getRedirectResponse(DeviceView::VIEW_MOBILE, 'http://mobilesite.com', Response::HTTP_FOUND);
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
+        static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         $cookies = $response->headers->getCookies();
         static::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
@@ -314,9 +316,9 @@ final class DeviceViewTest extends TestCase
         $deviceView->setCookieSecure(true);
         $deviceView->setCookieHttpOnly(false);
 
-        $response = $deviceView->getRedirectResponse(DeviceView::VIEW_MOBILE, 'http://mobilesite.com', 302);
-        static::assertInstanceOf('MobileDetectBundle\Helper\RedirectResponseWithCookie', $response);
-        static::assertSame(302, $response->getStatusCode());
+        $response = $deviceView->getRedirectResponse(DeviceView::VIEW_MOBILE, 'http://mobilesite.com', Response::HTTP_FOUND);
+        static::assertInstanceOf(RedirectResponseWithCookie::class, $response);
+        static::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
         /** @var Cookie[] $cookies */
         $cookies = $response->headers->getCookies();

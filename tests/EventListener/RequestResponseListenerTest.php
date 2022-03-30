@@ -8,12 +8,12 @@ use MobileDetectBundle\DeviceDetector\MobileDetector;
 use MobileDetectBundle\EventListener\RequestResponseListener;
 use MobileDetectBundle\Helper\DeviceView;
 use MobileDetectBundle\Helper\RedirectResponseWithCookie;
-use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -49,19 +49,11 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->mobileDetector = $this->getMockBuilder(MobileDetector::class)->disableOriginalConstructor()->getMock();
         $this->deviceView = $this->getMockBuilder(DeviceView::class)->disableOriginalConstructor()->getMock();
-        if (method_exists(MockBuilder::class, 'onlyMethods')) {
-            $this->router = $this->getMockBuilder(Router::class)
-                ->disableOriginalConstructor()
-                ->onlyMethods(['getRouteCollection'])
-                ->getMock()
-            ;
-        } else {
-            $this->router = $this->getMockBuilder(Router::class)
-                ->disableOriginalConstructor()
-                ->addMethods(['getRouteCollection'])
-                ->getMock()
-            ;
-        }
+        $this->router = $this->getMockBuilder(Router::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getRouteCollection'])
+            ->getMock()
+        ;
 
         $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $this->request->expects(static::any())->method('getScheme')->willReturn('http');
@@ -164,13 +156,13 @@ final class RequestResponseListenerTest extends TestCase
         $requestEventResponse = $getResponseEvent->getResponse();
         static::assertNull($requestEventResponse);
 
-        $responseEventResponse = new Response('Full view', 200);
+        $responseEventResponse = new Response('Full view', Response::HTTP_OK);
         $responseEvent = $this->createResponseEvent($responseEventResponse);
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
         static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
-        static::assertSame(200, $modifiedResponse->getStatusCode());
+        static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Full view', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
@@ -199,13 +191,13 @@ final class RequestResponseListenerTest extends TestCase
         $requestEventResponse = $getResponseEvent->getResponse();
         static::assertNull($requestEventResponse);
 
-        $responseEventResponse = new Response('Not mobile view', 200);
+        $responseEventResponse = new Response('Not mobile view', Response::HTTP_OK);
         $responseEvent = $this->createResponseEvent($responseEventResponse);
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
         static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
-        static::assertSame(200, $modifiedResponse->getStatusCode());
+        static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Not mobile view', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
@@ -319,13 +311,13 @@ final class RequestResponseListenerTest extends TestCase
         $requestEventResponse = $getResponseEvent->getResponse();
         static::assertNull($requestEventResponse);
 
-        $responseEventResponse = new Response('Tablet view', 200);
+        $responseEventResponse = new Response('Tablet view', Response::HTTP_OK);
         $responseEvent = $this->createResponseEvent($responseEventResponse);
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
         static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
-        static::assertSame(200, $modifiedResponse->getStatusCode());
+        static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Tablet view', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
@@ -448,13 +440,13 @@ final class RequestResponseListenerTest extends TestCase
         $requestEventResponse = $getResponseEvent->getResponse();
         static::assertNull($requestEventResponse);
 
-        $responseEventResponse = new Response('Tablet view no redirect', 200);
+        $responseEventResponse = new Response('Tablet view no redirect', Response::HTTP_OK);
         $responseEvent = $this->createResponseEvent($responseEventResponse);
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
         static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
-        static::assertSame(200, $modifiedResponse->getStatusCode());
+        static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Tablet view no redirect', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
@@ -578,13 +570,13 @@ final class RequestResponseListenerTest extends TestCase
         $requestEventResponse = $getResponseEvent->getResponse();
         static::assertNull($requestEventResponse);
 
-        $responseEventResponse = new Response('Mobile view no redirect', 200);
+        $responseEventResponse = new Response('Mobile view no redirect', Response::HTTP_OK);
         $responseEvent = $this->createResponseEvent($responseEventResponse);
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
         static::assertInstanceOf('Symfony\Component\HttpFoundation\Response', $modifiedResponse);
-        static::assertSame(200, $modifiedResponse->getStatusCode());
+        static::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         static::assertSame('Mobile view no redirect', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
@@ -625,7 +617,7 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ViewEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            HttpKernelInterface::MAIN_REQUEST,
+            HttpKernelInterface::MAIN_REQUEST ?? HttpKernelInterface::MASTER_REQUEST,
             $content
         );
         $event->getRequest()->headers = new HeaderBag($headers);
@@ -647,7 +639,7 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            HttpKernelInterface::MAIN_REQUEST,
+            HttpKernelInterface::MAIN_REQUEST ?? HttpKernelInterface::MASTER_REQUEST,
             $response
         );
         $event->getRequest()->headers = new HeaderBag($headers);

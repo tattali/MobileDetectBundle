@@ -19,6 +19,8 @@ use MobileDetectBundle\Helper\DeviceView;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ServerBag;
 
 /**
@@ -61,7 +63,7 @@ final class DeviceDataCollectorTest extends TestCase
         $redirectConfig['tablet'] = [
             'is_enabled' => true,
             'host' => 'http://testsite.com',
-            'status_code' => 302,
+            'status_code' => Response::HTTP_FOUND,
             'action' => RequestResponseListener::REDIRECT,
         ];
         $this->request->cookies = new ParameterBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
@@ -95,7 +97,7 @@ final class DeviceDataCollectorTest extends TestCase
         $redirectConfig['tablet'] = [
             'is_enabled' => true,
             'host' => 'http://testsite.com',
-            'status_code' => 302,
+            'status_code' => Response::HTTP_FOUND,
             'action' => RequestResponseListener::REDIRECT,
         ];
         $this->request->query = new ParameterBag(['param1' => 'value1']);
@@ -158,7 +160,7 @@ final class DeviceDataCollectorTest extends TestCase
         $redirectConfig['tablet'] = [
             'is_enabled' => true,
             'host' => 'http://testsite.com',
-            'status_code' => 302,
+            'status_code' => Response::HTTP_FOUND,
             'action' => RequestResponseListener::REDIRECT,
         ];
         $this->request->query = new ParameterBag(['param1' => 'value1']);
@@ -221,7 +223,7 @@ final class DeviceDataCollectorTest extends TestCase
         $redirectConfig['mobile'] = [
             'is_enabled' => true,
             'host' => 'http://m.testsite.com',
-            'status_code' => 302,
+            'status_code' => Response::HTTP_FOUND,
             'action' => RequestResponseListener::REDIRECT,
         ];
         $this->request->query = new ParameterBag(['param1' => 'value1']);
