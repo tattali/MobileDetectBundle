@@ -13,7 +13,10 @@ declare(strict_types=1);
 namespace MobileDetectBundle\Tests\DependencyInjection;
 
 use MobileDetectBundle\DependencyInjection\MobileDetectExtension;
+use MobileDetectBundle\DeviceDetector\MobileDetector;
+use MobileDetectBundle\EventListener\RequestResponseListener;
 use MobileDetectBundle\Helper\DeviceView;
+use MobileDetectBundle\Twig\Extension\MobileDetectExtension as TwigMobileDetectExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,9 +38,6 @@ final class MobileDetectExtensionTest extends TestCase
      */
     private $extension;
 
-    /**
-     * Set up.
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -64,19 +64,19 @@ final class MobileDetectExtensionTest extends TestCase
         );
         static::assertSame(DeviceView::SWITCH_PARAM_DEFAULT, $this->container->getParameter('mobile_detect.switch_param'));
         static::assertSame(
-            'MobileDetectBundle\DeviceDetector\MobileDetector',
+            MobileDetector::class,
             $this->container->getParameter('mobile_detect.mobile_detector.class')
         );
         static::assertSame(
-            'MobileDetectBundle\Helper\DeviceView',
+            DeviceView::class,
             $this->container->getParameter('mobile_detect.device_view.class')
         );
         static::assertSame(
-            'MobileDetectBundle\EventListener\RequestResponseListener',
+            RequestResponseListener::class,
             $this->container->getParameter('mobile_detect.request_response_listener.class')
         );
         static::assertSame(
-            'MobileDetectBundle\Twig\Extension\MobileDetectExtension',
+            TwigMobileDetectExtension::class,
             $this->container->getParameter('mobile_detect.twig.extension.class')
         );
 

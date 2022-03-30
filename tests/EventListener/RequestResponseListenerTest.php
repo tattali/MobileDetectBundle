@@ -13,11 +13,14 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @internal
@@ -48,7 +51,7 @@ final class RequestResponseListenerTest extends TestCase
             ->getMock()
         ;
 
-        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $this->request = $this->getMockBuilder(Request::class)->getMock();
         $this->request->expects(static::any())->method('getScheme')->willReturn('http');
         $this->request->expects(static::any())->method('getHost')->willReturn('testhost.com');
         $this->request->expects(static::any())->method('get')->willReturn('value');
@@ -56,7 +59,7 @@ final class RequestResponseListenerTest extends TestCase
         $this->request->query = new ParameterBag();
         $this->request->cookies = new ParameterBag();
 
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
+        $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
         $this->requestStack->expects(static::any())
             ->method(method_exists(RequestStack::class, 'getMainRequest') ? 'getMainRequest' : 'getMasterRequest')
             ->willReturn($this->request)
@@ -596,9 +599,9 @@ final class RequestResponseListenerTest extends TestCase
 
     private function createRouteCollecitonWithRouteAndRoutingOption($returnValue, $times)
     {
-        $route = $this->getMockBuilder('Symfony\Component\Routing\Route')->disableOriginalConstructor()->getMock();
+        $route = $this->getMockBuilder(Route::class)->disableOriginalConstructor()->getMock();
         $route->expects(static::exactly($times))->method('getOption')->willReturn($returnValue);
-        $routeCollection = $this->createMock('Symfony\Component\Routing\RouteCollection');
+        $routeCollection = $this->createMock(RouteCollection::class);
         $routeCollection->expects(static::exactly($times))->method('get')->willReturn($route);
 
         return $routeCollection;

@@ -43,19 +43,19 @@ final class DeviceDataCollectorTest extends TestCase
     {
         parent::setUp();
 
-        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $this->request = $this->getMockBuilder(Request::class)->getMock();
         $this->request->query = new ParameterBag();
         $this->request->cookies = new ParameterBag();
         $this->request->server = new ServerBag();
         $this->request->expects(static::any())->method('duplicate')->willReturn($this->request);
 
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
+        $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
         $this->requestStack->expects(static::any())
             ->method(method_exists(RequestStack::class, 'getMainRequest') ? 'getMainRequest' : 'getMasterRequest')
             ->willReturn($this->request)
         ;
 
-        $this->response = $this->getMockBuilder('Symfony\Component\HttpFoundation\Response')->getMock();
+        $this->response = $this->getMockBuilder(Response::class)->getMock();
     }
 
     public function testCollectCurrentViewMobileIsCurrent()

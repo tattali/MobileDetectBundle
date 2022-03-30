@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\Tests\Twig\Extension;
 
+use MobileDetectBundle\DeviceDetector\MobileDetector;
 use MobileDetectBundle\Helper\DeviceView;
 use MobileDetectBundle\Twig\Extension\MobileDetectExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\TwigFunction;
@@ -29,20 +31,16 @@ final class MobileDetectExtensionTest extends TestCase
 
     private $request;
 
-    private $cookieKey = DeviceView::COOKIE_KEY_DEFAULT;
     private $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
 
-    /**
-     * Set up.
-     */
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->mobileDetector = $this->getMockBuilder('MobileDetectBundle\DeviceDetector\MobileDetector')->disableOriginalConstructor()->getMock();
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
+        $this->mobileDetector = $this->getMockBuilder(MobileDetector::class)->disableOriginalConstructor()->getMock();
+        $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
 
-        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $this->request = $this->getMockBuilder(Request::class)->getMock();
         $this->request->expects(static::any())->method('getScheme')->willReturn('http');
         $this->request->expects(static::any())->method('getHost')->willReturn('testhost.com');
         $this->request->expects(static::any())->method('getUriForPath')->willReturn('/');

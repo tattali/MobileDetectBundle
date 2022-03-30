@@ -9,6 +9,7 @@ use MobileDetectBundle\Helper\RedirectResponseWithCookie;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,16 +26,13 @@ final class DeviceViewTest extends TestCase
     private $cookieKey = DeviceView::COOKIE_KEY_DEFAULT;
     private $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
 
-    /**
-     * Set up.
-     */
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
+        $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
 
-        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $this->request = $this->getMockBuilder(Request::class)->getMock();
         $this->request->expects(static::any())->method('getScheme')->willReturn('http');
         $this->request->expects(static::any())->method('getHost')->willReturn('testhost.com');
         $this->request->expects(static::any())->method('getUriForPath')->willReturn('/');
