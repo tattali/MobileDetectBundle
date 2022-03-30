@@ -612,7 +612,7 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ViewEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            \defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
+            \defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') : \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST'),
             $content
         );
         $event->getRequest()->headers = new HeaderBag($headers);
@@ -634,7 +634,7 @@ final class RequestResponseListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            \defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
+            \defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') : \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST'),
             $response
         );
         $event->getRequest()->headers = new HeaderBag($headers);
