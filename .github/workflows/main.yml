@@ -10,7 +10,6 @@ on:
 
 jobs:
   tests:
-    if: ${{ 3.4 == matrix.php }}
     name: Test on PHP ${{ matrix.php }} and Symfony ${{ matrix.symfony }}
     runs-on: ubuntu-latest
     strategy:
