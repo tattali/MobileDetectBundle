@@ -10,14 +10,15 @@ on:
 
 jobs:
   tests:
+    if: ${{ startsWith(matrix.symfony, '4.') }}
     name: Test on PHP ${{ matrix.php }} and Symfony ${{ matrix.symfony }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         php: [7.2, 7.3, 7.4, 8.0, 8.1]
         # php: [7.1, 7.2, 7.3, 7.4, 8.0, 8.1]
-        sf: [4.0, 4.1, 4.2, 4.3, 4.4, 5.0, 5.1, 5.2, 5.3, 5.4]
-        # sf: [3.4, 4.0, 4.1, 4.2, 4.3, 4.4, 5.0, 5.1, 5.2, 5.3, 5.4, 6.0]
+        symfony: [4.0, 4.1, 4.2, 4.3, 4.4, 5.0, 5.1, 5.2, 5.3, 5.4]
+        # symfony: [3.4, 4.0, 4.1, 4.2, 4.3, 4.4, 5.0, 5.1, 5.2, 5.3, 5.4, 6.0]
     steps:
 
     - name: Setup tmate session
@@ -25,8 +26,6 @@ jobs:
       uses: mxschmitt/action-tmate@v3
       with:
         limit-access-to-actor: true
-
-# ---------------------------------
 
     - name: Checkout
       uses: actions/checkout@v3
@@ -36,17 +35,20 @@ jobs:
       with:
         php-version: ${{ matrix.php }}
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
-      with:
-        path: vendor
-        key: php${{ matrix.php }}-sf${{ matrix.sf }}-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          php${{ matrix.php }}-sf${{ matrix.sf }}-
+    # - name: Cache Composer packages
+    #   id: composer-cache
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: vendor
+    #     key: php${{ matrix.php }}-sf${{ matrix.symfony }}-${{ hashFiles('**/composer.lock') }}
+    #     restore-keys: |
+    #       php${{ matrix.php }}-sf${{ matrix.symfony }}-
+
+    - name: Globally install symfony/flex
+      run: composer global require --no-progress --no-scripts --no-plugins symfony/flex
 
     - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      run: composer install --prefer-dist --no-interaction --no-scripts
 
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       run: |
