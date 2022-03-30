@@ -93,7 +93,8 @@ class RequestResponseListener
     {
         // only handle master request, do not handle sub request like esi includes
         // If the device view is "not the mobile view" (e.g. we're not in the request context)
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType() || $this->deviceView->isNotMobileView()) {
+        // @phpstan-ignore-next-line
+        if ((HttpKernelInterface::MAIN_REQUEST ?? HttpKernelInterface::MASTER_REQUEST) !== $event->getRequestType() || $this->deviceView->isNotMobileView()) {
             return;
         }
 
