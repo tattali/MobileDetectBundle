@@ -107,7 +107,7 @@ class DeviceDataCollector extends DataCollector
         $this->data = [];
     }
 
-    protected function canUseView(string $view, string $host): bool
+    protected function canUseView(string $view, ?string $host): bool
     {
         if (!\is_array($this->redirectConfig)) {
             return true;
