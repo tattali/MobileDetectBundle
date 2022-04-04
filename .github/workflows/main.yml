@@ -41,7 +41,7 @@ jobs:
           - symfony-require: 5.1.*
             dependencies: lowest
             stability: stable
-            php: 7.2
+            php: 7.3
 
           # Bleeding edge
           - symfony-require: 6.*
