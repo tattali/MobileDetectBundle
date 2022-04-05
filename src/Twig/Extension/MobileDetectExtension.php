@@ -57,7 +57,7 @@ class MobileDetectExtension extends AbstractExtension
     /**
      * Get extension twig function.
      */
-    public function getFunctions(): array
+    public function getFunctions()
     {
         return [
             new TwigFunction('is_mobile', [$this, 'isMobile']),
@@ -76,7 +76,7 @@ class MobileDetectExtension extends AbstractExtension
         ];
     }
 
-    public function getRules(): array
+    public function getRules()
     {
         return array_merge(
             $this->mobileDetector->getPhoneDevices(),
@@ -100,7 +100,7 @@ class MobileDetectExtension extends AbstractExtension
      *
      * @return string|float the version of the property we are trying to extract
      */
-    public function deviceVersion(string $propertyName, string $type = MobileDetector::VERSION_TYPE_STRING): ?string
+    public function deviceVersion(string $propertyName, string $type = MobileDetector::VERSION_TYPE_STRING)
     {
         return $this->mobileDetector->version($propertyName, $type) ?: null;
     }
@@ -111,7 +111,7 @@ class MobileDetectExtension extends AbstractExtension
      * on mobile pages for Search Engine Optimization.
      * See: http://searchengineland.com/the-definitive-guide-to-mobile-technical-seo-166066.
      */
-    public function fullViewUrl(bool $addCurrentPathAndQuery = true): ?string
+    public function fullViewUrl(bool $addCurrentPathAndQuery = true)
     {
         if (!isset($this->redirectConf[DeviceView::VIEW_FULL]['host'])) {
             // The host property has not been configured for the full view
@@ -144,12 +144,12 @@ class MobileDetectExtension extends AbstractExtension
         return $result;
     }
 
-    public function isMobile(): bool
+    public function isMobile()
     {
         return $this->mobileDetector->isMobile();
     }
 
-    public function isTablet(): bool
+    public function isTablet()
     {
         return $this->mobileDetector->isTablet();
     }
@@ -157,44 +157,44 @@ class MobileDetectExtension extends AbstractExtension
     /**
      * @param string $deviceName is[iPhone|BlackBerry|HTC|Nexus|Dell|Motorola|Samsung|Sony|Asus|Palm|Vertu|...]
      */
-    public function isDevice(string $deviceName): bool
+    public function isDevice(string $deviceName)
     {
         $magicMethodName = 'is'.strtolower((string) $deviceName);
 
         return $this->mobileDetector->{$magicMethodName}();
     }
 
-    public function isFullView(): bool
+    public function isFullView()
     {
         return $this->deviceView->isFullView();
     }
 
-    public function isMobileView(): bool
+    public function isMobileView()
     {
         return $this->deviceView->isMobileView();
     }
 
-    public function isTabletView(): bool
+    public function isTabletView()
     {
         return $this->deviceView->isTabletView();
     }
 
-    public function isNotMobileView(): bool
+    public function isNotMobileView()
     {
         return $this->deviceView->isNotMobileView();
     }
 
-    public function isIOS(): bool
+    public function isIOS()
     {
         return $this->mobileDetector->isIOS();
     }
 
-    public function isAndroidOS(): bool
+    public function isAndroidOS()
     {
         return $this->mobileDetector->isAndroidOS();
     }
 
-    public function isWindowsOS(): bool
+    public function isWindowsOS()
     {
         return $this->mobileDetector->isWindowsMobileOS() || $this->mobileDetector->isWindowsPhoneOS();
     }

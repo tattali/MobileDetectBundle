@@ -41,12 +41,14 @@ class DeviceDataCollector extends DataCollector
 
     /**
      * Collects data for the given Request and Response.
+     *
+     * @param \Exception|\Throwable|null $exception
      */
     public function collect(
         Request $request,
         Response $response,
-        \Throwable $exception = null
-    ): void {
+        $exception = null
+    ) {
         $this->data['currentView'] = $this->deviceView->getViewType();
         $this->data['views'] = [
             [
@@ -82,37 +84,37 @@ class DeviceDataCollector extends DataCollector
         ];
     }
 
-    public function getCurrentView(): string
+    public function getCurrentView()
     {
         return $this->data['currentView'];
     }
 
-    public function getViews(): array
+    public function getViews()
     {
         return $this->data['views'];
     }
 
-    public function setRedirectConfig(array $redirectConfig): void
+    public function setRedirectConfig(array $redirectConfig)
     {
         $this->redirectConfig = $redirectConfig;
     }
 
-    public function getName(): string
+    public function getName()
     {
         return 'device.collector';
     }
 
-    public function getData(): array
+    public function getData()
     {
         return $this->data;
     }
 
-    public function reset(): void
+    public function reset()
     {
         $this->data = [];
     }
 
-    protected function canUseView(string $view, ?string $host): bool
+    protected function canUseView(string $view, ?string $host)
     {
         if (!\is_array($this->redirectConfig)) {
             return true;
@@ -150,7 +152,7 @@ class DeviceDataCollector extends DataCollector
     private function generateSwitchLink(
         Request $request,
         string $view
-    ): ?string {
+    ) {
         $requestSwitchView = $request->duplicate();
         $requestSwitchView->query->set($this->deviceView->getSwitchParam(), $view);
         $requestSwitchView->server->set(

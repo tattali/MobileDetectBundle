@@ -47,7 +47,7 @@ final class DeviceDataCollectorTest extends TestCase
      */
     private $response;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -66,7 +66,7 @@ final class DeviceDataCollectorTest extends TestCase
         $this->response = $this->getMockBuilder(Response::class)->getMock();
     }
 
-    public function testCollectCurrentViewMobileIsCurrent(): void
+    public function testCollectCurrentViewMobileIsCurrent()
     {
         $redirectConfig['tablet'] = [
             'is_enabled' => true,
@@ -100,7 +100,7 @@ final class DeviceDataCollectorTest extends TestCase
         }
     }
 
-    public function testCollectCurrentViewMobileCanUseTablet(): void
+    public function testCollectCurrentViewMobileCanUseTablet()
     {
         $redirectConfig['tablet'] = [
             'is_enabled' => true,
@@ -163,7 +163,7 @@ final class DeviceDataCollectorTest extends TestCase
         }
     }
 
-    public function testCollectCurrentViewFullCanUseMobile(): void
+    public function testCollectCurrentViewFullCanUseMobile()
     {
         $redirectConfig['tablet'] = [
             'is_enabled' => true,
@@ -226,7 +226,7 @@ final class DeviceDataCollectorTest extends TestCase
         }
     }
 
-    public function testCollectCurrentViewFullCantUseMobile(): void
+    public function testCollectCurrentViewFullCantUseMobile()
     {
         $redirectConfig['mobile'] = [
             'is_enabled' => true,
@@ -289,7 +289,7 @@ final class DeviceDataCollectorTest extends TestCase
         }
     }
 
-    public function testReset(): void
+    public function testReset()
     {
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);
@@ -297,7 +297,7 @@ final class DeviceDataCollectorTest extends TestCase
         static::assertSame([], $deviceDataCollector->getData());
     }
 
-    public function testGetNameValue(): void
+    public function testGetNameValue()
     {
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);

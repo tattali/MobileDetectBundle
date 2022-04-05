@@ -59,7 +59,7 @@ final class RequestResponseListenerTest extends TestCase
      */
     private $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -87,7 +87,7 @@ final class RequestResponseListenerTest extends TestCase
         ];
     }
 
-    public function testHandleRequestHasSwitchParam(): void
+    public function testHandleRequestHasSwitchParam()
     {
         $this->request->query = new ParameterBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(static::any())->method('getPathInfo')->willReturn('/');
@@ -112,7 +112,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestBis(): void
+    public function testHandleRequestBis()
     {
         $this->request->query = new ParameterBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(static::any())->method('getPathInfo')->willReturn('/');
@@ -137,7 +137,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestHasSwitchParamAndQuery(): void
+    public function testHandleRequestHasSwitchParamAndQuery()
     {
         $this->config['mobile'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
@@ -175,7 +175,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestIsFullView(): void
+    public function testHandleRequestIsFullView()
     {
         $deviceView = new DeviceView($this->requestStack);
         $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
@@ -209,7 +209,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestIsNotMobileView(): void
+    public function testHandleRequestIsNotMobileView()
     {
         $deviceView = new DeviceView();
         $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
@@ -237,7 +237,7 @@ final class RequestResponseListenerTest extends TestCase
         static::assertCount(0, $cookies);
     }
 
-    public function testHandleRequestHasTabletRedirect(): void
+    public function testHandleRequestHasTabletRedirect()
     {
         $this->config['tablet'] = ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND];
 
@@ -278,7 +278,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestWithDifferentSwitchParamRedirect(): void
+    public function testHandleRequestWithDifferentSwitchParamRedirect()
     {
         $this->config['tablet'] = ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND];
 
@@ -321,7 +321,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleDeviceIsTabletAndTabletRedirectIsDisabledAndDetectTabletAsMobileIsFalse(): void
+    public function testHandleDeviceIsTabletAndTabletRedirectIsDisabledAndDetectTabletAsMobileIsFalse()
     {
         $this->config['mobile'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
@@ -359,7 +359,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleDeviceIsTabletAsMobileAndTabletRedirectIsDisabledAndDetectTabletAsMobileIsTrue(): void
+    public function testHandleDeviceIsTabletAsMobileAndTabletRedirectIsDisabledAndDetectTabletAsMobileIsTrue()
     {
         $this->config['mobile'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com', 'status_code' => Response::HTTP_FOUND];
         $this->config['detect_tablet_as_mobile'] = true;
@@ -400,7 +400,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestHasTabletRedirectWithoutPath(): void
+    public function testHandleRequestHasTabletRedirectWithoutPath()
     {
         $this->config['tablet'] = ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND];
 
@@ -441,7 +441,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestHasTabletNoRedirect(): void
+    public function testHandleRequestHasTabletNoRedirect()
     {
         $this->config['tablet'] = ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND];
 
@@ -483,7 +483,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestHasMobileRedirect(): void
+    public function testHandleRequestHasMobileRedirect()
     {
         $this->config['mobile'] = ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND];
 
@@ -524,7 +524,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestHasMobileRedirectWithoutPath(): void
+    public function testHandleRequestHasMobileRedirectWithoutPath()
     {
         $this->config['mobile'] = ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => Response::HTTP_FOUND];
 
@@ -565,7 +565,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestHasMobileNoRedirect(): void
+    public function testHandleRequestHasMobileNoRedirect()
     {
         $this->config['mobile'] = ['is_enabled' => true, 'host' => 'http://testsite.com', 'status_code' => 123];
 
@@ -608,7 +608,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestUpdatedMobileDetectorUserAgent(): void
+    public function testHandleRequestUpdatedMobileDetectorUserAgent()
     {
         $this->mobileDetector->expects(static::once())->method('setUserAgent')->with(static::equalTo('agent'));
 
@@ -620,7 +620,7 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleRequest($event);
     }
 
-    private function createGetResponseEvent(string $content, array $headers = []): ViewEvent
+    private function createGetResponseEvent(string $content, array $headers = [])
     {
         $event = new ViewEvent(
             $this->createMock(HttpKernelInterface::class),
@@ -633,7 +633,7 @@ final class RequestResponseListenerTest extends TestCase
         return $event;
     }
 
-    private function createRouteCollectionWithRouteAndRoutingOption(string $returnValue, int $times): RouteCollection
+    private function createRouteCollectionWithRouteAndRoutingOption(string $returnValue, int $times)
     {
         $route = $this->getMockBuilder(Route::class)->disableOriginalConstructor()->getMock();
         $route->expects(static::exactly($times))->method('getOption')->willReturn($returnValue);
@@ -646,7 +646,7 @@ final class RequestResponseListenerTest extends TestCase
         return $routeCollection;
     }
 
-    private function createResponseEvent(Response $response, array $headers = []): ResponseEvent
+    private function createResponseEvent(Response $response, array $headers = [])
     {
         $event = new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),

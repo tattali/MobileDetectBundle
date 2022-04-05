@@ -38,7 +38,7 @@ final class MobileDetectExtensionTest extends TestCase
      */
     private $extension;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -46,7 +46,7 @@ final class MobileDetectExtensionTest extends TestCase
         $this->extension = new MobileDetectExtension();
     }
 
-    public function testLoadDefaultConfig(): void
+    public function testLoadDefaultConfig()
     {
         $config = [];
         $this->extension->load($config, $this->container);
@@ -74,7 +74,7 @@ final class MobileDetectExtensionTest extends TestCase
         static::assertTrue($this->container->hasAlias(MobileDetectorInterface::class));
     }
 
-    public function testCustomRedirectConfigMobileHost(): void
+    public function testCustomRedirectConfigMobileHost()
     {
         $config = [
             'mobile_detect' => [
@@ -95,7 +95,7 @@ final class MobileDetectExtensionTest extends TestCase
         ], $this->container->getParameter('mobile_detect.redirect'));
     }
 
-    public function testCustomRedirectConfigWithMobileNotValidHost(): void
+    public function testCustomRedirectConfigWithMobileNotValidHost()
     {
         $config = [
             'mobile_detect' => [
@@ -116,7 +116,7 @@ final class MobileDetectExtensionTest extends TestCase
         ], $this->container->getParameter('mobile_detect.redirect'));
     }
 
-    public function testCustomRedirectConfigWithTabletNotValidHost(): void
+    public function testCustomRedirectConfigWithTabletNotValidHost()
     {
         $config = [
             'mobile_detect' => [
@@ -137,7 +137,7 @@ final class MobileDetectExtensionTest extends TestCase
         ], $this->container->getParameter('mobile_detect.redirect'));
     }
 
-    public function testCustomRedirectConfigWithFullNotValidHost(): void
+    public function testCustomRedirectConfigWithFullNotValidHost()
     {
         $config = [
             'mobile_detect' => [
@@ -158,7 +158,7 @@ final class MobileDetectExtensionTest extends TestCase
         ], $this->container->getParameter('mobile_detect.redirect'));
     }
 
-    public function testCustomConfigSaveRefererPathTrue(): void
+    public function testCustomConfigSaveRefererPathTrue()
     {
         $config = [
             'mobile_detect' => [
@@ -171,7 +171,7 @@ final class MobileDetectExtensionTest extends TestCase
         static::assertTrue($this->container->getParameter('mobile_detect.switch_device_view.save_referer_path'));
     }
 
-    public function testCustomConfigSaveRefererPathFalse(): void
+    public function testCustomConfigSaveRefererPathFalse()
     {
         $config = [
             'mobile_detect' => [
@@ -184,7 +184,7 @@ final class MobileDetectExtensionTest extends TestCase
         static::assertFalse($this->container->getParameter('mobile_detect.switch_device_view.save_referer_path'));
     }
 
-    public function testCustomConfigCookieKey(): void
+    public function testCustomConfigCookieKey()
     {
         $config = [
             'mobile_detect' => [
@@ -195,7 +195,7 @@ final class MobileDetectExtensionTest extends TestCase
         static::assertSame('custom_key', $this->container->getParameter('mobile_detect.cookie_key'));
     }
 
-    public function testCustomConfigCookieExpire(): void
+    public function testCustomConfigCookieExpire()
     {
         $config = [
             'mobile_detect' => [
@@ -206,7 +206,7 @@ final class MobileDetectExtensionTest extends TestCase
         static::assertSame('6 month', $this->container->getParameter('mobile_detect.cookie_expire_datetime_modifier'));
     }
 
-    public function testCustomConfigSwitchParam(): void
+    public function testCustomConfigSwitchParam()
     {
         $config = [
             'mobile_detect' => [
