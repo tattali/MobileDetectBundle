@@ -30,7 +30,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('mobile_detect');
+        $treeBuilder = method_exists(TreeBuilder::class, 'getRootNode') ? new TreeBuilder('mobile_detect') : new TreeBuilder();
         $rootNode = method_exists(TreeBuilder::class, 'getRootNode') ? $treeBuilder->getRootNode() : $treeBuilder->root('mobile_detect');
 
         $rootNode
