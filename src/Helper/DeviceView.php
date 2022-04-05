@@ -381,7 +381,7 @@ class DeviceView
             $expire = new \DateTime(self::COOKIE_EXPIRE_DATETIME_MODIFIER_DEFAULT);
         }
 
-        return Cookie::create(
+        return new Cookie(
             $this->getCookieKey(),
             $value,
             $expire,

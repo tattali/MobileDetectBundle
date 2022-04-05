@@ -17,8 +17,8 @@ use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use MobileDetectBundle\Helper\DeviceView;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -87,7 +87,7 @@ class RequestResponseListener
         $this->isFullPath = $fullPath;
     }
 
-    public function handleRequest(RequestEvent $event)
+    public function handleRequest(GetResponseEvent $event)
     {
         // only handle master request, do not handle sub request like esi includes
         // If the device view is "not the mobile view" (e.g. we're not in the request context)
@@ -149,7 +149,7 @@ class RequestResponseListener
         return $this->needModifyResponse;
     }
 
-    public function handleResponse(ResponseEvent $event)
+    public function handleResponse(FilterResponseEvent $event)
     {
         if ($this->needModifyResponse && $this->modifyResponseClosure instanceof \Closure) {
             $modifyClosure = $this->modifyResponseClosure;
@@ -282,7 +282,7 @@ class RequestResponseListener
      */
     protected function prepareResponseModification(string $view)
     {
-        $this->modifyResponseClosure = function (DeviceView $deviceView, ResponseEvent $event) use ($view) {
+        $this->modifyResponseClosure = function (DeviceView $deviceView, FilterResponseEvent $event) use ($view) {
             return $deviceView->modifyResponse($view, $event->getResponse());
         };
     }

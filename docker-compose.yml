@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  php:
+    image: php:${PHP_VERSION:-7.1}-fpm-alpine
+    volumes:
+      - .:/var/www/app/:rw

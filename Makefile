@@ -4,7 +4,7 @@ phpunit:
 	php vendor/bin/phpunit
 
 lint:
-	php vendor/bin/php-cs-fixer fix --diff
+	PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --diff
 	php vendor/bin/phpcs --report=code
 	php vendor/bin/phpstan analyse
 

@@ -17,31 +17,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-      #   php:
-      #     - 7.1
-      #     - 7.2
-      #     - 7.3
-      #     - 7.4
-      #     - 8.0
-      #     - 8.1
-      #   dependencies:
-      #     - lowest
-      #     - highest
-      #   stability:
-      #     - stable
-      #   symfony-require:
-      #     - 3.4.*
-      #     - 4.4.*
-      #     - 5.4.*
-        include:
-          - symfony-require: 3.4.*
-            php: 7.1
-            dependencies: lowest
-            stability: stable
-          - symfony-require: 3.4.*
-            php: 7.1
-            dependencies: highest
-            stability: stable
+        php:
+          - 7.1
+          - 7.2
+          - 7.3
+          - 7.4
+          - 8.0
+          - 8.1
+        dependencies:
+          - lowest
+          - highest
+        stability:
+          - stable
+        symfony-require:
+          - 3.4.*
+          - 4.4.*
+          - 5.4.*
 
     steps:
       - name: Checkout code
