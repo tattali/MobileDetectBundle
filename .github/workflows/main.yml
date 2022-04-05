@@ -1,14 +1,8 @@
-# Symfony minmal version:
-# - 3: 7.0.8
-# - 4: 7.1.3
-# - 5: 7.2.5
-# - 6: 8.0.2
-
 name: Symfony Bundle CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ 3.4 ]
   pull_request:
 
   workflow_dispatch:
@@ -24,30 +18,28 @@ jobs:
       fail-fast: false
       matrix:
         php:
+          - 7.1
+          - 7.2
+          - 7.3
+          - 7.4
           - 8.0
           - 8.1
         dependencies:
+          - lowest
           - highest
         stability:
           - stable
         symfony-require:
-          # Test latest LTS
+          - 3.4.*
+          - 4.4.*
           - 5.4.*
-          # Test last supported version
-          - 6.0.*
-          - 6.*
         include:
-          # Tests the lowest set of dependencies
-          - symfony-require: 5.1.*
-            dependencies: lowest
-            stability: stable
-            php: 7.2
 
           # Bleeding edge
-          - symfony-require: 6.*
-            php: 8.1
-            dependencies: highest
-            stability: dev
+          # - symfony-require: 6.*
+          #   php: 8.1
+          #   dependencies: highest
+          #   stability: dev
 
     steps:
       - name: Checkout code
@@ -83,11 +75,11 @@ jobs:
       - name: Unit and Feature tests via PHPUnit
         run: vendor/bin/phpunit
 
-      - name: Upload coverage file
-        uses: actions/upload-artifact@v3
-        with:
-          name: phpunit-${{ matrix.php }}-${{ matrix.dependencies }}-${{ hashFiles('composer.lock') }}.coverage
-          path: build/coverage.xml
+      # - name: Upload coverage file
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: phpunit-${{ matrix.php }}-${{ matrix.dependencies }}-${{ hashFiles('composer.lock') }}.coverage
+      #     path: build/coverage.xml
 
       - name: Setup tmate session
         if: ${{ failure() }}
@@ -95,24 +87,24 @@ jobs:
         with:
           limit-access-to-actor: true
 
-  upload_coverage:
-    name: Upload coverage to Codecov
-    runs-on: ubuntu-latest
-    needs:
-      - phpunit
+  # upload_coverage:
+  #   name: Upload coverage to Codecov
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - phpunit
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Download coverage files
-        uses: actions/download-artifact@v3
-        with:
-          path: reports
+  #     - name: Download coverage files
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         path: reports
 
-      - name: Upload to Codecov
-        env:
-          CODECOV_TOKEN: secrets.CODECOV_TOKEN
-        uses: codecov/codecov-action@v2
-        with:
-          directory: reports
+  #     - name: Upload to Codecov
+  #       env:
+  #         CODECOV_TOKEN: secrets.CODECOV_TOKEN
+  #       uses: codecov/codecov-action@v2
+  #       with:
+  #         directory: reports
