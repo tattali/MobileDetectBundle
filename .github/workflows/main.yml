@@ -58,14 +58,14 @@ jobs:
 
       - name: Lint via PHP Coding Standards Fixer and PHP_CodeSniffer
         run: |
-          vendor/bin/php-cs-fixer fix --dry-run --diff --ansi -vvv
-          vendor/bin/phpcs --report=code
+          php vendor/bin/php-cs-fixer fix --dry-run --diff --ansi -vvv
+          php vendor/bin/phpcs --report=code
 
       - name: Static Analysis via PHPStan
-        run: vendor/bin/phpstan analyse
+        run: php vendor/bin/phpstan analyse
 
       - name: Unit and Feature tests via PHPUnit
-        run: vendor/bin/phpunit
+        run: php vendor/bin/phpunit
 
       # - name: Upload coverage file
       #   uses: actions/upload-artifact@v3
