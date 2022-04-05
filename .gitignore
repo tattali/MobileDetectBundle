@@ -1,6 +1,7 @@
 /.phpstan/
 /build
-/vendor/
+/vendor/*
+!/vendor/mobiledetect/
 .php-cs-fixer.cache
 .phpunit.result.cache
 composer.lock
