@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\Event\ViewEvent;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -622,7 +622,7 @@ final class RequestResponseListenerTest extends TestCase
 
     private function createGetResponseEvent(string $content, array $headers = [])
     {
-        $event = new ViewEvent(
+        $event = new GetResponseForControllerResultEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
             \defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') : \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST'),
@@ -648,7 +648,7 @@ final class RequestResponseListenerTest extends TestCase
 
     private function createResponseEvent(Response $response, array $headers = [])
     {
-        $event = new ResponseEvent(
+        $event = new FilterResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
             \defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') : \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST'),
