@@ -24,7 +24,6 @@ jobs:
           - 8.0
           - 8.1
         dependencies:
-          - lowest
           - highest
         stability:
           - stable
