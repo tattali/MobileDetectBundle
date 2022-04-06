@@ -34,6 +34,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('mobile_detect');
         $rootNode = $treeBuilder->getRootNode();
         // } else {
+        //     /** @phpstan-ignore-next-line */
         //     $treeBuilder = new TreeBuilder();
         //     $rootNode = $treeBuilder->root('mobile_detect');
         // }
