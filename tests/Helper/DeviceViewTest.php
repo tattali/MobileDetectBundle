@@ -32,7 +32,7 @@ final class DeviceViewTest extends TestCase
     private $cookieKey = DeviceView::COOKIE_KEY_DEFAULT;
     private $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

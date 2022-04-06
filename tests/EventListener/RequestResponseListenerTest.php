@@ -59,7 +59,7 @@ final class RequestResponseListenerTest extends TestCase
      */
     private $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
