@@ -30,7 +30,6 @@ jobs:
         symfony-require:
           - 3.4.*
           - 4.4.*
-          - 5.4.*
 
     steps:
       - name: Checkout code
