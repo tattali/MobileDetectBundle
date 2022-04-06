@@ -31,12 +31,11 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder(): TreeBuilder
     {
         if (method_exists(TreeBuilder::class, 'getRootNode')) {
-            $treeBuilder = new TreeBuilder('mobile_detect');
-            $rootNode = $treeBuilder->getRootNode();
-        } else {
-            /** @phpstan-ignore-next-line */
             $treeBuilder = new TreeBuilder();
             $rootNode = $treeBuilder->root('mobile_detect');
+        } else {
+            $treeBuilder = new TreeBuilder('mobile_detect');
+            $rootNode = $treeBuilder->getRootNode();
         }
 
         $rootNode
