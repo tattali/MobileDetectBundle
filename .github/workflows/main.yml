@@ -61,7 +61,9 @@ jobs:
           ini-values: zend.assertions=1
 
       - name: Globally install symfony/flex
-        run: composer global require --no-progress --no-scripts --no-plugins symfony/flex
+        run: |
+            composer global config --no-plugins allow-plugins.symfony/flex true
+            composer global require --no-progress --no-scripts --no-plugins symfony/flex
 
       - name: Configure minimum stability of dependencies
         run: composer config minimum-stability ${{ matrix.stability }}
