@@ -1,6 +1,6 @@
 {
     "name": "tattali/mobile-detect-bundle",
-    "description": "Symfony5/6 bundle for detect mobile devices, managing mobile view types, redirect to mobile version.",
+    "description": "Symfony 3.4-6.x bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.",
     "keywords": [
         "mobile detect",
         "device detect",
