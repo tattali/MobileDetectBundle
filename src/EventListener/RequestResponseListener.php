@@ -224,7 +224,7 @@ class RequestResponseListener
 
     protected function getRedirectUrl(Request $request, string $view): ?string
     {
-        if (($routingOption = $this->getRoutingOption($request->get('_route'), $view))) {
+        if ($routingOption = $this->getRoutingOption($request->get('_route'), $view)) {
             if (self::REDIRECT === $routingOption) {
                 // Make sure to hint at the device override, otherwise infinite loop
                 // redirection may occur if different device views are hosted on
@@ -254,7 +254,7 @@ class RequestResponseListener
      */
     protected function getRedirectResponse(Request $request, string $view): ?RedirectResponse
     {
-        if (($host = $this->getRedirectUrl($request, $view))) {
+        if ($host = $this->getRedirectUrl($request, $view)) {
             return $this->deviceView->getRedirectResponse(
                 $view,
                 $host,
