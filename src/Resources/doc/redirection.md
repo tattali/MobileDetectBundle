@@ -7,7 +7,7 @@ In this example, we will make sure to activate the automatic redirection to a mo
 
 If the user reaches the mobile site http://m.example.com, on his desktop browser he should be redirected to the full version at http://example.com.
 
-If the user reaches the desktop site http://example.com, with his mobile he should be redirected to the full version at http://m.example.com.
+If the user reaches the desktop site http://example.com, with his mobile he should be redirected to the mobile version at http://m.example.com.
 
 ```env
 # .env
