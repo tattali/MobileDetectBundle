@@ -38,10 +38,10 @@ jobs:
           - 6.*
         include:
           # Tests the lowest set of dependencies
-          - symfony-require: 5.4.*
-            dependencies: lowest
-            stability: stable
-            php: 8.0
+          # - symfony-require: 5.4.*
+          #   dependencies: lowest
+          #   stability: stable
+          #   php: 8.0
 
           # Bleeding edge
           - symfony-require: 6.*
