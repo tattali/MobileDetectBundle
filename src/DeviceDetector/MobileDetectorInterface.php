@@ -395,7 +395,6 @@ interface MobileDetectorInterface
      * This method will be used to check custom regexes against
      * the User-Agent string.
      *
-     * @param $regex
      * @param string $userAgent
      *
      * @return bool

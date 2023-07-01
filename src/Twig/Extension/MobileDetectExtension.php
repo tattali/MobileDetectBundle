@@ -48,7 +48,7 @@ class MobileDetectExtension extends AbstractExtension
 
     public function __construct(RequestStack $requestStack, MobileDetectorInterface $mobileDetector, DeviceView $deviceView, array $redirectConf)
     {
-        $this->request = method_exists(RequestStack::class, 'getMainRequest') ? $requestStack->getMainRequest() : $requestStack->getMasterRequest();
+        $this->request = $requestStack->getMainRequest();
         $this->mobileDetector = $mobileDetector;
         $this->deviceView = $deviceView;
         $this->redirectConf = $redirectConf;

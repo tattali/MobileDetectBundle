@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\ServerBag;
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
  *
  * @internal
+ *
  * @coversDefaultClass
  */
 final class DeviceDataCollectorTest extends TestCase
@@ -55,11 +56,11 @@ final class DeviceDataCollectorTest extends TestCase
         $this->request->query = new ParameterBag();
         $this->request->cookies = new ParameterBag();
         $this->request->server = new ServerBag();
-        $this->request->expects(static::any())->method('duplicate')->willReturn($this->request);
+        $this->request->expects(self::any())->method('duplicate')->willReturn($this->request);
 
         $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
-        $this->requestStack->expects(static::any())
-            ->method(method_exists(RequestStack::class, 'getMainRequest') ? 'getMainRequest' : 'getMasterRequest')
+        $this->requestStack->expects(self::any())
+            ->method('getMainRequest')
             ->willReturn($this->request)
         ;
 
@@ -83,19 +84,19 @@ final class DeviceDataCollectorTest extends TestCase
         $currentView = $deviceDataCollector->getCurrentView();
         $views = $deviceDataCollector->getViews();
 
-        static::assertSame($deviceView->getViewType(), $currentView);
-        static::assertSame(DeviceView::VIEW_MOBILE, $currentView);
-        static::assertCount(3, $views);
+        self::assertSame($deviceView->getViewType(), $currentView);
+        self::assertSame(DeviceView::VIEW_MOBILE, $currentView);
+        self::assertCount(3, $views);
 
         foreach ($views as $view) {
-            static::assertIsArray($view);
-            static::assertArrayHasKey('type', $view);
-            static::assertArrayHasKey('label', $view);
-            static::assertArrayHasKey('link', $view);
-            static::assertArrayHasKey('isCurrent', $view);
-            static::assertArrayHasKey('enabled', $view);
+            self::assertIsArray($view);
+            self::assertArrayHasKey('type', $view);
+            self::assertArrayHasKey('label', $view);
+            self::assertArrayHasKey('link', $view);
+            self::assertArrayHasKey('isCurrent', $view);
+            self::assertArrayHasKey('enabled', $view);
             if (DeviceView::VIEW_MOBILE === $view['type']) {
-                static::assertTrue($view['isCurrent']);
+                self::assertTrue($view['isCurrent']);
             }
         }
     }
@@ -109,16 +110,16 @@ final class DeviceDataCollectorTest extends TestCase
             'action' => RequestResponseListener::REDIRECT,
         ];
         $this->request->query = new ParameterBag(['param1' => 'value1']);
-        $this->request->expects(static::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
-        $this->request->expects(static::any())->method('getBaseUrl')->willReturn('/base-url');
-        $this->request->expects(static::any())->method('getPathInfo')->willReturn('/path-info');
+        $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
+        $this->request->expects(self::any())->method('getBaseUrl')->willReturn('/base-url');
+        $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
         $test = $this;
-        $this->request->expects(static::any())->method('getQueryString')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(function () use ($test) {
             $qs = Request::normalizeQueryString($test->request->server->get('QUERY_STRING'));
 
             return '' === $qs ? null : $qs;
         });
-        $this->request->expects(static::any())->method('getUri')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getUri')->willReturnCallback(function () use ($test) {
             if (null !== $qs = $test->request->getQueryString()) {
                 $qs = '?'.$qs;
             }
@@ -134,24 +135,24 @@ final class DeviceDataCollectorTest extends TestCase
         $currentView = $deviceDataCollector->getCurrentView();
         $views = $deviceDataCollector->getViews();
 
-        static::assertSame($deviceView->getViewType(), $currentView);
-        static::assertSame(DeviceView::VIEW_MOBILE, $currentView);
-        static::assertCount(3, $views);
+        self::assertSame($deviceView->getViewType(), $currentView);
+        self::assertSame(DeviceView::VIEW_MOBILE, $currentView);
+        self::assertCount(3, $views);
 
         foreach ($views as $view) {
-            static::assertIsArray($view);
-            static::assertArrayHasKey('type', $view);
-            static::assertArrayHasKey('label', $view);
-            static::assertArrayHasKey('link', $view);
-            static::assertArrayHasKey('isCurrent', $view);
-            static::assertArrayHasKey('enabled', $view);
+            self::assertIsArray($view);
+            self::assertArrayHasKey('type', $view);
+            self::assertArrayHasKey('label', $view);
+            self::assertArrayHasKey('link', $view);
+            self::assertArrayHasKey('isCurrent', $view);
+            self::assertArrayHasKey('enabled', $view);
             if (DeviceView::VIEW_MOBILE === $view['type']) {
-                static::assertTrue($view['isCurrent']);
+                self::assertTrue($view['isCurrent']);
             }
             if (DeviceView::VIEW_TABLET === $view['type']) {
-                static::assertFalse($view['isCurrent']);
-                static::assertTrue($view['enabled']);
-                static::assertSame(
+                self::assertFalse($view['isCurrent']);
+                self::assertTrue($view['enabled']);
+                self::assertSame(
                     sprintf(
                         'http://t.testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
@@ -172,16 +173,16 @@ final class DeviceDataCollectorTest extends TestCase
             'action' => RequestResponseListener::REDIRECT,
         ];
         $this->request->query = new ParameterBag(['param1' => 'value1']);
-        $this->request->expects(static::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
-        $this->request->expects(static::any())->method('getBaseUrl')->willReturn('/base-url');
-        $this->request->expects(static::any())->method('getPathInfo')->willReturn('/path-info');
+        $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
+        $this->request->expects(self::any())->method('getBaseUrl')->willReturn('/base-url');
+        $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
         $test = $this;
-        $this->request->expects(static::any())->method('getQueryString')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(function () use ($test) {
             $qs = Request::normalizeQueryString($test->request->server->get('QUERY_STRING'));
 
             return '' === $qs ? null : $qs;
         });
-        $this->request->expects(static::any())->method('getUri')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getUri')->willReturnCallback(function () use ($test) {
             if (null !== $qs = $test->request->getQueryString()) {
                 $qs = '?'.$qs;
             }
@@ -197,24 +198,24 @@ final class DeviceDataCollectorTest extends TestCase
         $currentView = $deviceDataCollector->getCurrentView();
         $views = $deviceDataCollector->getViews();
 
-        static::assertSame($deviceView->getViewType(), $currentView);
-        static::assertSame(DeviceView::VIEW_FULL, $currentView);
-        static::assertCount(3, $views);
+        self::assertSame($deviceView->getViewType(), $currentView);
+        self::assertSame(DeviceView::VIEW_FULL, $currentView);
+        self::assertCount(3, $views);
 
         foreach ($views as $view) {
-            static::assertIsArray($view);
-            static::assertArrayHasKey('type', $view);
-            static::assertArrayHasKey('label', $view);
-            static::assertArrayHasKey('link', $view);
-            static::assertArrayHasKey('isCurrent', $view);
-            static::assertArrayHasKey('enabled', $view);
+            self::assertIsArray($view);
+            self::assertArrayHasKey('type', $view);
+            self::assertArrayHasKey('label', $view);
+            self::assertArrayHasKey('link', $view);
+            self::assertArrayHasKey('isCurrent', $view);
+            self::assertArrayHasKey('enabled', $view);
             if (DeviceView::VIEW_FULL === $view['type']) {
-                static::assertTrue($view['isCurrent']);
+                self::assertTrue($view['isCurrent']);
             }
             if (DeviceView::VIEW_MOBILE === $view['type']) {
-                static::assertFalse($view['isCurrent']);
-                static::assertTrue($view['enabled']);
-                static::assertSame(
+                self::assertFalse($view['isCurrent']);
+                self::assertTrue($view['enabled']);
+                self::assertSame(
                     sprintf(
                         'http://t.testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
@@ -235,16 +236,16 @@ final class DeviceDataCollectorTest extends TestCase
             'action' => RequestResponseListener::REDIRECT,
         ];
         $this->request->query = new ParameterBag(['param1' => 'value1']);
-        $this->request->expects(static::any())->method('getSchemeAndHttpHost')->willReturn('http://testsite.com');
-        $this->request->expects(static::any())->method('getBaseUrl')->willReturn('/base-url');
-        $this->request->expects(static::any())->method('getPathInfo')->willReturn('/path-info');
+        $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://testsite.com');
+        $this->request->expects(self::any())->method('getBaseUrl')->willReturn('/base-url');
+        $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
         $test = $this;
-        $this->request->expects(static::any())->method('getQueryString')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(function () use ($test) {
             $qs = Request::normalizeQueryString($test->request->server->get('QUERY_STRING'));
 
             return '' === $qs ? null : $qs;
         });
-        $this->request->expects(static::any())->method('getUri')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getUri')->willReturnCallback(function () use ($test) {
             if (null !== $qs = $test->request->getQueryString()) {
                 $qs = '?'.$qs;
             }
@@ -260,24 +261,24 @@ final class DeviceDataCollectorTest extends TestCase
         $currentView = $deviceDataCollector->getCurrentView();
         $views = $deviceDataCollector->getViews();
 
-        static::assertSame($deviceView->getViewType(), $currentView);
-        static::assertSame(DeviceView::VIEW_FULL, $currentView);
-        static::assertCount(3, $views);
+        self::assertSame($deviceView->getViewType(), $currentView);
+        self::assertSame(DeviceView::VIEW_FULL, $currentView);
+        self::assertCount(3, $views);
 
         foreach ($views as $view) {
-            static::assertIsArray($view);
-            static::assertArrayHasKey('type', $view);
-            static::assertArrayHasKey('label', $view);
-            static::assertArrayHasKey('link', $view);
-            static::assertArrayHasKey('isCurrent', $view);
-            static::assertArrayHasKey('enabled', $view);
+            self::assertIsArray($view);
+            self::assertArrayHasKey('type', $view);
+            self::assertArrayHasKey('label', $view);
+            self::assertArrayHasKey('link', $view);
+            self::assertArrayHasKey('isCurrent', $view);
+            self::assertArrayHasKey('enabled', $view);
             if (DeviceView::VIEW_FULL === $view['type']) {
-                static::assertTrue($view['isCurrent']);
+                self::assertTrue($view['isCurrent']);
             }
             if (DeviceView::VIEW_MOBILE === $view['type']) {
-                static::assertFalse($view['isCurrent']);
-                static::assertFalse($view['enabled']);
-                static::assertSame(
+                self::assertFalse($view['isCurrent']);
+                self::assertFalse($view['enabled']);
+                self::assertSame(
                     sprintf(
                         'http://testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
@@ -294,13 +295,13 @@ final class DeviceDataCollectorTest extends TestCase
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);
         $deviceDataCollector->reset();
-        static::assertSame([], $deviceDataCollector->getData());
+        self::assertSame([], $deviceDataCollector->getData());
     }
 
     public function testGetNameValue(): void
     {
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);
-        static::assertSame('device.collector', $deviceDataCollector->getName());
+        self::assertSame('device.collector', $deviceDataCollector->getName());
     }
 }
