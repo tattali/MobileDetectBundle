@@ -1,5 +1,5 @@
 {
-    "name": "tattali/mobile-detect-bundle",
+    "name": "xpanel/mobile-detect-bundle",
     "description": "Symfony 7 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.",
     "keywords": [
         "mobile detect",
