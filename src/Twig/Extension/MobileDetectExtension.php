@@ -27,31 +27,13 @@ use Twig\TwigFunction;
 class MobileDetectExtension extends AbstractExtension
 {
     /**
-     * @var MobileDetectorInterface
-     */
-    private $mobileDetector;
-
-    /**
-     * @var DeviceView
-     */
-    private $deviceView;
-
-    /**
-     * @var array
-     */
-    private $redirectConf;
-
-    /**
      * @var Request
      */
     private $request;
 
-    public function __construct(RequestStack $requestStack, MobileDetectorInterface $mobileDetector, DeviceView $deviceView, array $redirectConf)
+    public function __construct(RequestStack $requestStack, private readonly MobileDetectorInterface $mobileDetector, private readonly DeviceView $deviceView, private array $redirectConf)
     {
         $this->request = $requestStack->getMainRequest();
-        $this->mobileDetector = $mobileDetector;
-        $this->deviceView = $deviceView;
-        $this->redirectConf = $redirectConf;
     }
 
     /**
@@ -60,19 +42,19 @@ class MobileDetectExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('is_mobile', [$this, 'isMobile']),
-            new TwigFunction('is_tablet', [$this, 'isTablet']),
-            new TwigFunction('is_device', [$this, 'isDevice']),
-            new TwigFunction('is_full_view', [$this, 'isFullView']),
-            new TwigFunction('is_mobile_view', [$this, 'isMobileView']),
-            new TwigFunction('is_tablet_view', [$this, 'isTabletView']),
-            new TwigFunction('is_not_mobile_view', [$this, 'isNotMobileView']),
-            new TwigFunction('is_ios', [$this, 'isIOS']),
-            new TwigFunction('is_android_os', [$this, 'isAndroidOS']),
-            new TwigFunction('is_windows_os', [$this, 'isWindowsOS']),
-            new TwigFunction('full_view_url', [$this, 'fullViewUrl'], ['is_safe' => ['html']]),
-            new TwigFunction('device_version', [$this, 'deviceVersion']),
-            new TwigFunction('rules_list', [$this, 'getRules']),
+            new TwigFunction('is_mobile', $this->isMobile(...)),
+            new TwigFunction('is_tablet', $this->isTablet(...)),
+            new TwigFunction('is_device', $this->isDevice(...)),
+            new TwigFunction('is_full_view', $this->isFullView(...)),
+            new TwigFunction('is_mobile_view', $this->isMobileView(...)),
+            new TwigFunction('is_tablet_view', $this->isTabletView(...)),
+            new TwigFunction('is_not_mobile_view', $this->isNotMobileView(...)),
+            new TwigFunction('is_ios', $this->isIOS(...)),
+            new TwigFunction('is_android_os', $this->isAndroidOS(...)),
+            new TwigFunction('is_windows_os', $this->isWindowsOS(...)),
+            new TwigFunction('full_view_url', $this->fullViewUrl(...), ['is_safe' => ['html']]),
+            new TwigFunction('device_version', $this->deviceVersion(...)),
+            new TwigFunction('rules_list', $this->getRules(...)),
         ];
     }
 
@@ -82,8 +64,7 @@ class MobileDetectExtension extends AbstractExtension
             $this->mobileDetector->getPhoneDevices(),
             $this->mobileDetector->getTabletDevices(),
             $this->mobileDetector->getOperatingSystems(),
-            $this->mobileDetector->getBrowsers(),
-            $this->mobileDetector->getUtilities()
+            $this->mobileDetector->getBrowsers()
         );
     }
 
@@ -134,7 +115,7 @@ class MobileDetectExtension extends AbstractExtension
         }
 
         // if fullHost ends with /, skip it since getPathInfo() also starts with /
-        $result = rtrim($fullHost, '/').$this->request->getPathInfo();
+        $result = rtrim((string) $fullHost, '/').$this->request->getPathInfo();
 
         $query = Request::normalizeQueryString(http_build_query($this->request->query->all(), '', '&'));
         if ($query) {
@@ -159,7 +140,7 @@ class MobileDetectExtension extends AbstractExtension
      */
     public function isDevice(string $deviceName): bool
     {
-        $magicMethodName = 'is'.strtolower((string) $deviceName);
+        $magicMethodName = 'is'.strtolower($deviceName);
 
         return $this->mobileDetector->{$magicMethodName}();
     }

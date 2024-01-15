@@ -103,7 +103,7 @@ class DeviceView
      */
     protected $redirectConfig = [];
 
-    public function __construct(RequestStack $requestStack = null)
+    public function __construct(?RequestStack $requestStack = null)
     {
         if (!$requestStack || !$this->request = $requestStack->getMainRequest()) {
             $this->viewType = self::VIEW_NOT_MOBILE;
@@ -362,11 +362,7 @@ class DeviceView
 
     protected function getStatusCode(string $view): int
     {
-        if (isset($this->getRedirectConfig()[$view]['status_code'])) {
-            return $this->getRedirectConfig()[$view]['status_code'];
-        }
-
-        return Response::HTTP_FOUND;
+        return $this->getRedirectConfig()[$view]['status_code'] ?? Response::HTTP_FOUND;
     }
 
     /**
@@ -376,7 +372,7 @@ class DeviceView
     {
         try {
             $expire = new \DateTime($this->getCookieExpireDatetimeModifier());
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $expire = new \DateTime(self::COOKIE_EXPIRE_DATETIME_MODIFIER_DEFAULT);
         }
 
