@@ -272,7 +272,7 @@ class RequestResponseListener
      */
     protected function prepareResponseModification(string $view): void
     {
-        $this->modifyResponseClosure = function (DeviceView $deviceView, ResponseEvent $event) use ($view) {
+        $this->modifyResponseClosure = static function (DeviceView $deviceView, ResponseEvent $event) use ($view) {
             return $deviceView->modifyResponse($view, $event->getResponse());
         };
     }
