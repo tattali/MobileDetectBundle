@@ -114,12 +114,12 @@ final class DeviceDataCollectorTest extends TestCase
         $this->request->expects(self::any())->method('getBaseUrl')->willReturn('/base-url');
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
         $test = $this;
-        $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(static function () use ($test) {
             $qs = Request::normalizeQueryString($test->request->server->get('QUERY_STRING'));
 
             return '' === $qs ? null : $qs;
         });
-        $this->request->expects(self::any())->method('getUri')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getUri')->willReturnCallback(static function () use ($test) {
             if (null !== $qs = $test->request->getQueryString()) {
                 $qs = '?'.$qs;
             }
@@ -177,12 +177,12 @@ final class DeviceDataCollectorTest extends TestCase
         $this->request->expects(self::any())->method('getBaseUrl')->willReturn('/base-url');
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
         $test = $this;
-        $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(static function () use ($test) {
             $qs = Request::normalizeQueryString($test->request->server->get('QUERY_STRING'));
 
             return '' === $qs ? null : $qs;
         });
-        $this->request->expects(self::any())->method('getUri')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getUri')->willReturnCallback(static function () use ($test) {
             if (null !== $qs = $test->request->getQueryString()) {
                 $qs = '?'.$qs;
             }
@@ -240,12 +240,12 @@ final class DeviceDataCollectorTest extends TestCase
         $this->request->expects(self::any())->method('getBaseUrl')->willReturn('/base-url');
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
         $test = $this;
-        $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(static function () use ($test) {
             $qs = Request::normalizeQueryString($test->request->server->get('QUERY_STRING'));
 
             return '' === $qs ? null : $qs;
         });
-        $this->request->expects(self::any())->method('getUri')->willReturnCallback(function () use ($test) {
+        $this->request->expects(self::any())->method('getUri')->willReturnCallback(static function () use ($test) {
             if (null !== $qs = $test->request->getQueryString()) {
                 $qs = '?'.$qs;
             }

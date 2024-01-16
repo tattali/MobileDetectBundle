@@ -24,10 +24,6 @@ return (new PhpCsFixer\Config())
         'array_syntax' => [
             'syntax' => 'short',
         ],
-        'braces' => [
-            'allow_single_line_closure' => true,
-        ],
-        'compact_nullable_typehint' => true,
         'doctrine_annotation_array_assignment' => [
             'operator' => '=',
         ],
