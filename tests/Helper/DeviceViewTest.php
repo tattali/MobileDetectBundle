@@ -354,6 +354,7 @@ final class DeviceViewTest extends TestCase
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame($this->switchParam, $deviceView->getSwitchParam());
     }
+
     public function testSetCookieExpireDatetimeModifier(): void
     {
         $this->request->query = new InputBag();
