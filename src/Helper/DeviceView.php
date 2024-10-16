@@ -21,23 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
  */
-class DeviceView
+class DeviceView implements DeviceViewInterface
 {
-    public const VIEW_MOBILE = 'mobile';
-    public const VIEW_TABLET = 'tablet';
-    public const VIEW_FULL = 'full';
-    public const VIEW_NOT_MOBILE = 'not_mobile';
-
-    public const COOKIE_KEY_DEFAULT = 'device_view';
-    public const COOKIE_PATH_DEFAULT = '/';
-    public const COOKIE_DOMAIN_DEFAULT = '';
-    public const COOKIE_SECURE_DEFAULT = false;
-    public const COOKIE_HTTP_ONLY_DEFAULT = true;
-    public const COOKIE_RAW_DEFAULT = false;
-    public const COOKIE_SAMESITE_DEFAULT = Cookie::SAMESITE_LAX;
-    public const COOKIE_EXPIRE_DATETIME_MODIFIER_DEFAULT = '1 month';
-    public const SWITCH_PARAM_DEFAULT = 'device_view';
-
     /**
      * @var Request
      */
@@ -210,6 +195,9 @@ class DeviceView
         $this->redirectConfig = $redirectConfig;
     }
 
+    /**
+     * Get RedirectResponseWithCookie based on the switch parameter value.
+     */
     public function getRedirectResponseBySwitchParam(string $redirectUrl): RedirectResponseWithCookie
     {
         switch ($this->getSwitchParamValue()) {
@@ -360,6 +348,9 @@ class DeviceView
         $this->switchParam = $switchParam;
     }
 
+    /**
+     * Get the status code for the specified device view.
+     */
     protected function getStatusCode(string $view): int
     {
         return $this->getRedirectConfig()[$view]['status_code'] ?? Response::HTTP_FOUND;

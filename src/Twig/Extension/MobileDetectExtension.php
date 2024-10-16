@@ -16,6 +16,7 @@ namespace MobileDetectBundle\Twig\Extension;
 use MobileDetectBundle\DeviceDetector\MobileDetector;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use MobileDetectBundle\Helper\DeviceView;
+use MobileDetectBundle\Helper\DeviceViewInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
@@ -94,12 +95,12 @@ class MobileDetectExtension extends AbstractExtension
      */
     public function fullViewUrl(bool $addCurrentPathAndQuery = true): ?string
     {
-        if (!isset($this->redirectConf[DeviceView::VIEW_FULL]['host'])) {
+        if (!isset($this->redirectConf[DeviceViewInterface::VIEW_FULL]['host'])) {
             // The host property has not been configured for the full view
             return null;
         }
 
-        $fullHost = $this->redirectConf[DeviceView::VIEW_FULL]['host'];
+        $fullHost = $this->redirectConf[DeviceViewInterface::VIEW_FULL]['host'];
 
         if (empty($fullHost)) {
             return null;
