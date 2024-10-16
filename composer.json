@@ -1,6 +1,6 @@
 {
-    "name": "tattali/mobile-detect-bundle",
-    "description": "Symfony 6.4 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.",
+    "name": "digifa/mobile-detect-bundle",
+    "description": "Symfony 6.4 / PHP 8.2 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.",
     "keywords": [
         "mobile detect",
         "device detect",
@@ -12,10 +12,14 @@
         "symfony mobiledetect",
         "symfony"
     ],
-    "homepage": "https://github.com/tattali/MobileDetectBundle",
+    "homepage": "https://github.com/digifa/MobileDetectBundle",
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
+        {
+            "name": "Guido Faust",
+            "email": "gfaust@digifa.de"
+        },
         {
             "name": "Théo Attali",
             "email": "theoattali@gmail.com"

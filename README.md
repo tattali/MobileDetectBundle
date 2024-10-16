@@ -3,12 +3,12 @@
 MobileDetectBundle
 ==================
 
-Symfony 3.4.x-6.0.x bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+Symfony 6.4.x / PHP 8.2 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
 
 [![Github Actions Status](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml/badge.svg?branch=main
 )](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml?query=branch%3Amain) [![Latest Stable Version](http://poser.pugx.org/tattali/mobile-detect-bundle/v)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![Total Downloads](http://poser.pugx.org/tattali/mobile-detect-bundle/downloads)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![codecov](https://codecov.io/gh/tattali/MobileDetectBundle/branch/main/graph/badge.svg?token=HWV1OYRSD9)](https://codecov.io/gh/tattali/MobileDetectBundle) [![License](http://poser.pugx.org/tattali/mobile-detect-bundle/license)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![PHP Version Require](http://poser.pugx.org/tattali/mobile-detect-bundle/require/php)](https://packagist.org/packages/tattali/mobile-detect-bundle)
 
-*This bundle is a fork of [suncat2000/MobileDetectBundle](https://github.com/suncat2000/MobileDetectBundle). As this project doesn't look maintained anymore, we decided to create & maintain a fork. For more information read our [manifest](https://github.com/tattali/MobileDetectBundle/issues/8).*
+*This bundle is a fork of [tattali/MobileDetectBundle](https://github.com/tattali/MobileDetectBundle) that is a fork of [suncat2000/MobileDetectBundle](https://github.com/suncat2000/MobileDetectBundle). As this project doesn't look maintained anymore, we decided to create & maintain a fork. For more information read our [manifest](https://github.com/tattali/MobileDetectBundle/issues/8).*
 
 Introduction
 ------------
