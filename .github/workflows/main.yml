@@ -36,7 +36,7 @@ jobs:
           - 7.*
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install PHP with PCOV
         uses: shivammathur/setup-php@v2
@@ -71,7 +71,7 @@ jobs:
         run: php vendor/bin/phpunit
 
       - name: Upload coverage file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: phpunit-${{ matrix.php }}-${{ matrix.dependencies }}-${{ hashFiles('composer.lock') }}.coverage
           path: build/coverage.xml
@@ -90,16 +90,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download coverage files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: reports
 
       - name: Upload to Codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
         with:
           directory: reports
