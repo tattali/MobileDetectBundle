@@ -77,7 +77,7 @@ class RequestResponseListener
         DeviceView $deviceView,
         RouterInterface $router,
         array $redirectConf,
-        bool $fullPath = true
+        bool $fullPath = true,
     ) {
         $this->mobileDetector = $mobileDetector;
         $this->deviceView = $deviceView;
@@ -232,7 +232,7 @@ class RequestResponseListener
                 $queryParams = $request->query->all();
                 $queryParams[$this->deviceView->getSwitchParam()] = $view;
 
-                return rtrim($this->redirectConf[$view]['host'], '/').$request->getPathInfo().'?'.Request::normalizeQueryString(http_build_query($queryParams));
+                return rtrim((string) $this->redirectConf[$view]['host'], '/').$request->getPathInfo().'?'.Request::normalizeQueryString(http_build_query($queryParams));
             }
             if (self::REDIRECT_WITHOUT_PATH === $routingOption) {
                 // Make sure to hint at the device override, otherwise infinite loop
@@ -272,8 +272,6 @@ class RequestResponseListener
      */
     protected function prepareResponseModification(string $view): void
     {
-        $this->modifyResponseClosure = static function (DeviceView $deviceView, ResponseEvent $event) use ($view) {
-            return $deviceView->modifyResponse($view, $event->getResponse());
-        };
+        $this->modifyResponseClosure = static fn (DeviceView $deviceView, ResponseEvent $event): \Symfony\Component\HttpFoundation\Response => $deviceView->modifyResponse($view, $event->getResponse());
     }
 }

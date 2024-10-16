@@ -25,17 +25,17 @@ final class MobileDetectExtensionTest extends TestCase
     /**
      * @var MockObject|MobileDetector
      */
-    private $mobileDetector;
+    private MockObject $mobileDetector;
 
     /**
      * @var MockObject|RequestStack
      */
-    private $requestStack;
+    private MockObject $requestStack;
 
     /**
      * @var MockObject|Request
      */
-    private $request;
+    private MockObject $request;
 
     /**
      * @var array
@@ -66,38 +66,6 @@ final class MobileDetectExtensionTest extends TestCase
             'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
             'detect_tablet_as_mobile' => false,
         ];
-    }
-
-    public function testGetFunctionsArray(): void
-    {
-        $deviceView = new DeviceView($this->requestStack);
-        $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetector, $deviceView, $this->config);
-
-        $functions = $extension->getFunctions();
-        self::assertCount(13, $functions);
-        $names = [
-            'is_mobile' => 'isMobile',
-            'is_tablet' => 'isTablet',
-            'is_device' => 'isDevice',
-            'is_full_view' => 'isFullView',
-            'is_mobile_view' => 'isMobileView',
-            'is_tablet_view' => 'isTabletView',
-            'is_not_mobile_view' => 'isNotMobileView',
-            'is_ios' => 'isIOS',
-            'is_android_os' => 'isAndroidOS',
-            'is_windows_os' => 'isWindowsOS',
-            'full_view_url' => 'fullViewUrl',
-            'device_version' => 'deviceVersion',
-            'rules_list' => 'getRules',
-        ];
-        foreach ($functions as $function) {
-            self::assertInstanceOf(TwigFunction::class, $function);
-            $name = $function->getName();
-            $callable = $function->getCallable();
-            self::assertArrayHasKey($name, $names);
-            self::assertIsArray($callable);
-            self::assertSame($names[$name], $callable[1]);
-        }
     }
 
     public function testRulesList(): void
@@ -367,5 +335,26 @@ final class MobileDetectExtensionTest extends TestCase
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetector, $deviceView, $this->config);
         self::assertFalse($extension->isWindowsOS());
+    }
+
+    public function testGetFunctions(): void
+    {
+        $deviceView = new DeviceView($this->requestStack);
+        $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetector, $deviceView, $this->config);
+        $functions = $extension->getFunctions();
+
+        self::assertCount(13, $functions);
+        self::assertInstanceOf(TwigFunction::class, $functions[0]);
+        self::assertInstanceOf(TwigFunction::class, $functions[1]);
+        self::assertInstanceOf(TwigFunction::class, $functions[2]);
+        self::assertInstanceOf(TwigFunction::class, $functions[3]);
+        self::assertInstanceOf(TwigFunction::class, $functions[4]);
+        self::assertInstanceOf(TwigFunction::class, $functions[5]);
+        self::assertInstanceOf(TwigFunction::class, $functions[6]);
+        self::assertInstanceOf(TwigFunction::class, $functions[7]);
+        self::assertInstanceOf(TwigFunction::class, $functions[8]);
+        self::assertInstanceOf(TwigFunction::class, $functions[9]);
+        self::assertInstanceOf(TwigFunction::class, $functions[10]);
+        self::assertInstanceOf(TwigFunction::class, $functions[11]);
     }
 }

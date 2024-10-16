@@ -8,4 +8,8 @@ lint:
 	php vendor/bin/phpcs --report=code
 	php vendor/bin/phpstan analyse
 
+refactor:
+	php vendor/bin/php-cs-fixer fix
+	php vendor/bin/rector
+
 test: lint phpunit
