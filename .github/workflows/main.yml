@@ -30,8 +30,10 @@ jobs:
         stability:
           - stable
         symfony-require:
-          # Test latest stable version
+          # Test latest LTS version
           - 6.4
+          # Test latest stable version
+          - 7.*
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

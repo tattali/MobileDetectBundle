@@ -1,6 +1,6 @@
 {
     "name": "digifa/mobile-detect-bundle",
-    "description": "Symfony 6.4 / PHP 8.2 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.",
+    "description": "Symfony 6.4, 7.0 / PHP 8.2 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.",
     "keywords": [
         "mobile detect",
         "device detect",
@@ -40,10 +40,10 @@
     "require": {
         "php": ">=8.2",
         "mobiledetect/mobiledetectlib": "^4.8",
-        "symfony/dependency-injection": "^6.4",
-        "symfony/event-dispatcher": "^6.4",
-        "symfony/framework-bundle": "^6.4",
-        "symfony/yaml": "^6.4",
+        "symfony/dependency-injection": "^6.4||^7.0",
+        "symfony/event-dispatcher": "^6.4||^7.0",
+        "symfony/framework-bundle": "^6.4||^7.0",
+        "symfony/yaml": "^6.4||^7.0",
         "twig/twig": "^2.0 || ^3.0"
     },
     "require-dev": {
@@ -55,8 +55,8 @@
         "phpunit/phpunit": "^9.5",
         "rector/rector": "^1.2",
         "squizlabs/php_codesniffer": "^3.6",
-        "symfony/dotenv": "^6.4",
-        "symfony/phpunit-bridge": "^6.4"
+        "symfony/dotenv": "^6.4||^7.0",
+        "symfony/phpunit-bridge": "^6.4||^7.0"
     },
     "config": {
         "sort-packages": true,
