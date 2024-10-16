@@ -27,16 +27,8 @@ use Symfony\Component\Routing\RouterInterface;
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
  * @author HenriVesala <henri.vesala@gmail.com>
  */
-class RequestResponseListener
+class RequestResponseListener implements RequestResponseListenerInterface
 {
-    public const REDIRECT = 'redirect';
-    public const NO_REDIRECT = 'no_redirect';
-    public const REDIRECT_WITHOUT_PATH = 'redirect_without_path';
-
-    public const MOBILE = 'mobile';
-    public const TABLET = 'tablet';
-    public const FULL = 'full';
-
     /**
      * @var RouterInterface
      */
@@ -88,6 +80,9 @@ class RequestResponseListener
         $this->isFullPath = $fullPath;
     }
 
+    /**
+     * Handles the request and performs necessary actions based on the device view type.
+     */
     public function handleRequest(RequestEvent $event): void
     {
         // only handle master request, do not handle sub request like esi includes
@@ -150,6 +145,9 @@ class RequestResponseListener
         return $this->needModifyResponse;
     }
 
+    /**
+     * Handles the response event by modifying the response if needed.
+     */
     public function handleResponse(ResponseEvent $event): void
     {
         if ($this->needModifyResponse && $this->modifyResponseClosure instanceof \Closure) {
@@ -160,6 +158,9 @@ class RequestResponseListener
         }
     }
 
+    /**
+     * Gets the RedirectResponse with a cookie based on the switch parameter in the request.
+     */
     protected function getRedirectResponseBySwitchParam(Request $request): RedirectResponseWithCookie
     {
         if ($this->mustRedirect($request, $this->deviceView->getViewType())) {
@@ -202,6 +203,9 @@ class RequestResponseListener
         return $request->getSchemeAndHttpHost() !== $this->redirectConf[$viewType]['host'];
     }
 
+    /**
+     * Gets the specified routing option for a given route name.
+     */
     protected function getRoutingOption(string $routeName, string $optionName): ?string
     {
         $option = null;

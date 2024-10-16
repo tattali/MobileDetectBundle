@@ -15,7 +15,7 @@ namespace MobileDetectBundle\Tests\DependencyInjection;
 use MobileDetectBundle\DependencyInjection\MobileDetectExtension;
 use MobileDetectBundle\DeviceDetector\MobileDetector;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
-use MobileDetectBundle\Helper\DeviceView;
+use MobileDetectBundle\Helper\DeviceViewInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,13 +61,13 @@ final class MobileDetectExtensionTest extends TestCase
             $this->container->getParameter('mobile_detect.redirect')
         );
         self::assertTrue($this->container->getParameter('mobile_detect.switch_device_view.save_referer_path'));
-        self::assertSame(DeviceView::COOKIE_KEY_DEFAULT, $this->container->getParameter('mobile_detect.cookie_key'));
+        self::assertSame(DeviceViewInterface::COOKIE_KEY_DEFAULT, $this->container->getParameter('mobile_detect.cookie_key'));
         self::assertSame(
-            DeviceView::COOKIE_EXPIRE_DATETIME_MODIFIER_DEFAULT,
+            DeviceViewInterface::COOKIE_EXPIRE_DATETIME_MODIFIER_DEFAULT,
             $this->container->getParameter('mobile_detect.cookie_expire_datetime_modifier')
         );
         self::assertSame(
-            DeviceView::SWITCH_PARAM_DEFAULT,
+            DeviceViewInterface::SWITCH_PARAM_DEFAULT,
             $this->container->getParameter('mobile_detect.switch_param')
         );
 

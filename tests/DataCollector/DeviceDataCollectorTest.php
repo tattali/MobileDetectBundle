@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace MobileDetectBundle\Tests\DataCollector;
 
 use MobileDetectBundle\DataCollector\DeviceDataCollector;
-use MobileDetectBundle\EventListener\RequestResponseListener;
+use MobileDetectBundle\EventListener\RequestResponseListenerInterface;
 use MobileDetectBundle\Helper\DeviceView;
+use MobileDetectBundle\Helper\DeviceViewInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -73,9 +74,9 @@ final class DeviceDataCollectorTest extends TestCase
             'is_enabled' => true,
             'host' => 'http://t.testsite.com',
             'status_code' => Response::HTTP_FOUND,
-            'action' => RequestResponseListener::REDIRECT,
+            'action' => RequestResponseListenerInterface::REDIRECT,
         ];
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
+        $this->request->cookies = new InputBag([DeviceViewInterface::COOKIE_KEY_DEFAULT => DeviceViewInterface::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);
         $deviceDataCollector->setRedirectConfig($redirectConfig);
@@ -85,7 +86,7 @@ final class DeviceDataCollectorTest extends TestCase
         $views = $deviceDataCollector->getViews();
 
         self::assertSame($deviceView->getViewType(), $currentView);
-        self::assertSame(DeviceView::VIEW_MOBILE, $currentView);
+        self::assertSame(DeviceViewInterface::VIEW_MOBILE, $currentView);
         self::assertCount(3, $views);
 
         foreach ($views as $view) {
@@ -95,7 +96,7 @@ final class DeviceDataCollectorTest extends TestCase
             self::assertArrayHasKey('link', $view);
             self::assertArrayHasKey('isCurrent', $view);
             self::assertArrayHasKey('enabled', $view);
-            if (DeviceView::VIEW_MOBILE === $view['type']) {
+            if (DeviceViewInterface::VIEW_MOBILE === $view['type']) {
                 self::assertTrue($view['isCurrent']);
             }
         }
@@ -107,7 +108,7 @@ final class DeviceDataCollectorTest extends TestCase
             'is_enabled' => true,
             'host' => 'http://t.testsite.com',
             'status_code' => Response::HTTP_FOUND,
-            'action' => RequestResponseListener::REDIRECT,
+            'action' => RequestResponseListenerInterface::REDIRECT,
         ];
         $this->request->query = new InputBag(['param1' => 'value1']);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
@@ -126,7 +127,7 @@ final class DeviceDataCollectorTest extends TestCase
 
             return $test->request->getSchemeAndHttpHost().$test->request->getBaseUrl().$test->request->getPathInfo().$qs;
         });
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
+        $this->request->cookies = new InputBag([DeviceViewInterface::COOKIE_KEY_DEFAULT => DeviceViewInterface::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);
         $deviceDataCollector->setRedirectConfig($redirectConfig);
@@ -136,7 +137,7 @@ final class DeviceDataCollectorTest extends TestCase
         $views = $deviceDataCollector->getViews();
 
         self::assertSame($deviceView->getViewType(), $currentView);
-        self::assertSame(DeviceView::VIEW_MOBILE, $currentView);
+        self::assertSame(DeviceViewInterface::VIEW_MOBILE, $currentView);
         self::assertCount(3, $views);
 
         foreach ($views as $view) {
@@ -146,17 +147,17 @@ final class DeviceDataCollectorTest extends TestCase
             self::assertArrayHasKey('link', $view);
             self::assertArrayHasKey('isCurrent', $view);
             self::assertArrayHasKey('enabled', $view);
-            if (DeviceView::VIEW_MOBILE === $view['type']) {
+            if (DeviceViewInterface::VIEW_MOBILE === $view['type']) {
                 self::assertTrue($view['isCurrent']);
             }
-            if (DeviceView::VIEW_TABLET === $view['type']) {
+            if (DeviceViewInterface::VIEW_TABLET === $view['type']) {
                 self::assertFalse($view['isCurrent']);
                 self::assertTrue($view['enabled']);
                 self::assertSame(
                     \sprintf(
                         'http://t.testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
-                        DeviceView::VIEW_TABLET
+                        DeviceViewInterface::VIEW_TABLET
                     ),
                     $view['link']
                 );
@@ -170,7 +171,7 @@ final class DeviceDataCollectorTest extends TestCase
             'is_enabled' => true,
             'host' => 'http://t.testsite.com',
             'status_code' => Response::HTTP_FOUND,
-            'action' => RequestResponseListener::REDIRECT,
+            'action' => RequestResponseListenerInterface::REDIRECT,
         ];
         $this->request->query = new InputBag(['param1' => 'value1']);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
@@ -189,7 +190,7 @@ final class DeviceDataCollectorTest extends TestCase
 
             return $test->request->getSchemeAndHttpHost().$test->request->getBaseUrl().$test->request->getPathInfo().$qs;
         });
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_FULL]);
+        $this->request->cookies = new InputBag([DeviceViewInterface::COOKIE_KEY_DEFAULT => DeviceViewInterface::VIEW_FULL]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);
         $deviceDataCollector->setRedirectConfig($redirectConfig);
@@ -199,7 +200,7 @@ final class DeviceDataCollectorTest extends TestCase
         $views = $deviceDataCollector->getViews();
 
         self::assertSame($deviceView->getViewType(), $currentView);
-        self::assertSame(DeviceView::VIEW_FULL, $currentView);
+        self::assertSame(DeviceViewInterface::VIEW_FULL, $currentView);
         self::assertCount(3, $views);
 
         foreach ($views as $view) {
@@ -209,17 +210,17 @@ final class DeviceDataCollectorTest extends TestCase
             self::assertArrayHasKey('link', $view);
             self::assertArrayHasKey('isCurrent', $view);
             self::assertArrayHasKey('enabled', $view);
-            if (DeviceView::VIEW_FULL === $view['type']) {
+            if (DeviceViewInterface::VIEW_FULL === $view['type']) {
                 self::assertTrue($view['isCurrent']);
             }
-            if (DeviceView::VIEW_MOBILE === $view['type']) {
+            if (DeviceViewInterface::VIEW_MOBILE === $view['type']) {
                 self::assertFalse($view['isCurrent']);
                 self::assertTrue($view['enabled']);
                 self::assertSame(
                     \sprintf(
                         'http://t.testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
-                        DeviceView::VIEW_MOBILE
+                        DeviceViewInterface::VIEW_MOBILE
                     ),
                     $view['link']
                 );
@@ -233,7 +234,7 @@ final class DeviceDataCollectorTest extends TestCase
             'is_enabled' => true,
             'host' => 'http://m.testsite.com',
             'status_code' => Response::HTTP_FOUND,
-            'action' => RequestResponseListener::REDIRECT,
+            'action' => RequestResponseListenerInterface::REDIRECT,
         ];
         $this->request->query = new InputBag(['param1' => 'value1']);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://testsite.com');
@@ -252,7 +253,7 @@ final class DeviceDataCollectorTest extends TestCase
 
             return $test->request->getSchemeAndHttpHost().$test->request->getBaseUrl().$test->request->getPathInfo().$qs;
         });
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_FULL]);
+        $this->request->cookies = new InputBag([DeviceViewInterface::COOKIE_KEY_DEFAULT => DeviceViewInterface::VIEW_FULL]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);
         $deviceDataCollector->setRedirectConfig($redirectConfig);
@@ -262,7 +263,7 @@ final class DeviceDataCollectorTest extends TestCase
         $views = $deviceDataCollector->getViews();
 
         self::assertSame($deviceView->getViewType(), $currentView);
-        self::assertSame(DeviceView::VIEW_FULL, $currentView);
+        self::assertSame(DeviceViewInterface::VIEW_FULL, $currentView);
         self::assertCount(3, $views);
 
         foreach ($views as $view) {
@@ -272,17 +273,17 @@ final class DeviceDataCollectorTest extends TestCase
             self::assertArrayHasKey('link', $view);
             self::assertArrayHasKey('isCurrent', $view);
             self::assertArrayHasKey('enabled', $view);
-            if (DeviceView::VIEW_FULL === $view['type']) {
+            if (DeviceViewInterface::VIEW_FULL === $view['type']) {
                 self::assertTrue($view['isCurrent']);
             }
-            if (DeviceView::VIEW_MOBILE === $view['type']) {
+            if (DeviceViewInterface::VIEW_MOBILE === $view['type']) {
                 self::assertFalse($view['isCurrent']);
                 self::assertFalse($view['enabled']);
                 self::assertSame(
                     \sprintf(
                         'http://testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
-                        DeviceView::VIEW_MOBILE
+                        DeviceViewInterface::VIEW_MOBILE
                     ),
                     $view['link']
                 );

@@ -24,11 +24,19 @@ class MobileDetector extends MobileDetect implements MobileDetectorInterface
 
     public const VERSION_TYPE_FLOAT = 'float';
 
+    /**
+     * Get the list of user agents by fetching browsers.
+     */
     public static function getUserAgents(): array
     {
         return self::getBrowsers();
     }
 
+    /**
+     * Get the CloudFront headers from the current request.
+     *
+     * @deprecated use self::getCloudFrontHttpHeaders() instead
+     */
     public function getCfHeaders(): array
     {
         return $this->getCloudFrontHttpHeaders();

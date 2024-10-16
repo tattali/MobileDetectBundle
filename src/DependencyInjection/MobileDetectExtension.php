@@ -58,6 +58,9 @@ class MobileDetectExtension extends Extension
         $container->setParameter('mobile_detect.switch_param', $config['switch_param']);
     }
 
+    /**
+     * Validates a given URL.
+     */
     protected function validHost(?string $url): bool
     {
         return (bool) filter_var($url, \FILTER_VALIDATE_URL);
