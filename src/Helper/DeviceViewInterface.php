@@ -58,22 +58,22 @@ interface DeviceViewInterface
      */
     public function hasSwitchParam(): bool;
 
-    public function setView(string $view): void;
+    public function setView(string $view): self;
 
     /**
      * Sets the full (desktop) view type.
      */
-    public function setFullView(): void;
+    public function setFullView(): self;
 
-    public function setTabletView(): void;
+    public function setTabletView(): self;
 
-    public function setMobileView(): void;
+    public function setMobileView(): self;
 
-    public function setNotMobileView(): void;
+    public function setNotMobileView(): self;
 
     public function getRedirectConfig(): array;
 
-    public function setRedirectConfig(array $redirectConfig): void;
+    public function setRedirectConfig(array $redirectConfig): self;
 
     /**
      * Retrieves a RedirectResponseWithCookie object based on the provided redirect URL.
@@ -87,35 +87,35 @@ interface DeviceViewInterface
 
     public function getCookieExpireDatetimeModifier(): string;
 
-    public function setCookieExpireDatetimeModifier(string $cookieExpireDatetimeModifier): void;
+    public function setCookieExpireDatetimeModifier(string $cookieExpireDatetimeModifier): self;
 
     public function getCookieKey(): string;
 
-    public function setCookieKey(string $cookieKey): void;
+    public function setCookieKey(string $cookieKey): self;
 
     public function getCookiePath(): string;
 
-    public function setCookiePath(string $cookiePath): void;
+    public function setCookiePath(string $cookiePath): self;
 
     public function getCookieDomain(): string;
 
-    public function setCookieDomain(string $cookieDomain): void;
+    public function setCookieDomain(string $cookieDomain): self;
 
     public function isCookieSecure(): bool;
 
-    public function setCookieSecure(bool $cookieSecure): void;
+    public function setCookieSecure(bool $cookieSecure): self;
 
     public function isCookieHttpOnly(): bool;
 
-    public function setCookieHttpOnly(bool $cookieHttpOnly): void;
+    public function setCookieHttpOnly(bool $cookieHttpOnly): self;
 
     public function isCookieRaw(): bool;
 
-    public function setCookieRaw(bool $cookieRaw = false): void;
+    public function setCookieRaw(bool $cookieRaw = false): self;
 
     public function getCookieSameSite(): ?string;
 
-    public function setCookieSameSite(?string $cookieSameSite = Cookie::SAMESITE_LAX): void;
+    public function setCookieSameSite(?string $cookieSameSite = Cookie::SAMESITE_LAX): self;
 
     /**
      * Modifies the Response for the specified device view.
@@ -135,5 +135,5 @@ interface DeviceViewInterface
 
     public function getSwitchParam(): string;
 
-    public function setSwitchParam(string $switchParam): void;
+    public function setSwitchParam(string $switchParam): self;
 }

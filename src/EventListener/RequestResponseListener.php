@@ -153,8 +153,6 @@ class RequestResponseListener implements RequestResponseListenerInterface
         if ($this->needModifyResponse && $this->modifyResponseClosure instanceof \Closure) {
             $modifyClosure = $this->modifyResponseClosure;
             $event->setResponse($modifyClosure($this->deviceView, $event));
-
-            return;
         }
     }
 
