@@ -157,32 +157,42 @@ class DeviceView implements DeviceViewInterface
         return $this->request && $this->request->query->has($this->switchParam);
     }
 
-    public function setView(string $view): void
+    public function setView(string $view): self
     {
         $this->viewType = $view;
+
+        return $this;
     }
 
     /**
      * Sets the full (desktop) view type.
      */
-    public function setFullView(): void
+    public function setFullView(): self
     {
         $this->viewType = self::VIEW_FULL;
+
+        return $this;
     }
 
-    public function setTabletView(): void
+    public function setTabletView(): self
     {
         $this->viewType = self::VIEW_TABLET;
+
+        return $this;
     }
 
-    public function setMobileView(): void
+    public function setMobileView(): self
     {
         $this->viewType = self::VIEW_MOBILE;
+
+        return $this;
     }
 
-    public function setNotMobileView(): void
+    public function setNotMobileView(): self
     {
         $this->viewType = self::VIEW_NOT_MOBILE;
+
+        return $this;
     }
 
     public function getRedirectConfig(): array
@@ -190,9 +200,11 @@ class DeviceView implements DeviceViewInterface
         return $this->redirectConfig;
     }
 
-    public function setRedirectConfig(array $redirectConfig): void
+    public function setRedirectConfig(array $redirectConfig): self
     {
         $this->redirectConfig = $redirectConfig;
+
+        return $this;
     }
 
     /**
@@ -239,9 +251,11 @@ class DeviceView implements DeviceViewInterface
         return $this->cookieExpireDatetimeModifier;
     }
 
-    public function setCookieExpireDatetimeModifier(string $cookieExpireDatetimeModifier): void
+    public function setCookieExpireDatetimeModifier(string $cookieExpireDatetimeModifier): self
     {
         $this->cookieExpireDatetimeModifier = $cookieExpireDatetimeModifier;
+
+        return $this;
     }
 
     public function getCookieKey(): string
@@ -249,9 +263,11 @@ class DeviceView implements DeviceViewInterface
         return $this->cookieKey;
     }
 
-    public function setCookieKey(string $cookieKey): void
+    public function setCookieKey(string $cookieKey): self
     {
         $this->cookieKey = $cookieKey;
+
+        return $this;
     }
 
     public function getCookiePath(): string
@@ -259,9 +275,11 @@ class DeviceView implements DeviceViewInterface
         return $this->cookiePath;
     }
 
-    public function setCookiePath(string $cookiePath): void
+    public function setCookiePath(string $cookiePath): self
     {
         $this->cookiePath = $cookiePath;
+
+        return $this;
     }
 
     public function getCookieDomain(): string
@@ -269,9 +287,11 @@ class DeviceView implements DeviceViewInterface
         return $this->cookieDomain;
     }
 
-    public function setCookieDomain(string $cookieDomain): void
+    public function setCookieDomain(string $cookieDomain): self
     {
         $this->cookieDomain = $cookieDomain;
+
+        return $this;
     }
 
     public function isCookieSecure(): bool
@@ -279,9 +299,11 @@ class DeviceView implements DeviceViewInterface
         return $this->cookieSecure;
     }
 
-    public function setCookieSecure(bool $cookieSecure): void
+    public function setCookieSecure(bool $cookieSecure): self
     {
         $this->cookieSecure = $cookieSecure;
+
+        return $this;
     }
 
     public function isCookieHttpOnly(): bool
@@ -289,9 +311,11 @@ class DeviceView implements DeviceViewInterface
         return $this->cookieHttpOnly;
     }
 
-    public function setCookieHttpOnly(bool $cookieHttpOnly): void
+    public function setCookieHttpOnly(bool $cookieHttpOnly): self
     {
         $this->cookieHttpOnly = $cookieHttpOnly;
+
+        return $this;
     }
 
     public function isCookieRaw(): bool
@@ -299,9 +323,11 @@ class DeviceView implements DeviceViewInterface
         return $this->cookieRaw;
     }
 
-    public function setCookieRaw(bool $cookieRaw = false): void
+    public function setCookieRaw(bool $cookieRaw = false): self
     {
         $this->cookieRaw = $cookieRaw;
+
+        return $this;
     }
 
     public function getCookieSameSite(): ?string
@@ -309,9 +335,11 @@ class DeviceView implements DeviceViewInterface
         return $this->cookieSameSite;
     }
 
-    public function setCookieSameSite(?string $cookieSameSite = Cookie::SAMESITE_LAX): void
+    public function setCookieSameSite(?string $cookieSameSite = Cookie::SAMESITE_LAX): self
     {
         $this->cookieSameSite = $cookieSameSite;
+
+        return $this;
     }
 
     /**
@@ -343,9 +371,11 @@ class DeviceView implements DeviceViewInterface
         return $this->switchParam;
     }
 
-    public function setSwitchParam(string $switchParam): void
+    public function setSwitchParam(string $switchParam): self
     {
         $this->switchParam = $switchParam;
+
+        return $this;
     }
 
     /**
