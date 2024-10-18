@@ -86,7 +86,7 @@ class DeviceDataCollector extends DataCollector implements DeviceDataCollectorIn
     /**
      * Get the current view being displayed.
      */
-    public function getCurrentView(): string
+    public function getCurrentView(): ?string
     {
         return $this->data['currentView'];
     }
@@ -102,9 +102,11 @@ class DeviceDataCollector extends DataCollector implements DeviceDataCollectorIn
     /**
      * Sets the redirect configuration.
      */
-    public function setRedirectConfig(array $redirectConfig): void
+    public function setRedirectConfig(array $redirectConfig): self
     {
         $this->redirectConfig = $redirectConfig;
+
+        return $this;
     }
 
     /**
