@@ -28,9 +28,9 @@ interface DeviceDataCollectorInterface
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void;
 
     /**
-     * Returns the current view name as a string.
+     * Returns the current view name as a string or null.
      */
-    public function getCurrentView(): string;
+    public function getCurrentView(): ?string;
 
     /**
      * Returns an array of views associated with this object.
@@ -40,7 +40,7 @@ interface DeviceDataCollectorInterface
     /**
      * Sets the redirect configuration for the Symfony application.
      */
-    public function setRedirectConfig(array $redirectConfig): void;
+    public function setRedirectConfig(array $redirectConfig): self;
 
     /**
      * Gets the name of the Symfony application.
