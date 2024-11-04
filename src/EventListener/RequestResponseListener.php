@@ -92,7 +92,11 @@ class RequestResponseListener implements RequestResponseListenerInterface
         }
 
         $request = $event->getRequest();
-        $this->mobileDetector->setUserAgent($request->headers->get('user-agent'));
+        if ($request->headers->get('user-agent')) {
+            $this->mobileDetector->setUserAgent($request->headers->get('user-agent'));
+        } else {
+            $this->mobileDetector->setUserAgent('');
+        }
 
         // Sets the flag for the response handled by the GET switch param and the type of the view.
         if ($this->deviceView->hasSwitchParam()) {
