@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the MobileDetectBundle.
  *
@@ -12,9 +13,8 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\Tests\DependencyInjection;
 
+use Detection\MobileDetect;
 use MobileDetectBundle\DependencyInjection\MobileDetectExtension;
-use MobileDetectBundle\DeviceDetector\MobileDetector;
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use MobileDetectBundle\Helper\DeviceView;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -71,8 +71,7 @@ final class MobileDetectExtensionTest extends TestCase
             $this->container->getParameter('mobile_detect.switch_param')
         );
 
-        self::assertTrue($this->container->hasDefinition(MobileDetector::class));
-        self::assertTrue($this->container->hasAlias(MobileDetectorInterface::class));
+        self::assertTrue($this->container->hasDefinition(MobileDetect::class));
     }
 
     public function testCustomRedirectConfigMobileHost(): void

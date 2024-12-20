@@ -153,7 +153,7 @@ final class DeviceDataCollectorTest extends TestCase
                 self::assertFalse($view['isCurrent']);
                 self::assertTrue($view['enabled']);
                 self::assertSame(
-                    sprintf(
+                    \sprintf(
                         'http://t.testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
                         DeviceView::VIEW_TABLET
@@ -216,7 +216,7 @@ final class DeviceDataCollectorTest extends TestCase
                 self::assertFalse($view['isCurrent']);
                 self::assertTrue($view['enabled']);
                 self::assertSame(
-                    sprintf(
+                    \sprintf(
                         'http://t.testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
                         DeviceView::VIEW_MOBILE
@@ -279,7 +279,7 @@ final class DeviceDataCollectorTest extends TestCase
                 self::assertFalse($view['isCurrent']);
                 self::assertFalse($view['enabled']);
                 self::assertSame(
-                    sprintf(
+                    \sprintf(
                         'http://testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
                         DeviceView::VIEW_MOBILE

@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\Twig\Extension;
 
-use MobileDetectBundle\DeviceDetector\MobileDetector;
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
+use Detection\MobileDetect;
 use MobileDetectBundle\Helper\DeviceView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,32 +25,15 @@ use Twig\TwigFunction;
  */
 class MobileDetectExtension extends AbstractExtension
 {
-    /**
-     * @var MobileDetectorInterface
-     */
-    private $mobileDetector;
+    private Request $request;
 
-    /**
-     * @var DeviceView
-     */
-    private $deviceView;
-
-    /**
-     * @var array
-     */
-    private $redirectConf;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(RequestStack $requestStack, MobileDetectorInterface $mobileDetector, DeviceView $deviceView, array $redirectConf)
-    {
+    public function __construct(
+        private readonly RequestStack $requestStack,
+        private readonly MobileDetect $mobileDetect,
+        private readonly DeviceView $deviceView,
+        private readonly array $redirectConf,
+    ) {
         $this->request = $requestStack->getMainRequest();
-        $this->mobileDetector = $mobileDetector;
-        $this->deviceView = $deviceView;
-        $this->redirectConf = $redirectConf;
     }
 
     /**
@@ -79,11 +61,11 @@ class MobileDetectExtension extends AbstractExtension
     public function getRules(): array
     {
         return array_merge(
-            $this->mobileDetector->getPhoneDevices(),
-            $this->mobileDetector->getTabletDevices(),
-            $this->mobileDetector->getOperatingSystems(),
-            $this->mobileDetector->getBrowsers(),
-            $this->mobileDetector->getUtilities()
+            $this->mobileDetect->getPhoneDevices(),
+            $this->mobileDetect->getTabletDevices(),
+            $this->mobileDetect->getOperatingSystems(),
+            $this->mobileDetect->getBrowsers(),
+            $this->mobileDetect->getUtilities()
         );
     }
 
@@ -100,9 +82,9 @@ class MobileDetectExtension extends AbstractExtension
      *
      * @return string|float|null the version of the property we are trying to extract
      */
-    public function deviceVersion(string $propertyName, string $type = MobileDetector::VERSION_TYPE_STRING)
+    public function deviceVersion(string $propertyName, string $type = MobileDetect::VERSION_TYPE_STRING)
     {
-        return $this->mobileDetector->version($propertyName, $type) ?: null;
+        return $this->mobileDetect->version($propertyName, $type) ?: null;
     }
 
     /**
@@ -146,12 +128,12 @@ class MobileDetectExtension extends AbstractExtension
 
     public function isMobile(): bool
     {
-        return $this->mobileDetector->isMobile();
+        return $this->mobileDetect->isMobile();
     }
 
     public function isTablet(): bool
     {
-        return $this->mobileDetector->isTablet();
+        return $this->mobileDetect->isTablet();
     }
 
     /**
@@ -161,7 +143,7 @@ class MobileDetectExtension extends AbstractExtension
     {
         $magicMethodName = 'is'.strtolower((string) $deviceName);
 
-        return $this->mobileDetector->{$magicMethodName}();
+        return $this->mobileDetect->{$magicMethodName}();
     }
 
     public function isFullView(): bool
@@ -186,16 +168,16 @@ class MobileDetectExtension extends AbstractExtension
 
     public function isIOS(): bool
     {
-        return $this->mobileDetector->isIOS();
+        return $this->mobileDetect->isIOS();
     }
 
     public function isAndroidOS(): bool
     {
-        return $this->mobileDetector->isAndroidOS();
+        return $this->mobileDetect->isAndroidOS();
     }
 
     public function isWindowsOS(): bool
     {
-        return $this->mobileDetector->isWindowsMobileOS() || $this->mobileDetector->isWindowsPhoneOS();
+        return $this->mobileDetect->isWindowsMobileOS() || $this->mobileDetect->isWindowsPhoneOS();
     }
 }
