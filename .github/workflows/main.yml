@@ -34,7 +34,7 @@ jobs:
           - 7.*
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install PHP with PCOV
         uses: shivammathur/setup-php@v2
@@ -52,7 +52,7 @@ jobs:
         run: composer config minimum-stability ${{ matrix.stability }}
 
       - name: Install dependencies with Composer
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v3
         with:
           dependency-versions: ${{ matrix.dependencies }}
           composer-options: --prefer-dist
@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download coverage files
         uses: actions/download-artifact@v3
