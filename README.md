@@ -48,7 +48,7 @@ With Twig
 {% if is_tablet() %}
 {% if is_device('iPhone') %} # magic methods is[...]
 ```
-Available User-Agents (uaMatch) with the php `is()` and twig `is_device()` [here](https://cdn.statically.io/gh/serbanghita/Mobile-Detect/5.x/Mobile_Detect.json)
+Available User-Agents (uaMatch) with the php `is()` and twig `is_device()` [here](https://github.com/serbanghita/Mobile-Detect/blob/4.8.x/MobileDetect.json)
 
 #### Switch device view
 
