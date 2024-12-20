@@ -12,7 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,8 +71,8 @@ final class RequestResponseListenerTest extends TestCase
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://testhost.com');
         $this->request->expects(self::any())->method('get')->willReturn('value');
         $this->request->expects(self::any())->method('getUriForPath')->willReturn('/');
-        $this->request->query = new ParameterBag();
-        $this->request->cookies = new ParameterBag();
+        $this->request->query = new InputBag();
+        $this->request->cookies = new InputBag();
 
         $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
         $this->requestStack->expects(self::any())
@@ -89,7 +89,7 @@ final class RequestResponseListenerTest extends TestCase
 
     public function testHandleRequestHasSwitchParam(): void
     {
-        $this->request->query = new ParameterBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->request->query = new InputBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
         $deviceView = new DeviceView($this->requestStack);
         $deviceView->setRedirectConfig([DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
@@ -114,7 +114,7 @@ final class RequestResponseListenerTest extends TestCase
 
     public function testHandleRequestBis(): void
     {
-        $this->request->query = new ParameterBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->request->query = new InputBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
         $deviceView = new DeviceView($this->requestStack);
         $deviceView->setRedirectConfig([DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
@@ -141,7 +141,7 @@ final class RequestResponseListenerTest extends TestCase
     {
         $this->config['mobile'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
-        $this->request->query = new ParameterBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->request->query = new InputBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
         $this->request->expects(self::any())->method('get')->willReturn('value');
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
@@ -241,7 +241,7 @@ final class RequestResponseListenerTest extends TestCase
     {
         $this->config['tablet'] = ['is_enabled' => true, 'host' => 'http://t.testsite.com', 'status_code' => Response::HTTP_FOUND];
 
-        $this->request->query = new ParameterBag(['some' => 'param']);
+        $this->request->query = new InputBag(['some' => 'param']);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->request->expects(self::any())->method('get')->willReturn('value');
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
@@ -284,7 +284,7 @@ final class RequestResponseListenerTest extends TestCase
 
         $switchParam = 'custom_param';
 
-        $this->request->query = new ParameterBag(['some' => 'param']);
+        $this->request->query = new InputBag(['some' => 'param']);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
             $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2)
