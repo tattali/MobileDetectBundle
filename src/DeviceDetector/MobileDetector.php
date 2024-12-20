@@ -12,10 +12,11 @@ declare(strict_types=1);
  */
 
 namespace MobileDetectBundle\DeviceDetector;
+use Detection\MobileDetect;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
  */
-class MobileDetector extends \Mobile_Detect implements MobileDetectorInterface
+class MobileDetector extends MobileDetect implements MobileDetectorInterface
 {
 }
