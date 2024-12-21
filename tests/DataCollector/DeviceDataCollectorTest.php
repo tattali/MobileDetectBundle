@@ -26,27 +26,14 @@ use Symfony\Component\HttpFoundation\ServerBag;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
- *
- * @internal
- *
- * @coversDefaultClass
  */
 final class DeviceDataCollectorTest extends TestCase
 {
-    /**
-     * @var MockObject|RequestStack
-     */
-    private $requestStack;
+    private MockObject&RequestStack $requestStack;
 
-    /**
-     * @var MockObject|Request
-     */
-    private $request;
+    private MockObject&Request $request;
 
-    /**
-     * @var MockObject|Response
-     */
-    private $response;
+    private MockObject&Response $response;
 
     protected function setUp(): void
     {
@@ -77,8 +64,7 @@ final class DeviceDataCollectorTest extends TestCase
         ];
         $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
-        $deviceDataCollector = new DeviceDataCollector($deviceView);
-        $deviceDataCollector->setRedirectConfig($redirectConfig);
+        $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
 
         $currentView = $deviceDataCollector->getCurrentView();
@@ -128,8 +114,7 @@ final class DeviceDataCollectorTest extends TestCase
         });
         $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
-        $deviceDataCollector = new DeviceDataCollector($deviceView);
-        $deviceDataCollector->setRedirectConfig($redirectConfig);
+        $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
 
         $currentView = $deviceDataCollector->getCurrentView();
@@ -156,9 +141,9 @@ final class DeviceDataCollectorTest extends TestCase
                     \sprintf(
                         'http://t.testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
-                        DeviceView::VIEW_TABLET
+                        DeviceView::VIEW_TABLET,
                     ),
-                    $view['link']
+                    $view['link'],
                 );
             }
         }
@@ -191,8 +176,7 @@ final class DeviceDataCollectorTest extends TestCase
         });
         $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_FULL]);
         $deviceView = new DeviceView($this->requestStack);
-        $deviceDataCollector = new DeviceDataCollector($deviceView);
-        $deviceDataCollector->setRedirectConfig($redirectConfig);
+        $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
 
         $currentView = $deviceDataCollector->getCurrentView();
@@ -219,9 +203,9 @@ final class DeviceDataCollectorTest extends TestCase
                     \sprintf(
                         'http://t.testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
-                        DeviceView::VIEW_MOBILE
+                        DeviceView::VIEW_MOBILE,
                     ),
-                    $view['link']
+                    $view['link'],
                 );
             }
         }
@@ -254,8 +238,7 @@ final class DeviceDataCollectorTest extends TestCase
         });
         $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_FULL]);
         $deviceView = new DeviceView($this->requestStack);
-        $deviceDataCollector = new DeviceDataCollector($deviceView);
-        $deviceDataCollector->setRedirectConfig($redirectConfig);
+        $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
 
         $currentView = $deviceDataCollector->getCurrentView();
@@ -282,9 +265,9 @@ final class DeviceDataCollectorTest extends TestCase
                     \sprintf(
                         'http://testsite.com/base-url/path-info?%s=%s&param1=value1',
                         $deviceView->getSwitchParam(),
-                        DeviceView::VIEW_MOBILE
+                        DeviceView::VIEW_MOBILE,
                     ),
-                    $view['link']
+                    $view['link'],
                 );
             }
         }

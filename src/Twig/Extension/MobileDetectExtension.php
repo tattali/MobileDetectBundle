@@ -25,10 +25,13 @@ use Twig\TwigFunction;
  */
 class MobileDetectExtension extends AbstractExtension
 {
-    private Request $request;
+    private ?Request $request;
 
+    /**
+     * @param array<string, mixed> $redirectConf
+     */
     public function __construct(
-        private readonly RequestStack $requestStack,
+        RequestStack $requestStack,
         private readonly MobileDetect $mobileDetect,
         private readonly DeviceView $deviceView,
         private readonly array $redirectConf,
@@ -38,6 +41,8 @@ class MobileDetectExtension extends AbstractExtension
 
     /**
      * Get extension twig function.
+     *
+     * @return TwigFunction[]
      */
     public function getFunctions(): array
     {
@@ -49,7 +54,7 @@ class MobileDetectExtension extends AbstractExtension
             new TwigFunction('is_mobile_view', [$this, 'isMobileView']),
             new TwigFunction('is_tablet_view', [$this, 'isTabletView']),
             new TwigFunction('is_not_mobile_view', [$this, 'isNotMobileView']),
-            new TwigFunction('is_ios', [$this, 'isIOS']),
+            new TwigFunction('is_ios', [$this, 'isiOS']),
             new TwigFunction('is_android_os', [$this, 'isAndroidOS']),
             new TwigFunction('is_windows_os', [$this, 'isWindowsOS']),
             new TwigFunction('full_view_url', [$this, 'fullViewUrl'], ['is_safe' => ['html']]),
@@ -58,31 +63,15 @@ class MobileDetectExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getRules(): array
     {
-        return array_merge(
-            $this->mobileDetect->getPhoneDevices(),
-            $this->mobileDetect->getTabletDevices(),
-            $this->mobileDetect->getOperatingSystems(),
-            $this->mobileDetect->getBrowsers(),
-            $this->mobileDetect->getUtilities()
-        );
+        return $this->mobileDetect->getRules();
     }
 
-    /**
-     * Check the version of the given property in the User-Agent.
-     * Will return a float number. (eg. 2_0 will return 2.0, 4.3.1 will return 4.31).
-     *
-     * @param string $propertyName The name of the property. See self::getProperties() array
-     *                             keys for all possible properties.
-     * @param string $type         Either self::VERSION_TYPE_STRING to get a string value or
-     *                             self::VERSION_TYPE_FLOAT indicating a float value. This parameter
-     *                             is optional and defaults to self::VERSION_TYPE_STRING. Passing an
-     *                             invalid parameter will default to the this type as well.
-     *
-     * @return string|float|null the version of the property we are trying to extract
-     */
-    public function deviceVersion(string $propertyName, string $type = MobileDetect::VERSION_TYPE_STRING)
+    public function deviceVersion(string $propertyName, string $type = ''): float|bool|string|null
     {
         return $this->mobileDetect->version($propertyName, $type) ?: null;
     }
@@ -166,9 +155,9 @@ class MobileDetectExtension extends AbstractExtension
         return $this->deviceView->isNotMobileView();
     }
 
-    public function isIOS(): bool
+    public function isiOS(): bool
     {
-        return $this->mobileDetect->isIOS();
+        return $this->mobileDetect->isiOS();
     }
 
     public function isAndroidOS(): bool

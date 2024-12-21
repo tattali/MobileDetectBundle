@@ -37,16 +37,13 @@ class RequestResponseListener
     public const TABLET = 'tablet';
     public const FULL = 'full';
 
-    /**
-     * @var bool
-     */
-    protected $needModifyResponse = false;
+    protected bool $needModifyResponse = false;
+
+    protected ?\Closure $modifyResponseClosure;
 
     /**
-     * @var \Closure
+     * @param array<string, mixed> $redirectConf
      */
-    protected $modifyResponseClosure;
-
     public function __construct(
         protected readonly MobileDetect $mobileDetect,
         protected readonly DeviceView $deviceView,
@@ -58,14 +55,14 @@ class RequestResponseListener
 
     public function handleRequest(RequestEvent $event): void
     {
-        // only handle master request, do not handle sub request like esi includes
+        // Only handle main request, do not handle sub request like esi includes
         // If the device view is "not the mobile view" (e.g. we're not in the request context)
-        if ((\defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') : \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST')) !== $event->getRequestType() || $this->deviceView->isNotMobileView()) {
+        if (!$event->isMainRequest() || $this->deviceView->isNotMobileView()) {
             return;
         }
 
         $request = $event->getRequest();
-        $this->mobileDetect->setUserAgent($request->headers->get('user-agent'));
+        $this->mobileDetect->setUserAgent($request->headers->get('user-agent', ''));
 
         // Sets the flag for the response handled by the GET switch param and the type of the view.
         if ($this->deviceView->hasSwitchParam()) {
@@ -226,7 +223,7 @@ class RequestResponseListener
             return $this->deviceView->getRedirectResponse(
                 $view,
                 $host,
-                $this->redirectConf[$view]['status_code']
+                $this->redirectConf[$view]['status_code'],
             );
         }
 
@@ -240,8 +237,6 @@ class RequestResponseListener
      */
     protected function prepareResponseModification(string $view): void
     {
-        $this->modifyResponseClosure = static function (DeviceView $deviceView, ResponseEvent $event) use ($view) {
-            return $deviceView->modifyResponse($view, $event->getResponse());
-        };
+        $this->modifyResponseClosure = static fn (DeviceView $deviceView, ResponseEvent $event) => $deviceView->modifyResponse($view, $event->getResponse());
     }
 }

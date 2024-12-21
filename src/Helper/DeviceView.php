@@ -38,73 +38,37 @@ class DeviceView
     public const COOKIE_EXPIRE_DATETIME_MODIFIER_DEFAULT = '1 month';
     public const SWITCH_PARAM_DEFAULT = 'device_view';
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected ?Request $request = null;
+
+    protected ?string $requestedViewType = null;
+
+    protected ?string $viewType = null;
+
+    protected string $cookieKey = self::COOKIE_KEY_DEFAULT;
+
+    protected string $cookiePath = self::COOKIE_PATH_DEFAULT;
+
+    protected string $cookieDomain = self::COOKIE_DOMAIN_DEFAULT;
+
+    protected bool $cookieSecure = self::COOKIE_SECURE_DEFAULT;
+
+    protected bool $cookieHttpOnly = self::COOKIE_HTTP_ONLY_DEFAULT;
+
+    protected bool $cookieRaw = self::COOKIE_RAW_DEFAULT;
+
+    protected ?string $cookieSameSite = self::COOKIE_SAMESITE_DEFAULT;
+
+    protected string $cookieExpireDatetimeModifier = self::COOKIE_EXPIRE_DATETIME_MODIFIER_DEFAULT;
+
+    protected string $switchParam = self::SWITCH_PARAM_DEFAULT;
 
     /**
-     * @var string
+     * @param array<string, mixed> $redirectConfig
      */
-    protected $requestedViewType;
-
-    /**
-     * @var string
-     */
-    protected $viewType;
-
-    /**
-     * @var string
-     */
-    protected $cookieKey = self::COOKIE_KEY_DEFAULT;
-
-    /**
-     * @var string
-     */
-    protected $cookiePath = self::COOKIE_PATH_DEFAULT;
-
-    /**
-     * @var string
-     */
-    protected $cookieDomain = self::COOKIE_DOMAIN_DEFAULT;
-
-    /**
-     * @var bool
-     */
-    protected $cookieSecure = self::COOKIE_SECURE_DEFAULT;
-
-    /**
-     * @var bool
-     */
-    protected $cookieHttpOnly = self::COOKIE_HTTP_ONLY_DEFAULT;
-
-    /**
-     * @var bool
-     */
-    protected $cookieRaw = self::COOKIE_RAW_DEFAULT;
-
-    /**
-     * @var string|null
-     */
-    protected $cookieSameSite = self::COOKIE_SAMESITE_DEFAULT;
-
-    /**
-     * @var string
-     */
-    protected $cookieExpireDatetimeModifier = self::COOKIE_EXPIRE_DATETIME_MODIFIER_DEFAULT;
-
-    /**
-     * @var string
-     */
-    protected $switchParam = self::SWITCH_PARAM_DEFAULT;
-
-    /**
-     * @var array
-     */
-    protected $redirectConfig = [];
-
-    public function __construct(?RequestStack $requestStack = null)
-    {
+    public function __construct(
+        ?RequestStack $requestStack = null,
+        protected array $redirectConfig = [],
+    ) {
         if (!$requestStack || !$this->request = $requestStack->getMainRequest()) {
             $this->viewType = self::VIEW_NOT_MOBILE;
 
@@ -200,14 +164,12 @@ class DeviceView
         $this->viewType = self::VIEW_NOT_MOBILE;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getRedirectConfig(): array
     {
         return $this->redirectConfig;
-    }
-
-    public function setRedirectConfig(array $redirectConfig): void
-    {
-        $this->redirectConfig = $redirectConfig;
     }
 
     public function getRedirectResponseBySwitchParam(string $redirectUrl): RedirectResponseWithCookie
@@ -230,7 +192,7 @@ class DeviceView
         return new RedirectResponseWithCookie(
             $redirectUrl,
             $this->getStatusCode($viewType),
-            $this->createCookie($viewType)
+            $this->createCookie($viewType),
         );
     }
 
@@ -389,7 +351,8 @@ class DeviceView
             $this->isCookieSecure(),
             $this->isCookieHttpOnly(),
             $this->isCookieRaw(),
-            $this->getCookieSameSite()
+            // @phpstan-ignore-next-line
+            $this->getCookieSameSite(),
         );
     }
 }

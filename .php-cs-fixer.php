@@ -10,31 +10,13 @@ $finder = PhpCsFixer\Finder::create()
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
-        '@DoctrineAnnotation' => true,
-        '@PhpCsFixer:risky' => true,
-        '@PhpCsFixer' => true,
-        '@PHPUnit84Migration:risky' => true,
-        '@PSR1' => true,
-        '@PSR12:risky' => true,
-        '@PSR12' => true,
-        '@PSR2' => true,
-        '@Symfony:risky' => true,
+        '@PER:risky' => true,
+        '@PER' => true,
+        '@PHP82Migration:risky' => true,
+        '@PHP84Migration' => true,
+        '@PHPUnit100Migration:risky' => true,
         '@Symfony' => true,
-        'array_indentation' => true,
-        'array_syntax' => [
-            'syntax' => 'short',
-        ],
-        'doctrine_annotation_array_assignment' => [
-            'operator' => '=',
-        ],
-        'doctrine_annotation_spaces' => [
-            'after_array_assignments_equals' => false,
-            'before_array_assignments_equals' => false,
-        ],
-        'linebreak_after_opening_tag' => true,
-        'list_syntax' => [
-            'syntax' => 'short',
-        ],
+        '@Symfony:risky' => true,
         'no_extra_blank_lines' => [
             'tokens' => [
                 'break',
@@ -48,7 +30,6 @@ return (new PhpCsFixer\Config())
                 'use',
             ],
         ],
-        'no_superfluous_phpdoc_tags' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
         'ordered_class_elements' => true,
@@ -68,7 +49,7 @@ return (new PhpCsFixer\Config())
         'single_line_comment_style' => true,
         'strict_comparison' => true,
         'strict_param' => true,
-        'void_return' => false,
+        'php_unit_test_class_requires_covers' => false,
     ])
     ->setFinder($finder)
 ;

@@ -22,22 +22,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
- *
- * @internal
- *
- * @coversDefaultClass
  */
 final class MobileDetectExtensionTest extends TestCase
 {
-    /**
-     * @var ContainerBuilder
-     */
-    private $container;
+    private ContainerBuilder $container;
 
-    /**
-     * @var MobileDetectExtension
-     */
-    private $extension;
+    private MobileDetectExtension $extension;
 
     protected function setUp(): void
     {
@@ -58,17 +48,17 @@ final class MobileDetectExtensionTest extends TestCase
                 'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
                 'detect_tablet_as_mobile' => false,
             ],
-            $this->container->getParameter('mobile_detect.redirect')
+            $this->container->getParameter('mobile_detect.redirect'),
         );
         self::assertTrue($this->container->getParameter('mobile_detect.switch_device_view.save_referer_path'));
         self::assertSame(DeviceView::COOKIE_KEY_DEFAULT, $this->container->getParameter('mobile_detect.cookie_key'));
         self::assertSame(
             DeviceView::COOKIE_EXPIRE_DATETIME_MODIFIER_DEFAULT,
-            $this->container->getParameter('mobile_detect.cookie_expire_datetime_modifier')
+            $this->container->getParameter('mobile_detect.cookie_expire_datetime_modifier'),
         );
         self::assertSame(
             DeviceView::SWITCH_PARAM_DEFAULT,
-            $this->container->getParameter('mobile_detect.switch_param')
+            $this->container->getParameter('mobile_detect.switch_param'),
         );
 
         self::assertTrue($this->container->hasDefinition(MobileDetect::class));

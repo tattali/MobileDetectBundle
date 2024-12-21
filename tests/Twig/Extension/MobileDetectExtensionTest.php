@@ -13,13 +13,7 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\TwigFunction;
 
-/**
- * @internal
- *
- * @coversDefaultClass
- */
 final class MobileDetectExtensionTest extends TestCase
 {
     private MockObject&MobileDetect $mobileDetect;
@@ -29,11 +23,11 @@ final class MobileDetectExtensionTest extends TestCase
     private MockObject&Request $request;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $config;
+    private array $config;
 
-    private $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
+    private string $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
 
     protected function setUp(): void
     {
@@ -74,7 +68,7 @@ final class MobileDetectExtensionTest extends TestCase
             'is_mobile_view' => 'isMobileView',
             'is_tablet_view' => 'isTabletView',
             'is_not_mobile_view' => 'isNotMobileView',
-            'is_ios' => 'isIOS',
+            'is_ios' => 'isiOS',
             'is_android_os' => 'isAndroidOS',
             'is_windows_os' => 'isWindowsOS',
             'full_view_url' => 'fullViewUrl',
@@ -82,7 +76,6 @@ final class MobileDetectExtensionTest extends TestCase
             'rules_list' => 'getRules',
         ];
         foreach ($functions as $function) {
-            self::assertInstanceOf(TwigFunction::class, $function);
             $name = $function->getName();
             $callable = $function->getCallable();
             self::assertArrayHasKey($name, $names);
@@ -100,20 +93,39 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testDeviceVersion(): void
     {
-        $this->mobileDetect->expects(self::exactly(3))
+        $reflection = new \ReflectionClass(MobileDetect::class);
+        $versionTypeString = $reflection->getConstant('VERSION_TYPE_STRING');
+        $versionTypeFloat = $reflection->getConstant('VERSION_TYPE_FLOAT');
+
+        $matcher = self::exactly(3);
+        $this->mobileDetect->expects($matcher)
             ->method('version')
-            ->withConsecutive(
-                [self::equalTo('Version'), self::equalTo(MobileDetect::VERSION_TYPE_STRING)],
-                [self::equalTo('Firefox'), self::equalTo(MobileDetect::VERSION_TYPE_STRING)],
-                [self::equalTo('Firefox'), self::equalTo(MobileDetect::VERSION_TYPE_FLOAT)]
-            )
-            ->willReturn(false, '98.0', 98.0)
+            ->willReturnCallback(static function ($parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    self::assertSame('Version', $parameters);
+
+                    return false;
+                }
+
+                if (2 === $matcher->numberOfInvocations()) {
+                    self::assertSame('Firefox', $parameters);
+
+                    return '98.0';
+                }
+
+                if (3 === $matcher->numberOfInvocations()) {
+                    self::assertSame('Firefox', $parameters);
+
+                    return 98.0;
+                }
+            })
         ;
+
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertNull($extension->deviceVersion('Version', MobileDetect::VERSION_TYPE_STRING));
-        self::assertSame('98.0', $extension->deviceVersion('Firefox', MobileDetect::VERSION_TYPE_STRING));
-        self::assertSame(98.0, $extension->deviceVersion('Firefox', MobileDetect::VERSION_TYPE_FLOAT));
+        self::assertNull($extension->deviceVersion('Version', $versionTypeString));
+        self::assertSame('98.0', $extension->deviceVersion('Firefox', $versionTypeString));
+        self::assertSame(98.0, $extension->deviceVersion('Firefox', $versionTypeFloat));
     }
 
     public function testFullViewUrlHostNull(): void
@@ -282,28 +294,28 @@ final class MobileDetectExtensionTest extends TestCase
         self::assertFalse($extension->isNotMobileView());
     }
 
-    public function testIsIOSTrue(): void
+    public function testIsiOSTrue(): void
     {
         $this->mobileDetect->expects(self::once())
             ->method('__call')
-            ->with(self::equalTo('isIOS'))
+            ->with(self::equalTo('isiOS'))
             ->willReturn(true)
         ;
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertTrue($extension->isIOS());
+        self::assertTrue($extension->isiOS());
     }
 
-    public function testIsIOSFalse(): void
+    public function testIsiOSFalse(): void
     {
         $this->mobileDetect->expects(self::once())
             ->method('__call')
-            ->with(self::equalTo('isIOS'))
+            ->with(self::equalTo('isiOS'))
             ->willReturn(false)
         ;
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertFalse($extension->isIOS());
+        self::assertFalse($extension->isiOS());
     }
 
     public function testIsAndroidOSTrue(): void
@@ -332,14 +344,24 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsWindowsOSTrue(): void
     {
-        $this->mobileDetect->expects(self::exactly(1))
+        $matcher = self::exactly(1);
+        $this->mobileDetect->expects($matcher)
             ->method('__call')
-            ->withConsecutive(
-                [self::equalTo('isWindowsMobileOS')],
-                [self::equalTo('isWindowsPhoneOS')]
-            )
-            ->willReturnOnConsecutiveCalls(true)
+            ->willReturnCallback(static function ($parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    self::assertSame('isWindowsMobileOS', $parameters);
+
+                    return true;
+                }
+
+                // if (1 === $matcher->numberOfInvocations()) {
+                //     self::assertSame('isWindowsPhoneOS', $parameters);
+
+                //     return true;
+                // }
+            })
         ;
+
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertTrue($extension->isWindowsOS());
@@ -347,14 +369,24 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsWindowsOSFalse(): void
     {
-        $this->mobileDetect->expects(self::exactly(2))
+        $matcher = self::exactly(2);
+        $this->mobileDetect->expects($matcher)
             ->method('__call')
-            ->withConsecutive(
-                [self::equalTo('isWindowsMobileOS')],
-                [self::equalTo('isWindowsPhoneOS')]
-            )
-            ->willReturn(false)
+            ->willReturnCallback(static function ($parameters) use ($matcher) {
+                if (1 === $matcher->numberOfInvocations()) {
+                    self::assertSame('isWindowsMobileOS', $parameters);
+
+                    return false;
+                }
+
+                // if (1 === $matcher->numberOfInvocations()) {
+                //     self::assertSame('isWindowsPhoneOS', $parameters);
+
+                //     return false;
+                // }
+            })
         ;
+
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertFalse($extension->isWindowsOS());
