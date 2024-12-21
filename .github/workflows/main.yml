@@ -50,7 +50,7 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: xdebug
 
-            - name: Install dependencies
+      - name: Install dependencies
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony-version }}
         run: |
