@@ -10,8 +10,8 @@ $finder = PhpCsFixer\Finder::create()
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
-        '@PER:risky' => true,
-        '@PER' => true,
+        '@PER-CS:risky' => true,
+        '@PER-CS' => true,
         '@PHP82Migration:risky' => true,
         '@PHP84Migration' => true,
         '@PHPUnit100Migration:risky' => true,
