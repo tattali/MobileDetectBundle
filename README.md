@@ -3,17 +3,17 @@
 MobileDetectBundle
 ==================
 
-Symfony 3.4.x-7.0 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+Symfony 5.4.x-7.0 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
 
 [![Github Actions Status](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml/badge.svg?branch=main
-)](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml?query=branch%3Amain) [![Latest Stable Version](http://poser.pugx.org/tattali/mobile-detect-bundle/v)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![Total Downloads](http://poser.pugx.org/tattali/mobile-detect-bundle/downloads)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![codecov](https://codecov.io/gh/tattali/MobileDetectBundle/branch/main/graph/badge.svg?token=HWV1OYRSD9)](https://codecov.io/gh/tattali/MobileDetectBundle) [![License](http://poser.pugx.org/tattali/mobile-detect-bundle/license)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![PHP Version Require](http://poser.pugx.org/tattali/mobile-detect-bundle/require/php)](https://packagist.org/packages/tattali/mobile-detect-bundle)
+)](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml?query=branch%3Amain) [![Latest Stable Version](https://poser.pugx.org/tattali/mobile-detect-bundle/v)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![Total Downloads](https://poser.pugx.org/tattali/mobile-detect-bundle/downloads)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![codecov](https://codecov.io/gh/tattali/MobileDetectBundle/branch/main/graph/badge.svg?token=HWV1OYRSD9)](https://codecov.io/gh/tattali/MobileDetectBundle) [![License](https://poser.pugx.org/tattali/mobile-detect-bundle/license)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![PHP Version Require](https://poser.pugx.org/tattali/mobile-detect-bundle/require/php)](https://packagist.org/packages/tattali/mobile-detect-bundle)
 
 *This bundle is a fork of [suncat2000/MobileDetectBundle](https://github.com/suncat2000/MobileDetectBundle). As this project doesn't look maintained anymore, we decided to create & maintain a fork. For more information read our [manifest](https://github.com/tattali/MobileDetectBundle/issues/8).*
 
 Introduction
 ------------
 
-This Bundle use [Mobile_Detect](https://github.com/serbanghita/Mobile-Detect) class and provides the following features:
+This Bundle use [MobileDetect](https://github.com/serbanghita/Mobile-Detect) class and provides the following features:
 
 * Detect the various mobile devices by Name, OS, browser User-Agent
 * Manages site views for the various mobile devices (`mobile`, `tablet`, `full`)
@@ -32,9 +32,9 @@ composer require tattali/mobile-detect-bundle
 #### Checking device
 
 ```php
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
+use Detection\MobileDetect;
 
-public function someaction(MobileDetectorInterface $mobileDetector)
+public function someaction(MobileDetect $mobileDetector)
 {
     $mobileDetector->isMobile();
     $mobileDetector->isTablet();
@@ -55,7 +55,7 @@ Available User-Agents (uaMatch) with the php `is()` and twig `is_device()` [here
 For switch device view, use `device_view` GET parameter:
 
 ```url
-http://localhost:8000?device_view={full/mobile/tablet}
+https://localhost:8000?device_view={full/mobile/tablet}
 ```
 
 Or using the Symfony toolbar
@@ -75,6 +75,6 @@ Any feedback and contribution will be very appreciated.
 License and credits
 -------
 
-This bundle is under the MIT license. See the complete [license](src/Resources/meta/LICENSE) in the bundle
+This bundle is under the MIT license. See the complete [license](LICENSE) in the bundle
 
 Original authors: [suncat2000](https://github.com/suncat2000), [HenriVesala](https://github.com/HenriVesala), [netmikey](https://github.com/netmikey) and [all contributors](https://github.com/suncat2000/MobileDetectBundle/graphs/contributors)
