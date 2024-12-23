@@ -59,7 +59,7 @@ https://localhost:8000?device_view={desktop/mobile/tablet}
 ```
 
 Or using the Symfony toolbar
-![mbd-bundle-sf-toolbar](https://user-images.githubusercontent.com/10502887/161488224-aaedde1c-d3c3-4636-8761-a207fbd5d4ff.png)
+![mbd-bundle-sf-toolbar](src/Resources/doc/sf-toolbar.png)
 
 #### Going further
 
