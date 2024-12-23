@@ -35,7 +35,7 @@ class RequestResponseListener
 
     public const MOBILE = 'mobile';
     public const TABLET = 'tablet';
-    public const FULL = 'full';
+    public const DESKTOP = 'desktop';
 
     protected bool $needModifyResponse = false;
 
@@ -49,7 +49,7 @@ class RequestResponseListener
         protected readonly DeviceView $deviceView,
         protected readonly RouterInterface $router,
         protected readonly array $redirectConf,
-        protected readonly bool $isFullPath = true,
+        protected readonly bool $isDesktopPath = true,
     ) {
     }
 
@@ -79,7 +79,7 @@ class RequestResponseListener
             } elseif ($this->mobileDetect->isMobile()) {
                 $this->deviceView->setMobileView();
             } else {
-                $this->deviceView->setFullView();
+                $this->deviceView->setDesktopView();
             }
         }
 
@@ -132,7 +132,7 @@ class RequestResponseListener
             // do it in one response while setting the cookie.
             $redirectUrl = $this->getRedirectUrl($request, $this->deviceView->getViewType());
         } else {
-            if (true === $this->isFullPath) {
+            if (true === $this->isDesktopPath) {
                 $redirectUrl = $request->getUriForPath($request->getPathInfo());
                 // $redirectUrl = ($request->getPathInfo()) ? $request->getUriForPath($request->getPathInfo()) : $this->getCurrentHost($request);
                 $queryParams = $request->query->all();

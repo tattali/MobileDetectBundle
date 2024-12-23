@@ -5,7 +5,7 @@ Set up automated mobile/desktop/tablet redirection
 
 In this example, we will make sure to activate the automatic redirection to a mobile site http://m.example.com when the user uses a mobile device and desktop http://example.com when the user uses a computer or desktop browser.
 
-If the user reaches the mobile site http://m.example.com, on his desktop browser he should be redirected to the full version at http://example.com.
+If the user reaches the mobile site http://m.example.com, on his desktop browser he should be redirected to the desktop version at http://example.com.
 
 If the user reaches the desktop site http://example.com, with his mobile he should be redirected to the mobile version at http://m.example.com.
 
@@ -24,7 +24,7 @@ parameters:
 # conﬁg/packages/mobile_detect.yaml
 mobile_detect:
     redirect:
-        full:
+        desktop:
             action: redirect                # redirect, no_redirect, redirect_without_path
             host: '%env(REDIRECT_DESKTOP)%' # with scheme (http|https), default null, url validate
             is_enabled: true                # default false

@@ -11,7 +11,7 @@ You can change default behaviour of your redirects with action parameter:
 # conﬁg/packages/mobile_detect.yaml
 mobile_detect:
   redirect:
-    full:
+    desktop:
       action: redirect            # redirect, no_redirect, redirect_without_path
       host: http://site.com       # with scheme (http|https), default null, url validate
       is_enabled: true            # default false

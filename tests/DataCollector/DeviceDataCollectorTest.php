@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the MobileDetectBundle.
  *
@@ -10,6 +8,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace MobileDetectBundle\Tests\DataCollector;
 
@@ -149,7 +149,7 @@ final class DeviceDataCollectorTest extends TestCase
         }
     }
 
-    public function testCollectCurrentViewFullCanUseMobile(): void
+    public function testCollectCurrentViewDesktopCanUseMobile(): void
     {
         $redirectConfig['tablet'] = [
             'is_enabled' => true,
@@ -174,7 +174,7 @@ final class DeviceDataCollectorTest extends TestCase
 
             return $test->request->getSchemeAndHttpHost().$test->request->getBaseUrl().$test->request->getPathInfo().$qs;
         });
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_FULL]);
+        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
@@ -183,7 +183,7 @@ final class DeviceDataCollectorTest extends TestCase
         $views = $deviceDataCollector->getViews();
 
         self::assertSame($deviceView->getViewType(), $currentView);
-        self::assertSame(DeviceView::VIEW_FULL, $currentView);
+        self::assertSame(DeviceView::VIEW_DESKTOP, $currentView);
         self::assertCount(3, $views);
 
         foreach ($views as $view) {
@@ -193,7 +193,7 @@ final class DeviceDataCollectorTest extends TestCase
             self::assertArrayHasKey('link', $view);
             self::assertArrayHasKey('isCurrent', $view);
             self::assertArrayHasKey('enabled', $view);
-            if (DeviceView::VIEW_FULL === $view['type']) {
+            if (DeviceView::VIEW_DESKTOP === $view['type']) {
                 self::assertTrue($view['isCurrent']);
             }
             if (DeviceView::VIEW_MOBILE === $view['type']) {
@@ -211,7 +211,7 @@ final class DeviceDataCollectorTest extends TestCase
         }
     }
 
-    public function testCollectCurrentViewFullCantUseMobile(): void
+    public function testCollectCurrentViewDesktopCantUseMobile(): void
     {
         $redirectConfig['mobile'] = [
             'is_enabled' => true,
@@ -236,7 +236,7 @@ final class DeviceDataCollectorTest extends TestCase
 
             return $test->request->getSchemeAndHttpHost().$test->request->getBaseUrl().$test->request->getPathInfo().$qs;
         });
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_FULL]);
+        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
@@ -245,7 +245,7 @@ final class DeviceDataCollectorTest extends TestCase
         $views = $deviceDataCollector->getViews();
 
         self::assertSame($deviceView->getViewType(), $currentView);
-        self::assertSame(DeviceView::VIEW_FULL, $currentView);
+        self::assertSame(DeviceView::VIEW_DESKTOP, $currentView);
         self::assertCount(3, $views);
 
         foreach ($views as $view) {
@@ -255,7 +255,7 @@ final class DeviceDataCollectorTest extends TestCase
             self::assertArrayHasKey('link', $view);
             self::assertArrayHasKey('isCurrent', $view);
             self::assertArrayHasKey('enabled', $view);
-            if (DeviceView::VIEW_FULL === $view['type']) {
+            if (DeviceView::VIEW_DESKTOP === $view['type']) {
                 self::assertTrue($view['isCurrent']);
             }
             if (DeviceView::VIEW_MOBILE === $view['type']) {

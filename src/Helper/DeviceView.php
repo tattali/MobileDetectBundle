@@ -25,7 +25,7 @@ class DeviceView
 {
     public const VIEW_MOBILE = 'mobile';
     public const VIEW_TABLET = 'tablet';
-    public const VIEW_FULL = 'full';
+    public const VIEW_DESKTOP = 'desktop';
     public const VIEW_NOT_MOBILE = 'not_mobile';
 
     public const COOKIE_KEY_DEFAULT = 'device_view';
@@ -103,11 +103,11 @@ class DeviceView
     }
 
     /**
-     * Is the device in full view.
+     * Is the device in desktop view.
      */
-    public function isFullView(): bool
+    public function isDesktopView(): bool
     {
-        return self::VIEW_FULL === $this->viewType;
+        return self::VIEW_DESKTOP === $this->viewType;
     }
 
     public function isTabletView(): bool
@@ -142,11 +142,11 @@ class DeviceView
     }
 
     /**
-     * Sets the full (desktop) view type.
+     * Sets the desktop (desktop) view type.
      */
-    public function setFullView(): void
+    public function setDesktopView(): void
     {
-        $this->viewType = self::VIEW_FULL;
+        $this->viewType = self::VIEW_DESKTOP;
     }
 
     public function setTabletView(): void
@@ -186,7 +186,7 @@ class DeviceView
                 }
                 break;
             default:
-                $viewType = self::VIEW_FULL;
+                $viewType = self::VIEW_DESKTOP;
         }
 
         return new RedirectResponseWithCookie(
@@ -205,7 +205,7 @@ class DeviceView
             return null;
         }
 
-        return $this->request->query->get($this->switchParam, self::VIEW_FULL);
+        return $this->request->query->get($this->switchParam, self::VIEW_DESKTOP);
     }
 
     public function getCookieExpireDatetimeModifier(): string

@@ -45,14 +45,14 @@ class DeviceDataCollector extends DataCollector
         $this->data['currentView'] = $this->deviceView->getViewType();
         $this->data['views'] = [
             [
-                'type' => DeviceView::VIEW_FULL,
-                'label' => 'Full',
+                'type' => DeviceView::VIEW_DESKTOP,
+                'label' => 'Desktop',
                 'link' => $this->generateSwitchLink(
                     $request,
-                    DeviceView::VIEW_FULL,
+                    DeviceView::VIEW_DESKTOP,
                 ),
-                'isCurrent' => $this->deviceView->isFullView(),
-                'enabled' => $this->canUseView(DeviceView::VIEW_FULL, $request->getSchemeAndHttpHost()),
+                'isCurrent' => $this->deviceView->isDesktopView(),
+                'enabled' => $this->canUseView(DeviceView::VIEW_DESKTOP, $request->getSchemeAndHttpHost()),
             ],
             [
                 'type' => DeviceView::VIEW_TABLET,

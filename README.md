@@ -16,7 +16,7 @@ Introduction
 This Bundle use [MobileDetect](https://github.com/serbanghita/Mobile-Detect) class and provides the following features:
 
 * Detect the various mobile devices by Name, OS, browser User-Agent
-* Manages site views for the various mobile devices (`mobile`, `tablet`, `full`)
+* Manages site views for the various mobile devices (`mobile`, `tablet`, `desktop`)
 * Redirects to mobile and tablet sites
 
 Documentation
@@ -55,7 +55,7 @@ Available User-Agents (uaMatch) with the php `is()` and twig `is_device()` [here
 For switch device view, use `device_view` GET parameter:
 
 ```url
-https://localhost:8000?device_view={full/mobile/tablet}
+https://localhost:8000?device_view={desktop/mobile/tablet}
 ```
 
 Or using the Symfony toolbar

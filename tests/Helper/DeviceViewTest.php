@@ -56,12 +56,12 @@ final class DeviceViewTest extends TestCase
         self::assertSame(DeviceView::VIEW_TABLET, $deviceView->getRequestedViewType());
     }
 
-    public function testGetViewTypeFull(): void
+    public function testGetViewTypeDesktop(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_FULL]);
+        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
-        self::assertSame(DeviceView::VIEW_FULL, $deviceView->getViewType());
-        self::assertSame(DeviceView::VIEW_FULL, $deviceView->getRequestedViewType());
+        self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getViewType());
+        self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getRequestedViewType());
     }
 
     public function testGetViewTypeNotMobile(): void
@@ -80,18 +80,18 @@ final class DeviceViewTest extends TestCase
         self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getRequestedViewType());
     }
 
-    public function testIsFullViewTrue(): void
+    public function testIsDesktopViewTrue(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_FULL]);
+        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
-        self::assertTrue($deviceView->isFullView());
+        self::assertTrue($deviceView->isDesktopView());
     }
 
-    public function testIsFullViewFalse(): void
+    public function testIsDesktopViewFalse(): void
     {
         $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
-        self::assertFalse($deviceView->isFullView());
+        self::assertFalse($deviceView->isDesktopView());
     }
 
     public function testIsTabletViewTrue(): void
@@ -164,18 +164,18 @@ final class DeviceViewTest extends TestCase
         self::assertTrue($deviceView->isMobileView());
     }
 
-    public function testSetViewFull(): void
+    public function testSetViewDesktop(): void
     {
         $deviceView = new DeviceView();
-        $deviceView->setView(DeviceView::VIEW_FULL);
-        self::assertTrue($deviceView->isFullView());
+        $deviceView->setView(DeviceView::VIEW_DESKTOP);
+        self::assertTrue($deviceView->isDesktopView());
     }
 
-    public function testSetFullViewAndCheckIsFullView(): void
+    public function testSetDesktopViewAndCheckIsDesktopView(): void
     {
         $deviceView = new DeviceView();
-        $deviceView->setFullView();
-        self::assertTrue($deviceView->isFullView());
+        $deviceView->setDesktopView();
+        self::assertTrue($deviceView->isDesktopView());
     }
 
     public function testSetTabletViewAndCheckIsTabletView(): void
@@ -206,18 +206,18 @@ final class DeviceViewTest extends TestCase
         self::assertNull($deviceView->getSwitchParamValue());
     }
 
-    public function testGetSwitchParamValueFullDefault(): void
+    public function testGetSwitchParamValueDesktopDefault(): void
     {
         $this->request->query = new InputBag();
         $deviceView = new DeviceView($this->requestStack);
-        self::assertSame(DeviceView::VIEW_FULL, $deviceView->getSwitchParamValue());
+        self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getSwitchParamValue());
     }
 
-    public function testGetSwitchParamValueFull(): void
+    public function testGetSwitchParamValueDesktop(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_FULL]);
+        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
-        self::assertSame(DeviceView::VIEW_FULL, $deviceView->getSwitchParamValue());
+        self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getSwitchParamValue());
     }
 
     public function testGetSwitchParamValueMobile(): void
@@ -250,7 +250,7 @@ final class DeviceViewTest extends TestCase
         self::assertSame(Response::HTTP_MOVED_PERMANENTLY, $response->getStatusCode());
     }
 
-    public function testGetRedirectResponseBySwitchParamWithCookieViewFullDefault(): void
+    public function testGetRedirectResponseBySwitchParamWithCookieViewDesktopDefault(): void
     {
         $this->request->query = new InputBag();
         $deviceView = new DeviceView($this->requestStack);

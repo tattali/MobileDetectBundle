@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
- * @author HenriVesala <email@gmail.com>
+ * @author HenriVesala <henri.vesala@gmail.com>
  */
 class Configuration implements ConfigurationInterface
 {
@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('action')->defaultValue(RequestResponseListener::REDIRECT)->cannotBeEmpty()->end()
             ->end()
             ->end()
-            ->arrayNode('full')
+            ->arrayNode('desktop')
             ->addDefaultsIfNotSet()
             ->children()
             ->booleanNode('is_enabled')->defaultFalse()->end()

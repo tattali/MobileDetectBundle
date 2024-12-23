@@ -50,14 +50,14 @@ class MobileDetectExtension extends AbstractExtension
             new TwigFunction('is_mobile', [$this, 'isMobile']),
             new TwigFunction('is_tablet', [$this, 'isTablet']),
             new TwigFunction('is_device', [$this, 'isDevice']),
-            new TwigFunction('is_full_view', [$this, 'isFullView']),
+            new TwigFunction('is_desktop_view', [$this, 'isDesktopView']),
             new TwigFunction('is_mobile_view', [$this, 'isMobileView']),
             new TwigFunction('is_tablet_view', [$this, 'isTabletView']),
             new TwigFunction('is_not_mobile_view', [$this, 'isNotMobileView']),
             new TwigFunction('is_ios', [$this, 'isiOS']),
             new TwigFunction('is_android_os', [$this, 'isAndroidOS']),
             new TwigFunction('is_windows_os', [$this, 'isWindowsOS']),
-            new TwigFunction('full_view_url', [$this, 'fullViewUrl'], ['is_safe' => ['html']]),
+            new TwigFunction('desktop_view_url', [$this, 'desktopViewUrl'], ['is_safe' => ['html']]),
             new TwigFunction('device_version', [$this, 'deviceVersion']),
             new TwigFunction('rules_list', [$this, 'getRules']),
         ];
@@ -78,34 +78,34 @@ class MobileDetectExtension extends AbstractExtension
 
     /**
      * Regardless of the current view, returns the URL that leads to the equivalent page
-     * in the full/desktop view. This is useful for generating <link rel="canonical"> tags
+     * in the desktop/desktop view. This is useful for generating <link rel="canonical"> tags
      * on mobile pages for Search Engine Optimization.
      * See: http://searchengineland.com/the-definitive-guide-to-mobile-technical-seo-166066.
      */
-    public function fullViewUrl(bool $addCurrentPathAndQuery = true): ?string
+    public function desktopViewUrl(bool $addCurrentPathAndQuery = true): ?string
     {
-        if (!isset($this->redirectConf[DeviceView::VIEW_FULL]['host'])) {
-            // The host property has not been configured for the full view
+        if (!isset($this->redirectConf[DeviceView::VIEW_DESKTOP]['host'])) {
+            // The host property has not been configured for the desktop view
             return null;
         }
 
-        $fullHost = $this->redirectConf[DeviceView::VIEW_FULL]['host'];
+        $desktopHost = $this->redirectConf[DeviceView::VIEW_DESKTOP]['host'];
 
-        if (empty($fullHost)) {
+        if (empty($desktopHost)) {
             return null;
         }
 
-        // If not in request scope, we can only return the base URL to the full view
+        // If not in request scope, we can only return the base URL to the desktop view
         if (!$this->request) {
-            return $fullHost;
+            return $desktopHost;
         }
 
         if (false === $addCurrentPathAndQuery) {
-            return $fullHost;
+            return $desktopHost;
         }
 
-        // if fullHost ends with /, skip it since getPathInfo() also starts with /
-        $result = rtrim($fullHost, '/').$this->request->getPathInfo();
+        // if desktopHost ends with /, skip it since getPathInfo() also starts with /
+        $result = rtrim($desktopHost, '/').$this->request->getPathInfo();
 
         $query = Request::normalizeQueryString(http_build_query($this->request->query->all(), '', '&'));
         if ($query) {
@@ -135,9 +135,9 @@ class MobileDetectExtension extends AbstractExtension
         return $this->mobileDetect->{$magicMethodName}();
     }
 
-    public function isFullView(): bool
+    public function isDesktopView(): bool
     {
-        return $this->deviceView->isFullView();
+        return $this->deviceView->isDesktopView();
     }
 
     public function isMobileView(): bool

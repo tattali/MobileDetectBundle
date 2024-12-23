@@ -150,7 +150,7 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
-    public function testHandleRequestIsFullView(): void
+    public function testHandleRequestIsDesktopView(): void
     {
         $deviceView = new DeviceView($this->requestStack);
         $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
@@ -160,24 +160,24 @@ final class RequestResponseListenerTest extends TestCase
 
         $listener->handleRequest($getResponseEvent);
         self::assertTrue($listener->needsResponseModification());
-        self::assertSame(DeviceView::VIEW_FULL, $deviceView->getViewType());
+        self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getViewType());
 
         $requestEventResponse = $getResponseEvent->getResponse();
         self::assertNull($requestEventResponse);
 
-        $responseEventResponse = new Response('Full view', Response::HTTP_OK);
+        $responseEventResponse = new Response('Desktop view', Response::HTTP_OK);
         $responseEvent = $this->createResponseEvent($responseEventResponse);
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
         self::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
-        self::assertSame('Full view', $modifiedResponse->getContent());
+        self::assertSame('Desktop view', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
             if ($cookie->getName() === $deviceView->getCookieKey()) {
-                self::assertSame(DeviceView::VIEW_FULL, $cookie->getValue());
+                self::assertSame(DeviceView::VIEW_DESKTOP, $cookie->getValue());
             }
         }
     }

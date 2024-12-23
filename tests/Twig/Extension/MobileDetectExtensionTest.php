@@ -48,7 +48,7 @@ final class MobileDetectExtensionTest extends TestCase
         ;
 
         $this->config = [
-            'full' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
+            'desktop' => ['is_enabled' => false, 'host' => null, 'status_code' => Response::HTTP_FOUND, 'action' => 'redirect'],
             'detect_tablet_as_mobile' => false,
         ];
     }
@@ -64,14 +64,14 @@ final class MobileDetectExtensionTest extends TestCase
             'is_mobile' => 'isMobile',
             'is_tablet' => 'isTablet',
             'is_device' => 'isDevice',
-            'is_full_view' => 'isFullView',
+            'is_desktop_view' => 'isDesktopView',
             'is_mobile_view' => 'isMobileView',
             'is_tablet_view' => 'isTabletView',
             'is_not_mobile_view' => 'isNotMobileView',
             'is_ios' => 'isiOS',
             'is_android_os' => 'isAndroidOS',
             'is_windows_os' => 'isWindowsOS',
-            'full_view_url' => 'fullViewUrl',
+            'desktop_view_url' => 'desktopViewUrl',
             'device_version' => 'deviceVersion',
             'rules_list' => 'getRules',
         ];
@@ -128,51 +128,51 @@ final class MobileDetectExtensionTest extends TestCase
         self::assertSame(98.0, $extension->deviceVersion('Firefox', $versionTypeFloat));
     }
 
-    public function testFullViewUrlHostNull(): void
+    public function testDesktopViewUrlHostNull(): void
     {
-        $this->config['full'] = ['is_enabled' => true, 'host' => null];
+        $this->config['desktop'] = ['is_enabled' => true, 'host' => null];
 
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertNull($extension->fullViewUrl());
+        self::assertNull($extension->desktopViewUrl());
     }
 
-    public function testFullViewUrlHostEmpty(): void
+    public function testDesktopViewUrlHostEmpty(): void
     {
-        $this->config['full'] = ['is_enabled' => true, 'host' => ''];
+        $this->config['desktop'] = ['is_enabled' => true, 'host' => ''];
 
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertNull($extension->fullViewUrl());
+        self::assertNull($extension->desktopViewUrl());
     }
 
-    public function testFullViewUrlNotSetRequest(): void
+    public function testDesktopViewUrlNotSetRequest(): void
     {
-        $this->config['full'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
+        $this->config['desktop'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertSame('http://mobilehost.com', $extension->fullViewUrl());
+        self::assertSame('http://mobilehost.com', $extension->desktopViewUrl());
     }
 
-    public function testFullViewUrlWithRequestQuery(): void
+    public function testDesktopViewUrlWithRequestQuery(): void
     {
-        $this->config['full'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
+        $this->config['desktop'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
         $this->request->query = new InputBag(['myparam' => 'myvalue']);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertSame('http://mobilehost.com?myparam=myvalue', $extension->fullViewUrl());
+        self::assertSame('http://mobilehost.com?myparam=myvalue', $extension->desktopViewUrl());
     }
 
-    public function testFullViewUrlWithRequestOnlyHost(): void
+    public function testDesktopViewUrlWithRequestOnlyHost(): void
     {
-        $this->config['full'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
+        $this->config['desktop'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
         $this->request->query = new InputBag(['myparam' => 'myvalue']);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertSame('http://mobilehost.com', $extension->fullViewUrl(false));
+        self::assertSame('http://mobilehost.com', $extension->desktopViewUrl(false));
     }
 
     public function testIsMobileTrue(): void
@@ -231,19 +231,19 @@ final class MobileDetectExtensionTest extends TestCase
         self::assertTrue($extension->isDevice('android'));
     }
 
-    public function testIsFullViewTrue(): void
+    public function testIsDesktopViewTrue(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_FULL]);
+        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertTrue($extension->isFullView());
+        self::assertTrue($extension->isDesktopView());
     }
 
-    public function testIsFullViewFalse(): void
+    public function testIsDesktopViewFalse(): void
     {
         $deviceView = new DeviceView();
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
-        self::assertFalse($extension->isFullView());
+        self::assertFalse($extension->isDesktopView());
     }
 
     public function testIsMobileViewTrue(): void
@@ -288,7 +288,7 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsNotMobileViewFalse(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_FULL]);
+        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertFalse($extension->isNotMobileView());
