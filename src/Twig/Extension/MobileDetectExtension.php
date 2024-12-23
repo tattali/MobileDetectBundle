@@ -84,11 +84,6 @@ class MobileDetectExtension extends AbstractExtension
      */
     public function desktopViewUrl(bool $addCurrentPathAndQuery = true): ?string
     {
-        if (!isset($this->redirectConf[DeviceView::VIEW_DESKTOP]['host'])) {
-            // The host property has not been configured for the desktop view
-            return null;
-        }
-
         $desktopHost = $this->redirectConf[DeviceView::VIEW_DESKTOP]['host'];
 
         if (empty($desktopHost)) {
@@ -96,11 +91,7 @@ class MobileDetectExtension extends AbstractExtension
         }
 
         // If not in request scope, we can only return the base URL to the desktop view
-        if (!$this->request) {
-            return $desktopHost;
-        }
-
-        if (false === $addCurrentPathAndQuery) {
+        if (!$this->request || !$addCurrentPathAndQuery) {
             return $desktopHost;
         }
 
