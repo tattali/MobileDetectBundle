@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\Tests\EventListener;
 
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
+use Detection\MobileDetect;
 use MobileDetectBundle\EventListener\RequestResponseListener;
 use MobileDetectBundle\Helper\DeviceView;
 use MobileDetectBundle\Helper\RedirectResponseWithCookie;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,48 +22,28 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * @internal
- *
- * @coversDefaultClass
- */
 final class RequestResponseListenerTest extends TestCase
 {
-    /**
-     * @var MockObject|MobileDetectorInterface
-     */
-    private $mobileDetector;
+    private MockObject&MobileDetect $mobileDetect;
+
+    private MockObject&RequestStack $requestStack;
+
+    private MockObject&Request $request;
+
+    private MockObject&RouterInterface $router;
 
     /**
-     * @var MockObject|RequestStack
+     * @var array<string, mixed>
      */
-    private $requestStack;
+    private array $config;
 
-    /**
-     * @var MockObject|Request
-     */
-    private $request;
-
-    /**
-     * @var MockObject|RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var array
-     */
-    private $config;
-
-    /**
-     * @var string
-     */
-    private $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
+    private string $switchParam = DeviceView::SWITCH_PARAM_DEFAULT;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->mobileDetector = $this->createMock(MobileDetectorInterface::class);
+        $this->mobileDetect = $this->createMock(MobileDetect::class);
         $this->router = $this->createMock(RouterInterface::class);
 
         $this->request = $this->getMockBuilder(Request::class)->getMock();
@@ -91,21 +70,20 @@ final class RequestResponseListenerTest extends TestCase
     {
         $this->request->query = new InputBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
-        $deviceView = new DeviceView($this->requestStack);
-        $deviceView->setRedirectConfig([DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, []);
+        $deviceView = new DeviceView($this->requestStack, [DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, []);
         $event = $this->createGetResponseEvent('some content');
 
         $listener->handleRequest($event);
         self::assertFalse($listener->needsResponseModification());
 
+        /** @var ?RedirectResponseWithCookie */
         $response = $event->getResponse();
         self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         $cookies = $response->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
             }
@@ -116,9 +94,8 @@ final class RequestResponseListenerTest extends TestCase
     {
         $this->request->query = new InputBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
-        $deviceView = new DeviceView($this->requestStack);
-        $deviceView->setRedirectConfig([DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, [], false);
+        $deviceView = new DeviceView($this->requestStack, [DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, [], false);
         $event = $this->createGetResponseEvent('some content');
 
         $listener->handleRequest($event);
@@ -130,7 +107,6 @@ final class RequestResponseListenerTest extends TestCase
         $cookies = $response->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
             }
@@ -145,66 +121,63 @@ final class RequestResponseListenerTest extends TestCase
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
         $this->request->expects(self::any())->method('get')->willReturn('value');
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
-            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2)
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
         );
 
-        $deviceView = new DeviceView($this->requestStack);
-        $deviceView->setRedirectConfig([DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $deviceView = new DeviceView($this->requestStack, [DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
         $event = $this->createGetResponseEvent('some content');
 
         $listener->handleRequest($event);
         self::assertFalse($listener->needsResponseModification());
 
+        /** @var ?RedirectResponseWithCookie */
         $response = $event->getResponse();
         self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertSame(sprintf(
+        self::assertSame(\sprintf(
             'http://mobilehost.com/?%s=%s&myparam=myvalue',
             $this->switchParam,
-            DeviceView::VIEW_MOBILE
+            DeviceView::VIEW_MOBILE,
         ), $response->getTargetUrl());
 
         $cookies = $response->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
             }
         }
     }
 
-    public function testHandleRequestIsFullView(): void
+    public function testHandleRequestIsDesktopView(): void
     {
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
         self::assertFalse($deviceView->hasSwitchParam());
         self::assertNull($deviceView->getRequestedViewType());
         $getResponseEvent = $this->createGetResponseEvent('some content');
 
         $listener->handleRequest($getResponseEvent);
         self::assertTrue($listener->needsResponseModification());
-        self::assertSame(DeviceView::VIEW_FULL, $deviceView->getViewType());
+        self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getViewType());
 
         $requestEventResponse = $getResponseEvent->getResponse();
         self::assertNull($requestEventResponse);
 
-        $responseEventResponse = new Response('Full view', Response::HTTP_OK);
+        $responseEventResponse = new Response('Desktop view', Response::HTTP_OK);
         $responseEvent = $this->createResponseEvent($responseEventResponse);
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        self::assertInstanceOf(Response::class, $modifiedResponse);
         self::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
-        self::assertSame('Full view', $modifiedResponse->getContent());
+        self::assertSame('Desktop view', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
-                self::assertSame(DeviceView::VIEW_FULL, $cookie->getValue());
+                self::assertSame(DeviceView::VIEW_DESKTOP, $cookie->getValue());
             }
         }
     }
@@ -212,7 +185,7 @@ final class RequestResponseListenerTest extends TestCase
     public function testHandleRequestIsNotMobileView(): void
     {
         $deviceView = new DeviceView();
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
         self::assertFalse($deviceView->hasSwitchParam());
         self::assertNull($deviceView->getRequestedViewType());
         self::assertSame(DeviceView::VIEW_NOT_MOBILE, $deviceView->getViewType());
@@ -229,7 +202,6 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        self::assertInstanceOf(Response::class, $modifiedResponse);
         self::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         self::assertSame('Not mobile view', $modifiedResponse->getContent());
 
@@ -245,12 +217,12 @@ final class RequestResponseListenerTest extends TestCase
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->request->expects(self::any())->method('get')->willReturn('value');
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
-            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2)
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
         );
-        $this->mobileDetector->expects(self::once())->method('isTablet')->willReturn(true);
+        $this->mobileDetect->expects(self::once())->method('isTablet')->willReturn(true);
 
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
 
         $getResponseEvent = $this->createGetResponseEvent('some content');
 
@@ -259,19 +231,19 @@ final class RequestResponseListenerTest extends TestCase
         self::assertNull($deviceView->getRequestedViewType());
         self::assertSame(DeviceView::VIEW_TABLET, $deviceView->getViewType());
 
+        /** @var ?RedirectResponseWithCookie */
         $response = $getResponseEvent->getResponse();
         self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertSame(sprintf(
+        self::assertSame(\sprintf(
             'http://t.testsite.com/some/parameters?%s=%s&some=param',
             $this->switchParam,
-            DeviceView::VIEW_TABLET
+            DeviceView::VIEW_TABLET,
         ), $response->getTargetUrl());
 
         $cookies = $response->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
             }
@@ -287,13 +259,13 @@ final class RequestResponseListenerTest extends TestCase
         $this->request->query = new InputBag(['some' => 'param']);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
-            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2)
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
         );
-        $this->mobileDetector->expects(self::once())->method('isTablet')->willReturn(true);
+        $this->mobileDetect->expects(self::once())->method('isTablet')->willReturn(true);
 
         $deviceView = new DeviceView($this->requestStack);
         $deviceView->setSwitchParam($switchParam);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
 
         $getResponseEvent = $this->createGetResponseEvent('some content');
 
@@ -302,19 +274,19 @@ final class RequestResponseListenerTest extends TestCase
         self::assertNull($deviceView->getRequestedViewType());
         self::assertSame(DeviceView::VIEW_TABLET, $deviceView->getViewType());
 
+        /** @var ?RedirectResponseWithCookie */
         $response = $getResponseEvent->getResponse();
         self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertSame(sprintf(
+        self::assertSame(\sprintf(
             'http://testsite.com/some/parameters?%s=%s&some=param',
             $switchParam,
-            DeviceView::VIEW_TABLET
+            DeviceView::VIEW_TABLET,
         ), $response->getTargetUrl());
 
         $cookies = $response->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
             }
@@ -325,10 +297,10 @@ final class RequestResponseListenerTest extends TestCase
     {
         $this->config['mobile'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
-        $this->mobileDetector->expects(self::once())->method('isTablet')->willReturn(true);
+        $this->mobileDetect->expects(self::once())->method('isTablet')->willReturn(true);
 
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
 
         $getResponseEvent = $this->createGetResponseEvent('some content');
         $listener->handleRequest($getResponseEvent);
@@ -345,14 +317,12 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        self::assertInstanceOf(Response::class, $modifiedResponse);
         self::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         self::assertSame('Tablet view', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
             }
@@ -366,12 +336,12 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->router->expects(self::atLeastOnce())->method('getRouteCollection')->willReturn(
-            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2)
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
         );
-        $this->mobileDetector->expects(self::atLeastOnce())->method('isMobile')->willReturn(true);
+        $this->mobileDetect->expects(self::atLeastOnce())->method('isMobile')->willReturn(true);
 
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
 
         $getResponseEvent = $this->createGetResponseEvent('some content');
         $listener->handleRequest($getResponseEvent);
@@ -380,20 +350,19 @@ final class RequestResponseListenerTest extends TestCase
         self::assertNull($deviceView->getRequestedViewType());
         self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getViewType());
 
+        /** @var ?RedirectResponseWithCookie */
         $response = $getResponseEvent->getResponse();
-
         self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertSame(sprintf(
+        self::assertSame(\sprintf(
             'http://mobilehost.com/some/parameters?%s=%s',
             $this->switchParam,
-            DeviceView::VIEW_MOBILE
+            DeviceView::VIEW_MOBILE,
         ), $response->getTargetUrl());
 
         $cookies = $response->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
             }
@@ -406,12 +375,12 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->router->expects(self::atLeastOnce())->method('getRouteCollection')->willReturn(
-            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT_WITHOUT_PATH, 2)
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT_WITHOUT_PATH, 2),
         );
-        $this->mobileDetector->expects(self::once())->method('isTablet')->willReturn(true);
+        $this->mobileDetect->expects(self::once())->method('isTablet')->willReturn(true);
 
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
 
         $getResponseEvent = $this->createGetResponseEvent('some content');
         $listener->handleRequest($getResponseEvent);
@@ -420,21 +389,20 @@ final class RequestResponseListenerTest extends TestCase
         self::assertNull($deviceView->getRequestedViewType());
         self::assertSame(DeviceView::VIEW_TABLET, $deviceView->getViewType());
 
+        /** @var ?RedirectResponseWithCookie */
         $response = $getResponseEvent->getResponse();
-
         self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         self::assertSame('http://testsite.com?device_view=tablet', $response->getTargetUrl());
-        self::assertSame(sprintf(
+        self::assertSame(\sprintf(
             'http://testsite.com?%s=%s',
             $this->switchParam,
-            DeviceView::VIEW_TABLET
+            DeviceView::VIEW_TABLET,
         ), $response->getTargetUrl());
 
         $cookies = $response->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
             }
@@ -447,12 +415,12 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->router->expects(self::atLeastOnce())->method('getRouteCollection')->willReturn(
-            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::NO_REDIRECT, 1)
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::NO_REDIRECT, 1),
         );
-        $this->mobileDetector->expects(self::once())->method('isTablet')->willReturn(true);
+        $this->mobileDetect->expects(self::once())->method('isTablet')->willReturn(true);
 
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
 
         $getResponseEvent = $this->createGetResponseEvent('some content');
         $listener->handleRequest($getResponseEvent);
@@ -469,14 +437,12 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        self::assertInstanceOf(Response::class, $modifiedResponse);
         self::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         self::assertSame('Tablet view no redirect', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_TABLET, $cookie->getValue());
             }
@@ -489,13 +455,13 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->router->expects(self::atLeastOnce())->method('getRouteCollection')->willReturn(
-            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2)
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
         );
-        $this->mobileDetector->expects(self::once())->method('isTablet')->willReturn(false);
-        $this->mobileDetector->expects(self::once())->method('isMobile')->willReturn(true);
+        $this->mobileDetect->expects(self::once())->method('isTablet')->willReturn(false);
+        $this->mobileDetect->expects(self::once())->method('isMobile')->willReturn(true);
 
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
 
         $getResponseEvent = $this->createGetResponseEvent('some content');
         $listener->handleRequest($getResponseEvent);
@@ -504,20 +470,19 @@ final class RequestResponseListenerTest extends TestCase
         self::assertNull($deviceView->getRequestedViewType());
         self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getViewType());
 
+        /** @var ?RedirectResponseWithCookie */
         $response = $getResponseEvent->getResponse();
-
         self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertSame(sprintf(
+        self::assertSame(\sprintf(
             'http://testsite.com/some/parameters?%s=%s',
             $this->switchParam,
-            DeviceView::VIEW_MOBILE
+            DeviceView::VIEW_MOBILE,
         ), $response->getTargetUrl());
 
         $cookies = $response->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
             }
@@ -530,13 +495,13 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->router->expects(self::atLeastOnce())->method('getRouteCollection')->willReturn(
-            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT_WITHOUT_PATH, 2)
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT_WITHOUT_PATH, 2),
         );
-        $this->mobileDetector->expects(self::once())->method('isTablet')->willReturn(false);
-        $this->mobileDetector->expects(self::once())->method('isMobile')->willReturn(true);
+        $this->mobileDetect->expects(self::once())->method('isTablet')->willReturn(false);
+        $this->mobileDetect->expects(self::once())->method('isMobile')->willReturn(true);
 
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
 
         $getResponseEvent = $this->createGetResponseEvent('some content');
         $listener->handleRequest($getResponseEvent);
@@ -545,20 +510,19 @@ final class RequestResponseListenerTest extends TestCase
         self::assertNull($deviceView->getRequestedViewType());
         self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getViewType());
 
+        /** @var ?RedirectResponseWithCookie */
         $response = $getResponseEvent->getResponse();
-
         self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertSame(sprintf(
+        self::assertSame(\sprintf(
             'http://testsite.com?%s=%s',
             $this->switchParam,
-            DeviceView::VIEW_MOBILE
+            DeviceView::VIEW_MOBILE,
         ), $response->getTargetUrl());
 
         $cookies = $response->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
             }
@@ -571,13 +535,13 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->router->expects(self::atLeastOnce())->method('getRouteCollection')->willReturn(
-            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::NO_REDIRECT, 1)
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::NO_REDIRECT, 1),
         );
-        $this->mobileDetector->expects(self::once())->method('isTablet')->willReturn(false);
-        $this->mobileDetector->expects(self::once())->method('isMobile')->willReturn(true);
+        $this->mobileDetect->expects(self::once())->method('isTablet')->willReturn(false);
+        $this->mobileDetect->expects(self::once())->method('isMobile')->willReturn(true);
 
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
 
         $getResponseEvent = $this->createGetResponseEvent('some content');
         $listener->handleRequest($getResponseEvent);
@@ -594,51 +558,52 @@ final class RequestResponseListenerTest extends TestCase
         $listener->handleResponse($responseEvent);
         $modifiedResponse = $responseEvent->getResponse();
 
-        self::assertInstanceOf(Response::class, $modifiedResponse);
         self::assertSame(Response::HTTP_OK, $modifiedResponse->getStatusCode());
         self::assertSame('Mobile view no redirect', $modifiedResponse->getContent());
 
         $cookies = $modifiedResponse->headers->getCookies();
         self::assertGreaterThan(0, \count($cookies));
         foreach ($cookies as $cookie) {
-            self::assertInstanceOf(Cookie::class, $cookie);
             if ($cookie->getName() === $deviceView->getCookieKey()) {
                 self::assertSame(DeviceView::VIEW_MOBILE, $cookie->getValue());
             }
         }
     }
 
-    public function testHandleRequestUpdatedMobileDetectorUserAgent(): void
+    public function testHandleRequestUpdatedMobileDetectUserAgent(): void
     {
-        $this->mobileDetector->expects(self::once())->method('setUserAgent')->with(self::equalTo('agent'));
+        $this->mobileDetect->expects(self::once())->method('setUserAgent')->with(self::equalTo('agent'));
 
         $event = $this->createGetResponseEvent('some content');
         $event->getRequest()->headers->set('user-agent', 'agent');
 
         $deviceView = new DeviceView($this->requestStack);
-        $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
         $listener->handleRequest($event);
     }
 
+    /**
+     * @param array<string, list<string|null>> $headers
+     */
     private function createGetResponseEvent(string $content, array $headers = []): ViewEvent
     {
         $event = new ViewEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            \defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') : \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST'),
-            $content
+            HttpKernelInterface::MAIN_REQUEST,
+            $content,
         );
         $event->getRequest()->headers = new HeaderBag($headers);
 
         return $event;
     }
 
-    private function createRouteCollectionWithRouteAndRoutingOption(string $returnValue, int $times): RouteCollection
+    private function createRouteCollectionWithRouteAndRoutingOption(string $returnValue, int $times): MockObject&RouteCollection
     {
         $route = $this->getMockBuilder(Route::class)->disableOriginalConstructor()->getMock();
         $route->expects(self::exactly($times))->method('getOption')->willReturn($returnValue);
         /**
-         * @var MockObject|RouteCollection
+         * @var MockObject&RouteCollection
          */
         $routeCollection = $this->createMock(RouteCollection::class);
         $routeCollection->expects(self::exactly($times))->method('get')->willReturn($route);
@@ -646,13 +611,16 @@ final class RequestResponseListenerTest extends TestCase
         return $routeCollection;
     }
 
+    /**
+     * @param array<string, list<string|null>> $headers
+     */
     private function createResponseEvent(Response $response, array $headers = []): ResponseEvent
     {
         $event = new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            \defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') : \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST'),
-            $response
+            HttpKernelInterface::MAIN_REQUEST,
+            $response,
         );
         $event->getRequest()->headers = new HeaderBag($headers);
 

@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\Twig\Extension;
 
-use MobileDetectBundle\DeviceDetector\MobileDetector;
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
+use Detection\MobileDetect;
 use MobileDetectBundle\Helper\DeviceView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,36 +25,24 @@ use Twig\TwigFunction;
  */
 class MobileDetectExtension extends AbstractExtension
 {
-    /**
-     * @var MobileDetectorInterface
-     */
-    private $mobileDetector;
+    private ?Request $request;
 
     /**
-     * @var DeviceView
+     * @param array<string, mixed> $redirectConf
      */
-    private $deviceView;
-
-    /**
-     * @var array
-     */
-    private $redirectConf;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(RequestStack $requestStack, MobileDetectorInterface $mobileDetector, DeviceView $deviceView, array $redirectConf)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        private readonly MobileDetect $mobileDetect,
+        private readonly DeviceView $deviceView,
+        private readonly array $redirectConf,
+    ) {
         $this->request = $requestStack->getMainRequest();
-        $this->mobileDetector = $mobileDetector;
-        $this->deviceView = $deviceView;
-        $this->redirectConf = $redirectConf;
     }
 
     /**
      * Get extension twig function.
+     *
+     * @return TwigFunction[]
      */
     public function getFunctions(): array
     {
@@ -63,78 +50,53 @@ class MobileDetectExtension extends AbstractExtension
             new TwigFunction('is_mobile', [$this, 'isMobile']),
             new TwigFunction('is_tablet', [$this, 'isTablet']),
             new TwigFunction('is_device', [$this, 'isDevice']),
-            new TwigFunction('is_full_view', [$this, 'isFullView']),
+            new TwigFunction('is_desktop_view', [$this, 'isDesktopView']),
             new TwigFunction('is_mobile_view', [$this, 'isMobileView']),
             new TwigFunction('is_tablet_view', [$this, 'isTabletView']),
             new TwigFunction('is_not_mobile_view', [$this, 'isNotMobileView']),
-            new TwigFunction('is_ios', [$this, 'isIOS']),
+            new TwigFunction('is_ios', [$this, 'isiOS']),
             new TwigFunction('is_android_os', [$this, 'isAndroidOS']),
             new TwigFunction('is_windows_os', [$this, 'isWindowsOS']),
-            new TwigFunction('full_view_url', [$this, 'fullViewUrl'], ['is_safe' => ['html']]),
+            new TwigFunction('desktop_view_url', [$this, 'desktopViewUrl'], ['is_safe' => ['html']]),
             new TwigFunction('device_version', [$this, 'deviceVersion']),
             new TwigFunction('rules_list', [$this, 'getRules']),
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getRules(): array
     {
-        return array_merge(
-            $this->mobileDetector->getPhoneDevices(),
-            $this->mobileDetector->getTabletDevices(),
-            $this->mobileDetector->getOperatingSystems(),
-            $this->mobileDetector->getBrowsers(),
-            $this->mobileDetector->getUtilities()
-        );
+        return $this->mobileDetect->getRules();
     }
 
-    /**
-     * Check the version of the given property in the User-Agent.
-     * Will return a float number. (eg. 2_0 will return 2.0, 4.3.1 will return 4.31).
-     *
-     * @param string $propertyName The name of the property. See self::getProperties() array
-     *                             keys for all possible properties.
-     * @param string $type         Either self::VERSION_TYPE_STRING to get a string value or
-     *                             self::VERSION_TYPE_FLOAT indicating a float value. This parameter
-     *                             is optional and defaults to self::VERSION_TYPE_STRING. Passing an
-     *                             invalid parameter will default to the this type as well.
-     *
-     * @return string|float|null the version of the property we are trying to extract
-     */
-    public function deviceVersion(string $propertyName, string $type = MobileDetector::VERSION_TYPE_STRING)
+    public function deviceVersion(string $propertyName, string $type = ''): float|bool|string|null
     {
-        return $this->mobileDetector->version($propertyName, $type) ?: null;
+        return $this->mobileDetect->version($propertyName, $type) ?: null;
     }
 
     /**
      * Regardless of the current view, returns the URL that leads to the equivalent page
-     * in the full/desktop view. This is useful for generating <link rel="canonical"> tags
+     * in the desktop/desktop view. This is useful for generating <link rel="canonical"> tags
      * on mobile pages for Search Engine Optimization.
      * See: http://searchengineland.com/the-definitive-guide-to-mobile-technical-seo-166066.
      */
-    public function fullViewUrl(bool $addCurrentPathAndQuery = true): ?string
+    public function desktopViewUrl(bool $addCurrentPathAndQuery = true): ?string
     {
-        if (!isset($this->redirectConf[DeviceView::VIEW_FULL]['host'])) {
-            // The host property has not been configured for the full view
+        $desktopHost = $this->redirectConf[DeviceView::VIEW_DESKTOP]['host'];
+
+        if (empty($desktopHost)) {
             return null;
         }
 
-        $fullHost = $this->redirectConf[DeviceView::VIEW_FULL]['host'];
-
-        if (empty($fullHost)) {
-            return null;
+        // If not in request scope, we can only return the base URL to the desktop view
+        if (!$this->request || !$addCurrentPathAndQuery) {
+            return $desktopHost;
         }
 
-        // If not in request scope, we can only return the base URL to the full view
-        if (!$this->request) {
-            return $fullHost;
-        }
-
-        if (false === $addCurrentPathAndQuery) {
-            return $fullHost;
-        }
-
-        // if fullHost ends with /, skip it since getPathInfo() also starts with /
-        $result = rtrim($fullHost, '/').$this->request->getPathInfo();
+        // if desktopHost ends with /, skip it since getPathInfo() also starts with /
+        $result = rtrim($desktopHost, '/').$this->request->getPathInfo();
 
         $query = Request::normalizeQueryString(http_build_query($this->request->query->all(), '', '&'));
         if ($query) {
@@ -146,12 +108,12 @@ class MobileDetectExtension extends AbstractExtension
 
     public function isMobile(): bool
     {
-        return $this->mobileDetector->isMobile();
+        return $this->mobileDetect->isMobile();
     }
 
     public function isTablet(): bool
     {
-        return $this->mobileDetector->isTablet();
+        return $this->mobileDetect->isTablet();
     }
 
     /**
@@ -161,12 +123,12 @@ class MobileDetectExtension extends AbstractExtension
     {
         $magicMethodName = 'is'.strtolower((string) $deviceName);
 
-        return $this->mobileDetector->{$magicMethodName}();
+        return $this->mobileDetect->{$magicMethodName}();
     }
 
-    public function isFullView(): bool
+    public function isDesktopView(): bool
     {
-        return $this->deviceView->isFullView();
+        return $this->deviceView->isDesktopView();
     }
 
     public function isMobileView(): bool
@@ -184,18 +146,18 @@ class MobileDetectExtension extends AbstractExtension
         return $this->deviceView->isNotMobileView();
     }
 
-    public function isIOS(): bool
+    public function isiOS(): bool
     {
-        return $this->mobileDetector->isIOS();
+        return $this->mobileDetect->isiOS();
     }
 
     public function isAndroidOS(): bool
     {
-        return $this->mobileDetector->isAndroidOS();
+        return $this->mobileDetect->isAndroidOS();
     }
 
     public function isWindowsOS(): bool
     {
-        return $this->mobileDetector->isWindowsMobileOS() || $this->mobileDetector->isWindowsPhoneOS();
+        return $this->mobileDetect->isWindowsMobileOS() || $this->mobileDetect->isWindowsPhoneOS();
     }
 }

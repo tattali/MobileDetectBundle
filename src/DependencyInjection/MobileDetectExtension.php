@@ -15,14 +15,11 @@ namespace MobileDetectBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class MobileDetectExtension extends Extension
 {
-    /**
-     * {@inheritDoc}
-     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
@@ -41,9 +38,9 @@ class MobileDetectExtension extends Extension
             $config['redirect']['tablet']['is_enabled'] = false;
         }
 
-        // valid full host
-        if ($config['redirect']['full']['is_enabled'] && !$this->validHost($config['redirect']['full']['host'])) {
-            $config['redirect']['full']['is_enabled'] = false;
+        // valid desktop host
+        if ($config['redirect']['desktop']['is_enabled'] && !$this->validHost($config['redirect']['desktop']['host'])) {
+            $config['redirect']['desktop']['is_enabled'] = false;
         }
 
         $container->setParameter('mobile_detect.redirect', $config['redirect']);

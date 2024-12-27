@@ -18,6 +18,7 @@ use MobileDetectBundle\Helper\DeviceView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Jonas HAOUZI <haouzijonas@gmail.com>
@@ -25,18 +26,12 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class DeviceDataCollector extends DataCollector
 {
     /**
-     * @var DeviceView
+     * @param array<string, mixed> $redirectConfig
      */
-    protected $deviceView;
-
-    /**
-     * @var array
-     */
-    protected $redirectConfig;
-
-    public function __construct(DeviceView $deviceView)
-    {
-        $this->deviceView = $deviceView;
+    public function __construct(
+        protected readonly DeviceView $deviceView,
+        protected readonly array $redirectConfig = [],
+    ) {
     }
 
     /**
@@ -45,26 +40,26 @@ class DeviceDataCollector extends DataCollector
     public function collect(
         Request $request,
         Response $response,
-        \Throwable $exception = null
+        ?\Throwable $exception = null,
     ): void {
         $this->data['currentView'] = $this->deviceView->getViewType();
         $this->data['views'] = [
             [
-                'type' => DeviceView::VIEW_FULL,
-                'label' => 'Full',
+                'type' => DeviceView::VIEW_DESKTOP,
+                'label' => 'Desktop',
                 'link' => $this->generateSwitchLink(
                     $request,
-                    DeviceView::VIEW_FULL
+                    DeviceView::VIEW_DESKTOP,
                 ),
-                'isCurrent' => $this->deviceView->isFullView(),
-                'enabled' => $this->canUseView(DeviceView::VIEW_FULL, $request->getSchemeAndHttpHost()),
+                'isCurrent' => $this->deviceView->isDesktopView(),
+                'enabled' => $this->canUseView(DeviceView::VIEW_DESKTOP, $request->getSchemeAndHttpHost()),
             ],
             [
                 'type' => DeviceView::VIEW_TABLET,
                 'label' => 'Tablet',
                 'link' => $this->generateSwitchLink(
                     $request,
-                    DeviceView::VIEW_TABLET
+                    DeviceView::VIEW_TABLET,
                 ),
                 'isCurrent' => $this->deviceView->isTabletView(),
                 'enabled' => $this->canUseView(DeviceView::VIEW_TABLET, $request->getSchemeAndHttpHost()),
@@ -74,7 +69,7 @@ class DeviceDataCollector extends DataCollector
                 'label' => 'Mobile',
                 'link' => $this->generateSwitchLink(
                     $request,
-                    DeviceView::VIEW_MOBILE
+                    DeviceView::VIEW_MOBILE,
                 ),
                 'isCurrent' => $this->deviceView->isMobileView(),
                 'enabled' => $this->canUseView(DeviceView::VIEW_MOBILE, $request->getSchemeAndHttpHost()),
@@ -87,14 +82,12 @@ class DeviceDataCollector extends DataCollector
         return $this->data['currentView'];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getViews(): array
     {
         return $this->data['views'];
-    }
-
-    public function setRedirectConfig(array $redirectConfig): void
-    {
-        $this->redirectConfig = $redirectConfig;
     }
 
     public function getName(): string
@@ -102,7 +95,10 @@ class DeviceDataCollector extends DataCollector
         return 'device.collector';
     }
 
-    public function getData(): array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getData(): array|Data
     {
         return $this->data;
     }
@@ -114,8 +110,7 @@ class DeviceDataCollector extends DataCollector
 
     protected function canUseView(string $view, ?string $host): bool
     {
-        if (!\is_array($this->redirectConfig)
-            || !isset($this->redirectConfig[$view])
+        if (!isset($this->redirectConfig[$view])
             || !isset($this->redirectConfig[$view]['is_enabled'])
             || false === $this->redirectConfig[$view]['is_enabled']
         ) {
@@ -128,7 +123,7 @@ class DeviceDataCollector extends DataCollector
             && \in_array($this->redirectConfig[$view]['action'], [RequestResponseListener::REDIRECT, RequestResponseListener::REDIRECT_WITHOUT_PATH], true)
         ) {
             $parseHost = parse_url($this->redirectConfig[$view]['host']);
-            $redirectHost = $parseHost['scheme'].'://'.$parseHost['host'];
+            $redirectHost = ($parseHost['scheme'] ?? '').'://'.($parseHost['host'] ?? '');
             if (!empty($parseHost['port'])) {
                 $redirectHost .= ':'.$parseHost['port'];
             }
@@ -143,15 +138,15 @@ class DeviceDataCollector extends DataCollector
 
     private function generateSwitchLink(
         Request $request,
-        string $view
-    ): ?string {
+        string $view,
+    ): string {
         $requestSwitchView = $request->duplicate();
         $requestSwitchView->query->set($this->deviceView->getSwitchParam(), $view);
         $requestSwitchView->server->set(
             'QUERY_STRING',
             Request::normalizeQueryString(
-                http_build_query($requestSwitchView->query->all())
-            )
+                http_build_query($requestSwitchView->query->all()),
+            ),
         );
 
         return $requestSwitchView->getUri();

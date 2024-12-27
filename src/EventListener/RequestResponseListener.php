@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\EventListener;
 
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
+use Detection\MobileDetect;
 use MobileDetectBundle\Helper\DeviceView;
 use MobileDetectBundle\Helper\RedirectResponseWithCookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -35,69 +35,34 @@ class RequestResponseListener
 
     public const MOBILE = 'mobile';
     public const TABLET = 'tablet';
-    public const FULL = 'full';
+    public const DESKTOP = 'desktop';
+
+    protected bool $needModifyResponse = false;
+
+    protected ?\Closure $modifyResponseClosure;
 
     /**
-     * @var RouterInterface
+     * @param array<string, mixed> $redirectConf
      */
-    protected $router;
-
-    /**
-     * @var MobileDetectorInterface
-     */
-    protected $mobileDetector;
-
-    /**
-     * @var DeviceView
-     */
-    protected $deviceView;
-
-    /**
-     * @var array
-     */
-    protected $redirectConf;
-
-    /**
-     * @var bool
-     */
-    protected $isFullPath;
-
-    /**
-     * @var bool
-     */
-    protected $needModifyResponse = false;
-
-    /**
-     * @var \Closure
-     */
-    protected $modifyResponseClosure;
-
     public function __construct(
-        MobileDetectorInterface $mobileDetector,
-        DeviceView $deviceView,
-        RouterInterface $router,
-        array $redirectConf,
-        bool $fullPath = true
+        protected readonly MobileDetect $mobileDetect,
+        protected readonly DeviceView $deviceView,
+        protected readonly RouterInterface $router,
+        protected readonly array $redirectConf,
+        protected readonly bool $isDesktopPath = true,
     ) {
-        $this->mobileDetector = $mobileDetector;
-        $this->deviceView = $deviceView;
-        $this->router = $router;
-
-        // Configs mobile & tablet
-        $this->redirectConf = $redirectConf;
-        $this->isFullPath = $fullPath;
     }
 
     public function handleRequest(RequestEvent $event): void
     {
-        // only handle master request, do not handle sub request like esi includes
+        // Only handle main request, do not handle sub request like esi includes
         // If the device view is "not the mobile view" (e.g. we're not in the request context)
-        if ((\defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') : \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST')) !== $event->getRequestType() || $this->deviceView->isNotMobileView()) {
+        if (!$event->isMainRequest() || $this->deviceView->isNotMobileView()) {
             return;
         }
 
         $request = $event->getRequest();
-        $this->mobileDetector->setUserAgent($request->headers->get('user-agent'));
+        $this->mobileDetect->setUserAgent($request->headers->get('user-agent', ''));
 
         // Sets the flag for the response handled by the GET switch param and the type of the view.
         if ($this->deviceView->hasSwitchParam()) {
@@ -109,12 +74,12 @@ class RequestResponseListener
         // If neither the SwitchParam nor the cookie are set, detect the view...
         $cookieIsSet = null !== $this->deviceView->getRequestedViewType();
         if (!$cookieIsSet) {
-            if (false === $this->redirectConf['detect_tablet_as_mobile'] && $this->mobileDetector->isTablet()) {
+            if (false === $this->redirectConf['detect_tablet_as_mobile'] && $this->mobileDetect->isTablet()) {
                 $this->deviceView->setTabletView();
-            } elseif ($this->mobileDetector->isMobile()) {
+            } elseif ($this->mobileDetect->isMobile()) {
                 $this->deviceView->setMobileView();
             } else {
-                $this->deviceView->setFullView();
+                $this->deviceView->setDesktopView();
             }
         }
 
@@ -167,7 +132,7 @@ class RequestResponseListener
             // do it in one response while setting the cookie.
             $redirectUrl = $this->getRedirectUrl($request, $this->deviceView->getViewType());
         } else {
-            if (true === $this->isFullPath) {
+            if (true === $this->isDesktopPath) {
                 $redirectUrl = $request->getUriForPath($request->getPathInfo());
                 // $redirectUrl = ($request->getPathInfo()) ? $request->getUriForPath($request->getPathInfo()) : $this->getCurrentHost($request);
                 $queryParams = $request->query->all();
@@ -258,7 +223,7 @@ class RequestResponseListener
             return $this->deviceView->getRedirectResponse(
                 $view,
                 $host,
-                $this->redirectConf[$view]['status_code']
+                $this->redirectConf[$view]['status_code'],
             );
         }
 
@@ -272,8 +237,6 @@ class RequestResponseListener
      */
     protected function prepareResponseModification(string $view): void
     {
-        $this->modifyResponseClosure = static function (DeviceView $deviceView, ResponseEvent $event) use ($view) {
-            return $deviceView->modifyResponse($view, $event->getResponse());
-        };
+        $this->modifyResponseClosure = static fn (DeviceView $deviceView, ResponseEvent $event) => $deviceView->modifyResponse($view, $event->getResponse());
     }
 }

@@ -35,23 +35,25 @@
     ],
     "require": {
         "php": ">=8.2",
-        "mobiledetect/mobiledetectlib": "^2.8.15",
-        "symfony/dependency-injection": "^7.0",
-        "symfony/event-dispatcher": "^7.0",
-        "symfony/framework-bundle": "^7.0",
-        "symfony/yaml": "^7.0",
-        "twig/twig": "^2.0 || ^3.0"
+        "mobiledetect/mobiledetectlib": "^4.8",
+        "symfony/config": "^7.2",
+        "symfony/dependency-injection": "^7.2",
+        "symfony/event-dispatcher": "^7.2",
+        "symfony/http-kernel": "^7.2",
+        "symfony/routing": "^7.2",
+        "symfony/yaml": "^7.2",
+        "twig/twig": "^3.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.8",
-        "phpstan/extension-installer": "^1.0",
-        "phpstan/phpstan-nette": "^1.0",
-        "phpstan/phpstan-phpunit": "^1.0",
-        "phpstan/phpstan": "^1.0",
-        "phpunit/phpunit": "^9.5",
-        "squizlabs/php_codesniffer": "^3.6",
-        "symfony/dotenv": "^7.0",
-        "symfony/phpunit-bridge": "^7.0"
+        "friendsofphp/php-cs-fixer": "^3.65",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^11.5",
+        "squizlabs/php_codesniffer": "^3.11",
+        "symfony/dotenv": "^7.2",
+        "symfony/phpunit-bridge": "^7.2"
     },
     "config": {
         "sort-packages": true,
