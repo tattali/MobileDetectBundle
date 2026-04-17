@@ -29,13 +29,13 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RequestResponseListener
 {
-    public const REDIRECT = 'redirect';
-    public const NO_REDIRECT = 'no_redirect';
-    public const REDIRECT_WITHOUT_PATH = 'redirect_without_path';
+    public const string REDIRECT = 'redirect';
+    public const string NO_REDIRECT = 'no_redirect';
+    public const string REDIRECT_WITHOUT_PATH = 'redirect_without_path';
 
-    public const MOBILE = 'mobile';
-    public const TABLET = 'tablet';
-    public const DESKTOP = 'desktop';
+    public const string MOBILE = 'mobile';
+    public const string TABLET = 'tablet';
+    public const string DESKTOP = 'desktop';
 
     protected bool $needModifyResponse = false;
 
