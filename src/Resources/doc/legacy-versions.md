@@ -4,7 +4,7 @@ Installation
 Composer
 --------
 
-### Latest Symfony >=7.0
+### Latest Symfony >=8.0
 
 ```sh
 composer require tattali/mobile-detect-bundle
