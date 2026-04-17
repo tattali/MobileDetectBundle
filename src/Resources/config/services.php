@@ -39,7 +39,6 @@ return static function (ContainerConfigurator $container): void {
                 [param('mobile_detect.redirect')],
             ])
             ->tag('data_collector', [
-                'template' => '@MobileDetect/Collector/device.html.twig',
                 'id' => 'device.collector',
             ])
 

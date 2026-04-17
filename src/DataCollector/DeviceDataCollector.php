@@ -77,6 +77,11 @@ class DeviceDataCollector extends DataCollector
         ];
     }
 
+    public static function getTemplate(): ?string
+    {
+        return '@MobileDetect/Collector/device.html.twig';
+    }
+
     public function getCurrentView(): string
     {
         return $this->data['currentView'];
