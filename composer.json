@@ -1,6 +1,6 @@
 {
     "name": "tattali/mobile-detect-bundle",
-    "description": "Symfony 5.x-7.x bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.",
+    "description": "Symfony 5.x-8.x bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.",
     "keywords": [
         "mobile detect",
         "device detect",
@@ -17,7 +17,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Théo Attali",
+            "name": "Th\u00e9o Attali",
             "email": "theoattali@gmail.com"
         },
         {
@@ -36,12 +36,12 @@
     "require": {
         "php": ">=8.2",
         "mobiledetect/mobiledetectlib": "^4.8",
-        "symfony/config": "^7.2",
-        "symfony/dependency-injection": "^7.2",
-        "symfony/event-dispatcher": "^7.2",
-        "symfony/http-kernel": "^7.2",
-        "symfony/routing": "^7.2",
-        "symfony/yaml": "^7.2",
+        "symfony/config": "^7.2 || ^8.0",
+        "symfony/dependency-injection": "^7.2 || ^8.0",
+        "symfony/event-dispatcher": "^7.2 || ^8.0",
+        "symfony/http-kernel": "^7.2 || ^8.0",
+        "symfony/routing": "^7.2 || ^8.0",
+        "symfony/yaml": "^7.2 || ^8.0",
         "twig/twig": "^3.0"
     },
     "require-dev": {
@@ -52,8 +52,8 @@
         "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^11.5",
         "squizlabs/php_codesniffer": "^3.11",
-        "symfony/dotenv": "^7.2",
-        "symfony/phpunit-bridge": "^7.2"
+        "symfony/dotenv": "^7.2 || ^8.0",
+        "symfony/phpunit-bridge": "^7.2 || ^8.0"
     },
     "config": {
         "sort-packages": true,
