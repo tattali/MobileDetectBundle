@@ -29,10 +29,9 @@ final class DeviceViewTest extends TestCase
         $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
 
         $this->request = $this->getMockBuilder(Request::class)->getMock();
+        $this->initRequest([], [], [], []);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://testsite.com');
         $this->request->expects(self::any())->method('getUriForPath')->willReturn('/');
-        $this->request->query = new InputBag();
-        $this->request->cookies = new InputBag();
 
         $this->requestStack->expects(self::any())
             ->method('getMainRequest')
@@ -42,7 +41,7 @@ final class DeviceViewTest extends TestCase
 
     public function testGetViewTypeMobile(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getViewType());
         self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getRequestedViewType());
@@ -50,7 +49,7 @@ final class DeviceViewTest extends TestCase
 
     public function testGetViewTypeTablet(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_TABLET]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_TABLET]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame(DeviceView::VIEW_TABLET, $deviceView->getViewType());
         self::assertSame(DeviceView::VIEW_TABLET, $deviceView->getRequestedViewType());
@@ -58,7 +57,7 @@ final class DeviceViewTest extends TestCase
 
     public function testGetViewTypeDesktop(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getViewType());
         self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getRequestedViewType());
@@ -66,7 +65,7 @@ final class DeviceViewTest extends TestCase
 
     public function testGetViewTypeNotMobile(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView();
         self::assertSame(DeviceView::VIEW_NOT_MOBILE, $deviceView->getViewType());
         self::assertNull($deviceView->getRequestedViewType());
@@ -74,7 +73,7 @@ final class DeviceViewTest extends TestCase
 
     public function testGetViewTypeMobileFromCookie(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(cookies: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getViewType());
         self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getRequestedViewType());
@@ -82,77 +81,77 @@ final class DeviceViewTest extends TestCase
 
     public function testIsDesktopViewTrue(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertTrue($deviceView->isDesktopView());
     }
 
     public function testIsDesktopViewFalse(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertFalse($deviceView->isDesktopView());
     }
 
     public function testIsTabletViewTrue(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_TABLET]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_TABLET]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertTrue($deviceView->isTabletView());
     }
 
     public function testIsTabletViewFalse(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertFalse($deviceView->isTabletView());
     }
 
     public function testIsMobileViewTrue(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertTrue($deviceView->isMobileView());
     }
 
     public function testIsMobileViewFalse(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_TABLET]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_TABLET]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertFalse($deviceView->isMobileView());
     }
 
     public function testIsNotMobileViewTrue(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_NOT_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_NOT_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertTrue($deviceView->isNotMobileView());
     }
 
     public function testIsNotMobileViewFalse(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertFalse($deviceView->isNotMobileView());
     }
 
     public function testHasSwitchParamTrue(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertTrue($deviceView->hasSwitchParam());
     }
 
     public function testHasSwitchParamFalse1(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView($this->requestStack);
         self::assertFalse($deviceView->hasSwitchParam());
     }
 
     public function testHasSwitchParamFalse2(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView();
         self::assertFalse($deviceView->hasSwitchParam());
     }
@@ -201,42 +200,42 @@ final class DeviceViewTest extends TestCase
 
     public function testGetSwitchParamValueNull(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView();
         self::assertNull($deviceView->getSwitchParamValue());
     }
 
     public function testGetSwitchParamValueDesktopDefault(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getSwitchParamValue());
     }
 
     public function testGetSwitchParamValueDesktop(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame(DeviceView::VIEW_DESKTOP, $deviceView->getSwitchParamValue());
     }
 
     public function testGetSwitchParamValueMobile(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getSwitchParamValue());
     }
 
     public function testGetSwitchParamValueTablet(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_TABLET]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_TABLET]);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame(DeviceView::VIEW_TABLET, $deviceView->getSwitchParamValue());
     }
 
     public function testGetRedirectResponseBySwitchParamWithCookieViewMobile(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack, [DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_MOVED_PERMANENTLY]]);
         $response = $deviceView->getRedirectResponseBySwitchParam('/redirect-url');
         self::assertSame(Response::HTTP_MOVED_PERMANENTLY, $response->getStatusCode());
@@ -244,7 +243,7 @@ final class DeviceViewTest extends TestCase
 
     public function testGetRedirectResponseBySwitchParamWithCookieViewTablet(): void
     {
-        $this->request->query = new InputBag([$this->switchParam => DeviceView::VIEW_TABLET]);
+        $this->initRequest(query: [$this->switchParam => DeviceView::VIEW_TABLET]);
         $deviceView = new DeviceView($this->requestStack, [DeviceView::VIEW_TABLET => ['status_code' => Response::HTTP_MOVED_PERMANENTLY]]);
         $response = $deviceView->getRedirectResponseBySwitchParam('/redirect-url');
         self::assertSame(Response::HTTP_MOVED_PERMANENTLY, $response->getStatusCode());
@@ -252,7 +251,7 @@ final class DeviceViewTest extends TestCase
 
     public function testGetRedirectResponseBySwitchParamWithCookieViewDesktopDefault(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView($this->requestStack);
         $response = $deviceView->getRedirectResponseBySwitchParam('/redirect-url');
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
@@ -260,7 +259,7 @@ final class DeviceViewTest extends TestCase
 
     public function testModifyResponseToMobileAndCheckResponse(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView($this->requestStack);
         $response = new Response();
         self::assertCount(0, $response->headers->getCookies());
@@ -277,7 +276,7 @@ final class DeviceViewTest extends TestCase
 
     public function testGetRedirectResponseWithCookieViewMobile(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView($this->requestStack);
         $response = $deviceView->getRedirectResponse(DeviceView::VIEW_MOBILE, 'http://mobilesite.com', Response::HTTP_FOUND);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
@@ -292,7 +291,7 @@ final class DeviceViewTest extends TestCase
 
     public function testGetRedirectResponseAndCheckCookieSettings(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView($this->requestStack);
         $deviceView->setCookiePath('/test');
         $deviceView->setCookieDomain('example.com');
@@ -312,15 +311,42 @@ final class DeviceViewTest extends TestCase
 
     public function testGetCookieKeyDeviceView(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame($this->cookieKey, $deviceView->getCookieKey());
     }
 
     public function testGetSwitchParamDeviceView(): void
     {
-        $this->request->query = new InputBag();
+        $this->initRequest(query: []);
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame($this->switchParam, $deviceView->getSwitchParam());
+    }
+
+    /**
+     * Symfony 8.1 turned Request's bag properties into hooked properties, and
+     * writing one on a fully stubbed PHPUnit mock silently leaves the backing
+     * store uninitialized (direct assignment is deprecated upstream besides).
+     * Request::initialize() is the supported way in, but the mock stubs it out,
+     * so reach past the stub to the real implementation. Every other method
+     * stays mocked exactly as before, so test behaviour is unchanged. Bags this
+     * call does not name are carried over.
+     *
+     * @param array<string, mixed>|null $query
+     * @param array<string, mixed>|null $cookies
+     * @param array<string, mixed>|null $server
+     * @param array<string, mixed>|null $attributes
+     */
+    private function initRequest(?array $query = null, ?array $cookies = null, ?array $server = null, ?array $attributes = null): void
+    {
+        (new \ReflectionMethod(Request::class, 'initialize'))->invoke(
+            $this->request,
+            $query ?? $this->request->query->all(),
+            [],
+            $attributes ?? $this->request->attributes->all(),
+            $cookies ?? $this->request->cookies->all(),
+            [],
+            $server ?? $this->request->server->all(),
+        );
     }
 }

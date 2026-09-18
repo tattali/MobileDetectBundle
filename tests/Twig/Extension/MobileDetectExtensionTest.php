@@ -37,10 +37,9 @@ final class MobileDetectExtensionTest extends TestCase
         $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
 
         $this->request = $this->getMockBuilder(Request::class)->getMock();
+        $this->initRequest([], [], [], []);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://testsite.com');
         $this->request->expects(self::any())->method('getUriForPath')->willReturn('/');
-        $this->request->query = new InputBag();
-        $this->request->cookies = new InputBag();
 
         $this->requestStack->expects(self::any())
             ->method('getMainRequest')
@@ -159,7 +158,7 @@ final class MobileDetectExtensionTest extends TestCase
     {
         $this->config['desktop'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
-        $this->request->query = new InputBag(['myparam' => 'myvalue']);
+        $this->initRequest(query: ['myparam' => 'myvalue']);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertSame('http://mobilehost.com?myparam=myvalue', $extension->desktopViewUrl());
@@ -169,7 +168,7 @@ final class MobileDetectExtensionTest extends TestCase
     {
         $this->config['desktop'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
-        $this->request->query = new InputBag(['myparam' => 'myvalue']);
+        $this->initRequest(query: ['myparam' => 'myvalue']);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertSame('http://mobilehost.com', $extension->desktopViewUrl(false));
@@ -233,7 +232,7 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsDesktopViewTrue(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
+        $this->initRequest(cookies: [$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertTrue($extension->isDesktopView());
@@ -248,7 +247,7 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsMobileViewTrue(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(cookies: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertTrue($extension->isMobileView());
@@ -256,7 +255,7 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsMobileViewFalse(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_TABLET]);
+        $this->initRequest(cookies: [$this->switchParam => DeviceView::VIEW_TABLET]);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertFalse($extension->isMobileView());
@@ -264,7 +263,7 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsTabletViewTrue(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_TABLET]);
+        $this->initRequest(cookies: [$this->switchParam => DeviceView::VIEW_TABLET]);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertTrue($extension->isTabletView());
@@ -272,7 +271,7 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsTabletViewFalse(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(cookies: [$this->switchParam => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertFalse($extension->isTabletView());
@@ -280,7 +279,7 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsNotMobileViewTrue(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_NOT_MOBILE]);
+        $this->initRequest(cookies: [$this->switchParam => DeviceView::VIEW_NOT_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertTrue($extension->isNotMobileView());
@@ -288,7 +287,7 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testIsNotMobileViewFalse(): void
     {
-        $this->request->cookies = new InputBag([$this->switchParam => DeviceView::VIEW_DESKTOP]);
+        $this->initRequest(cookies: [$this->switchParam => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertFalse($extension->isNotMobileView());
@@ -379,16 +378,41 @@ final class MobileDetectExtensionTest extends TestCase
                     return false;
                 }
 
-                // if (1 === $matcher->numberOfInvocations()) {
-                //     self::assertSame('isWindowsPhoneOS', $parameters);
+                self::assertSame('isWindowsPhoneOS', $parameters);
 
-                //     return false;
-                // }
+                return false;
             })
         ;
 
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
         self::assertFalse($extension->isWindowsOS());
+    }
+
+    /**
+     * Symfony 8.1 turned Request's bag properties into hooked properties, and
+     * writing one on a fully stubbed PHPUnit mock silently leaves the backing
+     * store uninitialized (direct assignment is deprecated upstream besides).
+     * Request::initialize() is the supported way in, but the mock stubs it out,
+     * so reach past the stub to the real implementation. Every other method
+     * stays mocked exactly as before, so test behaviour is unchanged. Bags this
+     * call does not name are carried over.
+     *
+     * @param array<string, mixed>|null $query
+     * @param array<string, mixed>|null $cookies
+     * @param array<string, mixed>|null $server
+     * @param array<string, mixed>|null $attributes
+     */
+    private function initRequest(?array $query = null, ?array $cookies = null, ?array $server = null, ?array $attributes = null): void
+    {
+        (new \ReflectionMethod(Request::class, 'initialize'))->invoke(
+            $this->request,
+            $query ?? $this->request->query->all(),
+            [],
+            $attributes ?? $this->request->attributes->all(),
+            $cookies ?? $this->request->cookies->all(),
+            [],
+            $server ?? $this->request->server->all(),
+        );
     }
 }

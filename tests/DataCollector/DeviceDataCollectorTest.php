@@ -40,9 +40,7 @@ final class DeviceDataCollectorTest extends TestCase
         parent::setUp();
 
         $this->request = $this->getMockBuilder(Request::class)->getMock();
-        $this->request->query = new InputBag();
-        $this->request->cookies = new InputBag();
-        $this->request->server = new ServerBag();
+        $this->initRequest([], [], [], []);
         $this->request->expects(self::any())->method('duplicate')->willReturn($this->request);
 
         $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
@@ -62,7 +60,7 @@ final class DeviceDataCollectorTest extends TestCase
             'status_code' => Response::HTTP_FOUND,
             'action' => RequestResponseListener::REDIRECT,
         ];
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(cookies: [DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
@@ -95,7 +93,7 @@ final class DeviceDataCollectorTest extends TestCase
             'status_code' => Response::HTTP_FOUND,
             'action' => RequestResponseListener::REDIRECT,
         ];
-        $this->request->query = new InputBag(['param1' => 'value1']);
+        $this->initRequest(query: ['param1' => 'value1']);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
         $this->request->expects(self::any())->method('getBaseUrl')->willReturn('/base-url');
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
@@ -112,7 +110,7 @@ final class DeviceDataCollectorTest extends TestCase
 
             return $test->request->getSchemeAndHttpHost().$test->request->getBaseUrl().$test->request->getPathInfo().$qs;
         });
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(cookies: [DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
@@ -157,7 +155,7 @@ final class DeviceDataCollectorTest extends TestCase
             'status_code' => Response::HTTP_FOUND,
             'action' => RequestResponseListener::REDIRECT,
         ];
-        $this->request->query = new InputBag(['param1' => 'value1']);
+        $this->initRequest(query: ['param1' => 'value1']);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
         $this->request->expects(self::any())->method('getBaseUrl')->willReturn('/base-url');
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
@@ -174,7 +172,7 @@ final class DeviceDataCollectorTest extends TestCase
 
             return $test->request->getSchemeAndHttpHost().$test->request->getBaseUrl().$test->request->getPathInfo().$qs;
         });
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_DESKTOP]);
+        $this->initRequest(cookies: [DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
@@ -219,7 +217,7 @@ final class DeviceDataCollectorTest extends TestCase
             'status_code' => Response::HTTP_FOUND,
             'action' => RequestResponseListener::REDIRECT,
         ];
-        $this->request->query = new InputBag(['param1' => 'value1']);
+        $this->initRequest(query: ['param1' => 'value1']);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://testsite.com');
         $this->request->expects(self::any())->method('getBaseUrl')->willReturn('/base-url');
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
@@ -236,7 +234,7 @@ final class DeviceDataCollectorTest extends TestCase
 
             return $test->request->getSchemeAndHttpHost().$test->request->getBaseUrl().$test->request->getPathInfo().$qs;
         });
-        $this->request->cookies = new InputBag([DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_DESKTOP]);
+        $this->initRequest(cookies: [DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_DESKTOP]);
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView, $redirectConfig);
         $deviceDataCollector->collect($this->request, $this->response);
@@ -286,5 +284,32 @@ final class DeviceDataCollectorTest extends TestCase
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);
         self::assertSame('device.collector', $deviceDataCollector->getName());
+    }
+
+    /**
+     * Symfony 8.1 turned Request's bag properties into hooked properties, and
+     * writing one on a fully stubbed PHPUnit mock silently leaves the backing
+     * store uninitialized (direct assignment is deprecated upstream besides).
+     * Request::initialize() is the supported way in, but the mock stubs it out,
+     * so reach past the stub to the real implementation. Every other method
+     * stays mocked exactly as before, so test behaviour is unchanged. Bags this
+     * call does not name are carried over.
+     *
+     * @param array<string, mixed>|null $query
+     * @param array<string, mixed>|null $cookies
+     * @param array<string, mixed>|null $server
+     * @param array<string, mixed>|null $attributes
+     */
+    private function initRequest(?array $query = null, ?array $cookies = null, ?array $server = null, ?array $attributes = null): void
+    {
+        (new \ReflectionMethod(Request::class, 'initialize'))->invoke(
+            $this->request,
+            $query ?? $this->request->query->all(),
+            [],
+            $attributes ?? $this->request->attributes->all(),
+            $cookies ?? $this->request->cookies->all(),
+            [],
+            $server ?? $this->request->server->all(),
+        );
     }
 }
