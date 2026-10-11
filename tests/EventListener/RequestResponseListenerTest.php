@@ -148,6 +148,28 @@ final class RequestResponseListenerTest extends TestCase
         }
     }
 
+    public function testHandleRequestDoesNotRedirectToInvalidHost(): void
+    {
+        // A host coming from an env var is only known at runtime: when it does
+        // not resolve to a valid URL, the listener must not redirect to it.
+        $this->config['mobile'] = ['is_enabled' => true, 'host' => 'not a url', 'status_code' => Response::HTTP_FOUND];
+
+        $this->mobileDetect->expects(self::any())->method('isMobile')->willReturn(true);
+        $this->router->expects(self::any())->method('getRouteCollection')->willReturn(
+            $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 1),
+        );
+
+        $deviceView = new DeviceView($this->requestStack);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
+        $event = $this->createGetResponseEvent('some content');
+
+        $listener->handleRequest($event);
+
+        self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getViewType());
+        self::assertNull($event->getResponse());
+        self::assertTrue($listener->needsResponseModification());
+    }
+
     public function testHandleRequestIsDesktopView(): void
     {
         $deviceView = new DeviceView($this->requestStack);

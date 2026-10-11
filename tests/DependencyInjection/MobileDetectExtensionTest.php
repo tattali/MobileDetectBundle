@@ -18,6 +18,7 @@ use MobileDetectBundle\DependencyInjection\MobileDetectExtension;
 use MobileDetectBundle\Helper\DeviceView;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -205,5 +206,45 @@ final class MobileDetectExtensionTest extends TestCase
         ];
         $this->extension->load($config, $this->container);
         self::assertSame('switch_param_custom', $this->container->getParameter('mobile_detect.switch_param'));
+    }
+
+    public function testRedirectHostFromEnvVarKeepsRedirectEnabled(): void
+    {
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag());
+        $hostPlaceholder = $container->getParameterBag()->resolveValue('%env(MOBILE_DETECT_TEST_MOBILE_HOST)%');
+        self::assertIsString($hostPlaceholder);
+
+        $config = [
+            'mobile_detect' => [
+                'redirect' => [
+                    'mobile' => ['is_enabled' => true, 'host' => $hostPlaceholder],
+                ],
+            ],
+        ];
+        $this->extension->load($config, $container);
+
+        /** @var array<string, array<string, mixed>> $redirect */
+        $redirect = $container->getParameter('mobile_detect.redirect');
+        self::assertTrue($redirect['mobile']['is_enabled']);
+        self::assertSame(
+            '%env(MOBILE_DETECT_TEST_MOBILE_HOST)%',
+            $container->resolveEnvPlaceholders($redirect['mobile']['host'], '%%env(%s)%%'),
+        );
+    }
+
+    public function testInvalidRedirectHostDisablesRedirect(): void
+    {
+        $config = [
+            'mobile_detect' => [
+                'redirect' => [
+                    'mobile' => ['is_enabled' => true, 'host' => 'not a url'],
+                ],
+            ],
+        ];
+        $this->extension->load($config, $this->container);
+
+        /** @var array<string, array<string, mixed>> $redirect */
+        $redirect = $this->container->getParameter('mobile_detect.redirect');
+        self::assertFalse($redirect['mobile']['is_enabled']);
     }
 }
