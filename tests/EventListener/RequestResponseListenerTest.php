@@ -47,11 +47,10 @@ final class RequestResponseListenerTest extends TestCase
         $this->router = $this->createMock(RouterInterface::class);
 
         $this->request = $this->getMockBuilder(Request::class)->getMock();
+        $this->initRequest([], [], [], []);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://testhost.com');
-        $this->request->expects(self::any())->method('get')->willReturn('value');
+        $this->initRequest(attributes: ['_route' => 'value']);
         $this->request->expects(self::any())->method('getUriForPath')->willReturn('/');
-        $this->request->query = new InputBag();
-        $this->request->cookies = new InputBag();
 
         $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
         $this->requestStack->expects(self::any())
@@ -68,7 +67,7 @@ final class RequestResponseListenerTest extends TestCase
 
     public function testHandleRequestHasSwitchParam(): void
     {
-        $this->request->query = new InputBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: ['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
         $deviceView = new DeviceView($this->requestStack, [DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
         $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, []);
@@ -92,7 +91,7 @@ final class RequestResponseListenerTest extends TestCase
 
     public function testHandleRequestBis(): void
     {
-        $this->request->query = new InputBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: ['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
         $deviceView = new DeviceView($this->requestStack, [DeviceView::VIEW_MOBILE => ['status_code' => Response::HTTP_FOUND]]);
         $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, [], false);
@@ -117,9 +116,9 @@ final class RequestResponseListenerTest extends TestCase
     {
         $this->config['mobile'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com'];
 
-        $this->request->query = new InputBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
+        $this->initRequest(query: ['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
-        $this->request->expects(self::any())->method('get')->willReturn('value');
+        $this->initRequest(attributes: ['_route' => 'value']);
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
             $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
         );
@@ -213,9 +212,9 @@ final class RequestResponseListenerTest extends TestCase
     {
         $this->config['tablet'] = ['is_enabled' => true, 'host' => 'http://t.testsite.com', 'status_code' => Response::HTTP_FOUND];
 
-        $this->request->query = new InputBag(['some' => 'param']);
+        $this->initRequest(query: ['some' => 'param']);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
-        $this->request->expects(self::any())->method('get')->willReturn('value');
+        $this->initRequest(attributes: ['_route' => 'value']);
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
             $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
         );
@@ -256,7 +255,7 @@ final class RequestResponseListenerTest extends TestCase
 
         $switchParam = 'custom_param';
 
-        $this->request->query = new InputBag(['some' => 'param']);
+        $this->initRequest(query: ['some' => 'param']);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
             $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
@@ -625,5 +624,32 @@ final class RequestResponseListenerTest extends TestCase
         $event->getRequest()->headers = new HeaderBag($headers);
 
         return $event;
+    }
+
+    /**
+     * Symfony 8.1 turned Request's bag properties into hooked properties, and
+     * writing one on a fully stubbed PHPUnit mock silently leaves the backing
+     * store uninitialized (direct assignment is deprecated upstream besides).
+     * Request::initialize() is the supported way in, but the mock stubs it out,
+     * so reach past the stub to the real implementation. Every other method
+     * stays mocked exactly as before, so test behaviour is unchanged. Bags this
+     * call does not name are carried over.
+     *
+     * @param array<string, mixed>|null $query
+     * @param array<string, mixed>|null $cookies
+     * @param array<string, mixed>|null $server
+     * @param array<string, mixed>|null $attributes
+     */
+    private function initRequest(?array $query = null, ?array $cookies = null, ?array $server = null, ?array $attributes = null): void
+    {
+        (new \ReflectionMethod(Request::class, 'initialize'))->invoke(
+            $this->request,
+            $query ?? $this->request->query->all(),
+            [],
+            $attributes ?? $this->request->attributes->all(),
+            $cookies ?? $this->request->cookies->all(),
+            [],
+            $server ?? $this->request->server->all(),
+        );
     }
 }
