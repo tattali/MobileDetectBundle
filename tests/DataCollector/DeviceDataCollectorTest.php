@@ -18,11 +18,9 @@ use MobileDetectBundle\EventListener\RequestResponseListener;
 use MobileDetectBundle\Helper\DeviceView;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ServerBag;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>

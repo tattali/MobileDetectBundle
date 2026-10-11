@@ -9,7 +9,6 @@ use MobileDetectBundle\Helper\DeviceView;
 use MobileDetectBundle\Twig\Extension\MobileDetectExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
