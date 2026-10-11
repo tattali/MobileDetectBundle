@@ -3,7 +3,7 @@
 MobileDetectBundle
 ==================
 
-Symfony 5.4.x-7.0 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+Symfony 7.4 LTS and 8.x bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
 
 [![Github Actions Status](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml/badge.svg?branch=main
 )](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml?query=branch%3Amain)
@@ -24,7 +24,9 @@ This Bundle use [MobileDetect](https://github.com/serbanghita/Mobile-Detect) cla
 * Manages site views for the various mobile devices (`mobile`, `tablet`, `desktop`)
 * Redirects to mobile and tablet sites
 
-* **[Migrate to 7x](src/Resources/doc/migration-7x.md)**
+* **[Migrate to 8x](src/Resources/doc/migration-8x.md)**
+* [Migrate to 7x](src/Resources/doc/migration-7x.md)
+* [Changelog](CHANGELOG.md)
 
 Documentation
 -------------
