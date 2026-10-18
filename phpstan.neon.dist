@@ -1,5 +1,6 @@
 parameters:
-    level: 1
+    level: max
+    phpVersion: 70205
     tmpDir: .phpstan
     paths:
         - src
