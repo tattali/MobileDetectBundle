@@ -20,6 +20,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
+ *
+ * @phpstan-type ViewRedirectConfig array{is_enabled?: bool, host?: string|null, status_code?: int, action?: string}
+ * @phpstan-type RedirectConfig array{mobile?: ViewRedirectConfig, tablet?: ViewRedirectConfig, full?: ViewRedirectConfig, detect_tablet_as_mobile?: bool}
+ * @phpstan-type SameSite Cookie::SAMESITE_*|''|null
  */
 class DeviceView
 {
@@ -39,17 +43,17 @@ class DeviceView
     public const SWITCH_PARAM_DEFAULT = 'device_view';
 
     /**
-     * @var Request
+     * @var Request|null
      */
     protected $request;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $requestedViewType;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $viewType;
 
@@ -84,7 +88,7 @@ class DeviceView
     protected $cookieRaw = self::COOKIE_RAW_DEFAULT;
 
     /**
-     * @var string|null
+     * @var SameSite
      */
     protected $cookieSameSite = self::COOKIE_SAMESITE_DEFAULT;
 
@@ -99,13 +103,13 @@ class DeviceView
     protected $switchParam = self::SWITCH_PARAM_DEFAULT;
 
     /**
-     * @var array
+     * @var RedirectConfig
      */
     protected $redirectConfig = [];
 
     public function __construct(RequestStack $requestStack = null)
     {
-        if (!$requestStack || !$this->request = $requestStack->getMainRequest()) {
+        if (null === $requestStack || null === $this->request = $requestStack->getMainRequest()) {
             $this->viewType = self::VIEW_NOT_MOBILE;
 
             return;
@@ -169,7 +173,7 @@ class DeviceView
      */
     public function hasSwitchParam(): bool
     {
-        return $this->request && $this->request->query->has($this->switchParam);
+        return null !== $this->request && $this->request->query->has($this->switchParam);
     }
 
     public function setView(string $view): void
@@ -200,11 +204,17 @@ class DeviceView
         $this->viewType = self::VIEW_NOT_MOBILE;
     }
 
+    /**
+     * @return RedirectConfig
+     */
     public function getRedirectConfig(): array
     {
         return $this->redirectConfig;
     }
 
+    /**
+     * @param RedirectConfig $redirectConfig
+     */
     public function setRedirectConfig(array $redirectConfig): void
     {
         $this->redirectConfig = $redirectConfig;
@@ -239,7 +249,7 @@ class DeviceView
      */
     public function getSwitchParamValue(): ?string
     {
-        if (!$this->request) {
+        if (null === $this->request) {
             return null;
         }
 
@@ -316,11 +326,17 @@ class DeviceView
         $this->cookieRaw = $cookieRaw;
     }
 
+    /**
+     * @return SameSite
+     */
     public function getCookieSameSite(): ?string
     {
         return $this->cookieSameSite;
     }
 
+    /**
+     * @param SameSite $cookieSameSite
+     */
     public function setCookieSameSite(?string $cookieSameSite = Cookie::SAMESITE_LAX): void
     {
         $this->cookieSameSite = $cookieSameSite;
@@ -362,8 +378,9 @@ class DeviceView
 
     protected function getStatusCode(string $view): int
     {
-        if (isset($this->getRedirectConfig()[$view]['status_code'])) {
-            return $this->getRedirectConfig()[$view]['status_code'];
+        $viewConfig = $this->getRedirectConfig()[$view] ?? null;
+        if (\is_array($viewConfig) && isset($viewConfig['status_code'])) {
+            return $viewConfig['status_code'];
         }
 
         return Response::HTTP_FOUND;

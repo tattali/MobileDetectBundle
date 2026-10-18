@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
  * @author Jonas HAOUZI <haouzijonas@gmail.com>
+ *
+ * @phpstan-import-type RedirectConfig from DeviceView
  */
 class DeviceDataCollector extends DataCollector
 {
@@ -30,7 +32,7 @@ class DeviceDataCollector extends DataCollector
     protected $deviceView;
 
     /**
-     * @var array
+     * @var RedirectConfig|null
      */
     protected $redirectConfig;
 
@@ -84,14 +86,24 @@ class DeviceDataCollector extends DataCollector
 
     public function getCurrentView(): string
     {
-        return $this->data['currentView'] ?? '';
+        $currentView = $this->data['currentView'] ?? null;
+
+        return \is_string($currentView) ? $currentView : '';
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getViews(): array
     {
-        return $this->data['views'];
+        $views = $this->data['views'] ?? null;
+
+        return \is_array($views) ? $views : [];
     }
 
+    /**
+     * @param RedirectConfig $redirectConfig
+     */
     public function setRedirectConfig(array $redirectConfig): void
     {
         $this->redirectConfig = $redirectConfig;
@@ -102,9 +114,12 @@ class DeviceDataCollector extends DataCollector
         return 'device.collector';
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getData(): array
     {
-        return $this->data;
+        return \is_array($this->data) ? $this->data : [];
     }
 
     public function reset(): void
@@ -114,25 +129,24 @@ class DeviceDataCollector extends DataCollector
 
     protected function canUseView(string $view, ?string $host): bool
     {
-        if (!\is_array($this->redirectConfig)
-            || !isset($this->redirectConfig[$view])
-            || !isset($this->redirectConfig[$view]['is_enabled'])
-            || false === $this->redirectConfig[$view]['is_enabled']
+        $viewConfig = $this->redirectConfig[$view] ?? null;
+        if (!\is_array($viewConfig)
+            || !isset($viewConfig['is_enabled'])
+            || true !== $viewConfig['is_enabled']
         ) {
             return true;
         }
 
-        if (true === $this->redirectConfig[$view]['is_enabled']
-            && isset($this->redirectConfig[$view]['host'], $this->redirectConfig[$view]['action'])
-            && !empty($this->redirectConfig[$view]['host'])
-            && \in_array($this->redirectConfig[$view]['action'], [RequestResponseListener::REDIRECT, RequestResponseListener::REDIRECT_WITHOUT_PATH], true)
+        if (isset($viewConfig['host'], $viewConfig['action'])
+            && (bool) $viewConfig['host']
+            && \in_array($viewConfig['action'], [RequestResponseListener::REDIRECT, RequestResponseListener::REDIRECT_WITHOUT_PATH], true)
         ) {
-            $parseHost = parse_url($this->redirectConfig[$view]['host']);
+            $parseHost = parse_url($viewConfig['host']);
             if (false === $parseHost) {
                 $parseHost = [];
             }
             $redirectHost = ($parseHost['scheme'] ?? '').'://'.($parseHost['host'] ?? '');
-            if (!empty($parseHost['port'])) {
+            if (isset($parseHost['port']) && 0 !== $parseHost['port']) {
                 $redirectHost .= ':'.$parseHost['port'];
             }
 
@@ -147,7 +161,7 @@ class DeviceDataCollector extends DataCollector
     private function generateSwitchLink(
         Request $request,
         string $view
-    ): ?string {
+    ): string {
         $requestSwitchView = $request->duplicate();
         $requestSwitchView->query->set($this->deviceView->getSwitchParam(), $view);
         $requestSwitchView->server->set(
