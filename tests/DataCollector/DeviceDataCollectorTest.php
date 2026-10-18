@@ -336,4 +336,23 @@ final class DeviceDataCollectorTest extends TestCase
         self::assertCount(1, $mobileViews);
         self::assertFalse($mobileViews[0]['enabled']);
     }
+
+    public function testGetViewsBeforeCollect(): void
+    {
+        $deviceDataCollector = new DeviceDataCollector(new DeviceView($this->requestStack));
+
+        self::assertSame([], $deviceDataCollector->getViews());
+    }
+
+    public function testGetViewsAfterReset(): void
+    {
+        $request = Request::create('http://testsite.com/page');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $deviceDataCollector = new DeviceDataCollector(new DeviceView($requestStack));
+        $deviceDataCollector->collect($request, new Response());
+        $deviceDataCollector->reset();
+
+        self::assertSame([], $deviceDataCollector->getViews());
+    }
 }
