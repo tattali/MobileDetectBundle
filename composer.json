@@ -62,9 +62,9 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
+            "infection/extension-installer": true,
             "phpstan/extension-installer": true,
-            "symfony/flex": true,
-            "infection/extension-installer": true
+            "symfony/flex": true
         },
         "policy": {
             "advisories": {
