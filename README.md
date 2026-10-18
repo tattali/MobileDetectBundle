@@ -28,8 +28,10 @@ Documentation
 
 ### Installation
 ```sh
-composer require tattali/mobile-detect-bundle
+composer require 'tattali/mobile-detect-bundle:^7.1'
 ```
+Keep the `^7.1` constraint: on Symfony 7.4, a plain `composer require` installs 8.0.0, which gets no more fixes.
+
 *Install with Symfony legacy versions: [here](src/Resources/doc/legacy-versions.md)*
 ### Usage
 
