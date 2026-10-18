@@ -101,6 +101,42 @@ final class DeviceDataCollectorTest extends TestCase
         }
     }
 
+    public function testCollectWithoutViewReportsAnEmptyCurrentView(): void
+    {
+        // The request listener did not run (e.g. the router answered 404 first) and
+        // neither the switch param nor the cookie are set: the view is unknown.
+        $request = Request::create('http://testsite.com/page');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $deviceView = new DeviceView($requestStack);
+        $deviceDataCollector = new DeviceDataCollector($deviceView);
+        $deviceDataCollector->collect($request, new Response());
+
+        self::assertNull($deviceView->getViewType());
+        self::assertSame('', $deviceDataCollector->getCurrentView());
+    }
+
+    public function testCollectWithRedirectHostWithoutSchemeMarksTheViewExternal(): void
+    {
+        $request = Request::create('http://testsite.com/page');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $deviceDataCollector = new DeviceDataCollector(new DeviceView($requestStack));
+        $deviceDataCollector->setRedirectConfig([
+            DeviceView::VIEW_MOBILE => [
+                'is_enabled' => true,
+                'host' => 'm.testsite.com',
+                'status_code' => Response::HTTP_FOUND,
+                'action' => RequestResponseListener::REDIRECT,
+            ],
+        ]);
+        $deviceDataCollector->collect($request, new Response());
+
+        $views = $deviceDataCollector->getViews();
+        self::assertSame(DeviceView::VIEW_MOBILE, $views[2]['type']);
+        self::assertFalse($views[2]['enabled']);
+    }
+
     public function testCollectCurrentViewMobileCanUseTablet(): void
     {
         $redirectConfig['tablet'] = [
