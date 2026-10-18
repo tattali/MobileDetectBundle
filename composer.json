@@ -39,7 +39,6 @@
         "mobiledetect/mobiledetectlib": "^4.8",
         "symfony/config": "^7.0",
         "symfony/dependency-injection": "^7.0",
-        "symfony/framework-bundle": "^7.0",
         "symfony/http-foundation": "^7.0",
         "symfony/http-kernel": "^7.0",
         "symfony/routing": "^7.0",
@@ -65,11 +64,6 @@
             "infection/extension-installer": true,
             "phpstan/extension-installer": true,
             "symfony/flex": true
-        },
-        "policy": {
-            "advisories": {
-                "block": false
-            }
         }
     },
     "autoload": {

@@ -355,8 +355,26 @@ class DeviceView
             $this->isCookieSecure(),
             $this->isCookieHttpOnly(),
             $this->isCookieRaw(),
-            // @phpstan-ignore-next-line
-            $this->getCookieSameSite(),
+            $this->getCookieSameSiteForCookie(),
         );
+    }
+
+    /**
+     * The same-site value as Cookie accepts it: Cookie compares it in lower case and reads '' as null.
+     *
+     * @return Cookie::SAMESITE_*|null
+     */
+    private function getCookieSameSiteForCookie(): ?string
+    {
+        $sameSite = $this->getCookieSameSite();
+
+        return match (null === $sameSite ? null : strtolower($sameSite)) {
+            null, '' => null,
+            Cookie::SAMESITE_LAX => Cookie::SAMESITE_LAX,
+            Cookie::SAMESITE_STRICT => Cookie::SAMESITE_STRICT,
+            Cookie::SAMESITE_NONE => Cookie::SAMESITE_NONE,
+            // the exception Cookie throws for this value
+            default => throw new \InvalidArgumentException('The "sameSite" parameter value is not valid.'),
+        };
     }
 }

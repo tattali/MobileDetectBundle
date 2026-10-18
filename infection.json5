@@ -9,7 +9,7 @@
     "mutators": {
         "@default": true
     },
-    // measured on 2026-10-18 (PHP 8.4, Symfony 7.4): 299 of 347 mutants killed, MSI 86.17%, covered code MSI 86.17%; raise them when tests improve
-    "minMsi": 86,
-    "minCoveredMsi": 86
+    // measured on 2026-10-18 (PHP 8.4, Symfony 7.4): 313 of 358 mutants killed, MSI 87.43%, covered code MSI 87.43%; raise them when tests improve
+    "minMsi": 87,
+    "minCoveredMsi": 87
 }
