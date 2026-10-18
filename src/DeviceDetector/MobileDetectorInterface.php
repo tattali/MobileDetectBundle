@@ -207,12 +207,12 @@ namespace MobileDetectBundle\DeviceDetector;
 interface MobileDetectorInterface
 {
     /**
-     * Magic overloading method.
+     * Magic overloading method, handles the is[...]() methods.
      *
-     * @method bool is[...]()
+     * @param string       $name
+     * @param array<mixed> $arguments
      *
-     * @param string $name
-     * @param array  $arguments
+     * @return mixed
      *
      * @throws \BadMethodCallException when the method doesn't exist and doesn't start with 'is'
      */
@@ -221,28 +221,28 @@ interface MobileDetectorInterface
     /**
      * Retrieve the list of known browsers. Specifically, the user agents.
      *
-     * @return array list of browsers / user agents
+     * @return array<string, string> list of browsers / user agents
      */
     public static function getBrowsers();
 
     /**
      * Retrieve the list of mobile operating systems.
      *
-     * @return array the list of mobile operating systems
+     * @return array<string, string> the list of mobile operating systems
      */
     public static function getOperatingSystems();
 
     /**
      * Retrieve the list of known phone devices.
      *
-     * @return array list of phone devices
+     * @return array<string, string> list of phone devices
      */
     public static function getPhoneDevices();
 
     /**
      * Get the properties array.
      *
-     * @return array
+     * @return array<string, string|array<string>>
      */
     public static function getProperties();
 
@@ -259,21 +259,21 @@ interface MobileDetectorInterface
     /**
      * Retrieve the list of known tablet devices.
      *
-     * @return array list of tablet devices
+     * @return array<string, string> list of tablet devices
      */
     public static function getTabletDevices();
 
     /**
      * Alias for getBrowsers() method.
      *
-     * @return array list of user agents
+     * @return array<string, string> list of user agents
      */
     public static function getUserAgents();
 
     /**
      * Retrieve the list of known utilities.
      *
-     * @return array list of utilities
+     * @return array<string, string> list of utilities
      */
     public static function getUtilities();
 
@@ -289,7 +289,7 @@ interface MobileDetectorInterface
     /**
      * Retrieves the cloudfront headers.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getCfHeaders();
 
@@ -297,7 +297,7 @@ interface MobileDetectorInterface
      * Set CloudFront headers
      * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/header-caching.html#header-caching-web-device.
      *
-     * @param array $cfHeaders List of HTTP headers
+     * @param array<string, string>|null $cfHeaders List of HTTP headers
      *
      * @return bool If there were CloudFront headers to be set
      */
@@ -318,29 +318,40 @@ interface MobileDetectorInterface
     /**
      * Retrieves the HTTP headers.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getHttpHeaders();
 
     /**
      * Set the HTTP Headers. Must be PHP-flavored. This method will reset existing headers.
      *
-     * @param array $httpHeaders The headers to set. If null, then using PHP's _SERVER to extract
-     *                           the headers. The default null is left for backwards compatibility.
+     * @param array<string, string>|null $httpHeaders The headers to set. If null, then using PHP's _SERVER to extract
+     *                                           the headers. The default null is left for backwards compatibility.
+     *
+     * @return void
      */
     public function setHttpHeaders($httpHeaders = null);
 
+    /**
+     * @return array<string>|null the matches of the last successful detection rule
+     */
     public function getMatchesArray();
 
+    /**
+     * @return string|null the last detection rule that matched
+     */
     public function getMatchingRegex();
 
+    /**
+     * @return array<string, array<string, array<string>>|null>
+     */
     public function getMobileHeaders();
 
     /**
      * Get all possible HTTP headers that
      * can contain the User-Agent string.
      *
-     * @return array list of HTTP headers
+     * @return array<string> list of HTTP headers
      */
     public function getUaHttpHeaders();
 
@@ -395,7 +406,8 @@ interface MobileDetectorInterface
      * This method will be used to check custom regexes against
      * the User-Agent string.
      *
-     * @param string $userAgent
+     * @param string      $regex
+     * @param string|null $userAgent
      *
      * @return bool
      */
