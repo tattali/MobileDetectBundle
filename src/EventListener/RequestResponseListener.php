@@ -162,11 +162,15 @@ class RequestResponseListener
 
     protected function getRedirectResponseBySwitchParam(Request $request): RedirectResponseWithCookie
     {
-        if ($this->mustRedirect($request, $this->deviceView->getViewType())) {
+        $viewType = $this->deviceView->getViewType();
+        $redirectUrl = null;
+        if (null !== $viewType && $this->mustRedirect($request, $viewType)) {
             // Avoid unnecessary redirects: if we need to redirect to another view,
             // do it in one response while setting the cookie.
-            $redirectUrl = $this->getRedirectUrl($request, $this->deviceView->getViewType());
-        } else {
+            $redirectUrl = $this->getRedirectUrl($request, $viewType);
+        }
+
+        if (null === $redirectUrl) {
             if (true === $this->isFullPath) {
                 $redirectUrl = $request->getUriForPath($request->getPathInfo());
                 // $redirectUrl = ($request->getPathInfo()) ? $request->getUriForPath($request->getPathInfo()) : $this->getCurrentHost($request);
@@ -192,14 +196,15 @@ class RequestResponseListener
      */
     protected function mustRedirect(Request $request, string $viewType): bool
     {
-        if (!isset($this->redirectConf[$viewType])
-            || !$this->redirectConf[$viewType]['is_enabled']
-            || (self::NO_REDIRECT === $this->getRoutingOption($request->get('_route'), $viewType))
+        $viewConfig = $this->getViewRedirectConf($viewType);
+        if (null === $viewConfig
+            || !$viewConfig['is_enabled']
+            || (self::NO_REDIRECT === $this->getRoutingOption($this->getRouteName($request), $viewType))
         ) {
             return false;
         }
 
-        return $request->getSchemeAndHttpHost() !== $this->redirectConf[$viewType]['host'];
+        return $request->getSchemeAndHttpHost() !== $viewConfig['host'];
     }
 
     protected function getRoutingOption(string $routeName, string $optionName): ?string
@@ -211,8 +216,9 @@ class RequestResponseListener
             $option = $route->getOption($optionName);
         }
 
-        if (!$option && isset($this->redirectConf[$optionName])) {
-            $option = $this->redirectConf[$optionName]['action'];
+        $viewConfig = $this->getViewRedirectConf($optionName);
+        if (!$option && null !== $viewConfig) {
+            $option = $viewConfig['action'];
         }
 
         if (\in_array($option, [self::REDIRECT, self::REDIRECT_WITHOUT_PATH, self::NO_REDIRECT], true)) {
@@ -224,7 +230,7 @@ class RequestResponseListener
 
     protected function getRedirectUrl(Request $request, string $view): ?string
     {
-        if ($routingOption = $this->getRoutingOption($request->get('_route'), $view)) {
+        if ($routingOption = $this->getRoutingOption($this->getRouteName($request), $view)) {
             if (self::REDIRECT === $routingOption) {
                 // Make sure to hint at the device override, otherwise infinite loop
                 // redirection may occur if different device views are hosted on
@@ -263,6 +269,23 @@ class RequestResponseListener
         }
 
         return null;
+    }
+
+    private function getRouteName(Request $request): string
+    {
+        $routeName = $request->get('_route');
+
+        return \is_string($routeName) ? $routeName : '';
+    }
+
+    /**
+     * Gets the redirect configuration of a view, or null when the name is not a view.
+     */
+    private function getViewRedirectConf(string $view): ?array
+    {
+        $viewConfig = $this->redirectConf[$view] ?? null;
+
+        return \is_array($viewConfig) ? $viewConfig : null;
     }
 
     /**
