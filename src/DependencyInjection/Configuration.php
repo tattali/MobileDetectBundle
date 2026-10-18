@@ -22,6 +22,9 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
  * @author HenriVesala <email@gmail.com>
+ *
+ * @phpstan-type ViewRedirectConfig array{is_enabled: bool, host: string|null, status_code: int, action: string}
+ * @phpstan-type RedirectConfig array{mobile: ViewRedirectConfig, tablet: ViewRedirectConfig, full: ViewRedirectConfig, detect_tablet_as_mobile: bool}
  */
 class Configuration implements ConfigurationInterface
 {
