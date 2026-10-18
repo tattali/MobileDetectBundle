@@ -1,4 +1,4 @@
-# Supported: PHP >=8.2, Symfony ^7.4 || ^8.0 (Symfony 8 needs PHP 8.4).
+# Supported: PHP >=8.4, Symfony ^8.0.
 # The lowest job installs the oldest allowed versions. The current job runs the linters,
 # coverage and SonarCloud; the other jobs only run the tests. The nightly job tries the next
 # PHP and Symfony versions in development and may fail without failing the workflow.
@@ -6,7 +6,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, '[0-9]*.x']
   pull_request:
   schedule:
     - cron: '0 6 * * 1' # every Monday, to catch breakage from new dependency releases
@@ -30,8 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { php: '8.2', symfony: '7.4.*', lowest: true }
-          - { php: '8.3', symfony: '7.4.*' }
+          - { php: '8.4', symfony: '8.0.*', lowest: true }
           - { php: '8.4', symfony: '8.*', current: true }
           - { php: '8.5', symfony: '8.*' }
           - { php: '8.6', symfony: 'next', nightly: true }
@@ -66,8 +65,12 @@ jobs:
             export SYMFONY_REQUIRE
             composer config minimum-stability dev
           fi
-          # php-cs-fixer cannot install on the lowest Symfony versions, and only the current job lints
-          if [ "${{ matrix.current }}" != "true" ]; then composer remove --dev --no-update friendsofphp/php-cs-fixer; fi
+          # only the current job lints, and the lint tools cannot install on every PHP and Symfony version
+          if [ "${{ matrix.current }}" != "true" ]; then
+            for tool in friendsofphp/php-cs-fixer phpstan/phpstan phpstan/extension-installer phpstan/phpstan-phpunit phpstan/phpstan-symfony phpstan/phpstan-deprecation-rules phpstan/phpstan-nette squizlabs/php_codesniffer; do
+              if grep -q "\"$tool\"" composer.json; then composer remove --dev --no-update --no-interaction "$tool"; fi
+            done
+          fi
           composer update --no-interaction --no-progress --prefer-dist --prefer-stable ${{ matrix.lowest && '--prefer-lowest --no-security-blocking' || '' }} ${{ matrix.nightly && '--ignore-platform-req=php+' || '' }}
 
       - name: PHP-CS-Fixer
