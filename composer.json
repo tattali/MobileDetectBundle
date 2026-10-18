@@ -35,10 +35,14 @@
     ],
     "require": {
         "php": ">=8.1",
+        "ext-filter": "*",
         "mobiledetect/mobiledetectlib": "^2.8.15",
+        "symfony/config": "^6.4",
         "symfony/dependency-injection": "^6.4",
-        "symfony/event-dispatcher": "^6.4",
         "symfony/framework-bundle": "^6.4",
+        "symfony/http-foundation": "^6.4",
+        "symfony/http-kernel": "^6.4",
+        "symfony/routing": "^6.4",
         "symfony/yaml": "^6.4",
         "twig/twig": "^2.0 || ^3.0"
     },
@@ -51,8 +55,8 @@
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^9.6",
+        "shipmonk/composer-dependency-analyser": "^1.8",
         "squizlabs/php_codesniffer": "^3.6",
-        "symfony/dotenv": "^6.4",
         "symfony/phpunit-bridge": "^6.4"
     },
     "config": {
