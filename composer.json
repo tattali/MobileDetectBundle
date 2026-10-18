@@ -60,6 +60,11 @@
         "allow-plugins": {
             "phpstan/extension-installer": true,
             "symfony/flex": true
+        },
+        "policy": {
+            "advisories": {
+                "block": false
+            }
         }
     },
     "autoload": {

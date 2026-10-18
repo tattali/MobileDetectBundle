@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\Tests\Helper;
 
+use MobileDetectBundle\Helper\DeviceView;
 use MobileDetectBundle\Helper\RedirectResponseWithCookie;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -25,7 +26,7 @@ final class RedirectResponseWithCookieTest extends TestCase
 {
     public function testItRedirectsWithTheCookie(): void
     {
-        $cookie = Cookie::create('device_view', 'mobile');
+        $cookie = self::createCookie();
         $response = new RedirectResponseWithCookie('http://testsite.com/', Response::HTTP_MOVED_PERMANENTLY, $cookie);
 
         self::assertSame('http://testsite.com/', $response->getTargetUrl());
@@ -35,8 +36,17 @@ final class RedirectResponseWithCookieTest extends TestCase
 
     public function testNullStatusUsesTheDefaultRedirectStatus(): void
     {
-        $response = new RedirectResponseWithCookie('http://testsite.com/', null, Cookie::create('device_view', 'mobile'));
+        $response = new RedirectResponseWithCookie('http://testsite.com/', null, self::createCookie());
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+    }
+
+    /**
+     * A cookie with the bundle's default path and domain: older Symfony 7 minors (7.2 here) store
+     * cookies by domain, and a null domain is a deprecated array offset on PHP 8.5.
+     */
+    private static function createCookie(): Cookie
+    {
+        return Cookie::create(DeviceView::COOKIE_KEY_DEFAULT, DeviceView::VIEW_MOBILE, 0, DeviceView::COOKIE_PATH_DEFAULT, DeviceView::COOKIE_DOMAIN_DEFAULT);
     }
 }
