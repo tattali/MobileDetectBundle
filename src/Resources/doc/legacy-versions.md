@@ -4,13 +4,15 @@ Installation
 Composer
 --------
 
-Composer installs the newest bundle version that supports your Symfony version:
+On Symfony 8, install the latest version:
 
 ```sh
 composer require tattali/mobile-detect-bundle
 ```
 
-To pin a version explicitly:
+On older Symfony versions, require the bundle version made for your Symfony version.
+On Symfony 7 (7.4 included), require `^7.1`: a plain `composer require` on Symfony 7.4 installs 8.0.0,
+which allows Symfony 7.4 but gets no more fixes.
 
 | Symfony | Command |
 |---------|---------|
@@ -24,7 +26,7 @@ To pin a version explicitly:
 Or add the version to the `require` section of your project's `composer.json`:
 ```json
 {
-    "tattali/mobile-detect-bundle": "2.1.*"
+    "tattali/mobile-detect-bundle": "^8.1"
 }
 ```
 

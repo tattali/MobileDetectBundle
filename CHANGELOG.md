@@ -4,7 +4,7 @@ Changelog
 8.1.0
 -----
 
-- Require Symfony 8 and PHP 8.4; drop Symfony 7.4 and PHP 8.2 and 8.3. Each major version of the bundle now supports one Symfony major version: Symfony 7 projects use the 7.x versions, Symfony 6.4 projects the 6.x versions and Symfony 5.4 projects the 5.x versions (security fixes only)
+- Require Symfony 8 and PHP 8.4; drop Symfony 7.4 and PHP 8.2 and 8.3. Each major version of the bundle now supports one Symfony major version: Symfony 7 projects use the 7.x versions (require `^7.1`: on Symfony 7.4 a plain `composer require` installs 8.0.0, which gets no more fixes), Symfony 6.4 projects the 6.x versions and Symfony 5.4 projects the 5.x versions (security fixes only)
 - CI: test PHP 8.4 and 8.5 against Symfony 8
 
 8.0.0
