@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -618,6 +619,74 @@ final class RequestResponseListenerTest extends TestCase
         $deviceView = new DeviceView($this->requestStack);
         $listener = new RequestResponseListener($this->mobileDetector, $deviceView, $this->router, $this->config);
         $listener->handleRequest($event);
+    }
+
+    public function testSwitchParamWithUnknownRedirectActionRedirectsToTheCurrentUrl(): void
+    {
+        $request = Request::create('http://testhost.com/page?'.$this->switchParam.'='.DeviceView::VIEW_MOBILE);
+        $request->attributes->set('_route', 'page');
+        $this->router->method('getRouteCollection')->willReturn(new RouteCollection());
+        $config = $this->config;
+        $config['mobile'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com', 'status_code' => Response::HTTP_FOUND, 'action' => 'unknown'];
+
+        $response = $this->handleRealRequest($request, $config);
+
+        self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
+        self::assertSame('http://testhost.com/page', $response->getTargetUrl());
+    }
+
+    public function testRequestWithoutRouteUsesTheConfiguredRedirectAction(): void
+    {
+        $request = Request::create('http://testhost.com/page');
+        $this->mobileDetector->method('isMobile')->willReturn(true);
+        $this->router->method('getRouteCollection')->willReturn(new RouteCollection());
+        $config = $this->config;
+        $config['mobile'] = ['is_enabled' => true, 'host' => 'http://mobilehost.com', 'status_code' => Response::HTTP_FOUND, 'action' => RequestResponseListener::REDIRECT];
+
+        $response = $this->handleRealRequest($request, $config);
+
+        self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
+        self::assertSame('http://mobilehost.com/page?'.$this->switchParam.'='.DeviceView::VIEW_MOBILE, $response->getTargetUrl());
+    }
+
+    public function testSwitchParamWithoutValueRedirectsToTheCurrentUrl(): void
+    {
+        $request = Request::create('http://testhost.com/page');
+        $request->query->set($this->switchParam, null);
+        $request->attributes->set('_route', 'page');
+
+        $response = $this->handleRealRequest($request, $this->config);
+
+        self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
+        self::assertSame('http://testhost.com/page', $response->getTargetUrl());
+    }
+
+    public function testCookieNamingAConfigKeyThatIsNotAViewDoesNotRedirect(): void
+    {
+        $request = Request::create('http://testhost.com/page', 'GET', [], [DeviceView::COOKIE_KEY_DEFAULT => 'detect_tablet_as_mobile']);
+        $request->attributes->set('_route', 'page');
+
+        $response = $this->handleRealRequest($request, $this->config);
+
+        self::assertNull($response);
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function handleRealRequest(Request $request, array $config): ?Response
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $listener = new RequestResponseListener($this->mobileDetector, new DeviceView($requestStack), $this->router, $config);
+        $event = new RequestEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $request,
+            \defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') : \constant('Symfony\Component\HttpKernel\HttpKernelInterface::MASTER_REQUEST')
+        );
+        $listener->handleRequest($event);
+
+        return $event->getResponse();
     }
 
     private function createGetResponseEvent(string $content, array $headers = []): ViewEvent

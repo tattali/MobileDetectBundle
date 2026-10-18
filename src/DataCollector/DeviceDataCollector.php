@@ -84,7 +84,7 @@ class DeviceDataCollector extends DataCollector
 
     public function getCurrentView(): string
     {
-        return $this->data['currentView'];
+        return $this->data['currentView'] ?? '';
     }
 
     public function getViews(): array
@@ -128,7 +128,10 @@ class DeviceDataCollector extends DataCollector
             && \in_array($this->redirectConfig[$view]['action'], [RequestResponseListener::REDIRECT, RequestResponseListener::REDIRECT_WITHOUT_PATH], true)
         ) {
             $parseHost = parse_url($this->redirectConfig[$view]['host']);
-            $redirectHost = $parseHost['scheme'].'://'.$parseHost['host'];
+            if (false === $parseHost) {
+                $parseHost = [];
+            }
+            $redirectHost = ($parseHost['scheme'] ?? '').'://'.($parseHost['host'] ?? '');
             if (!empty($parseHost['port'])) {
                 $redirectHost .= ':'.$parseHost['port'];
             }
