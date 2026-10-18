@@ -164,7 +164,14 @@ class RequestResponseListener
             return false;
         }
 
-        return $request->getSchemeAndHttpHost() !== $this->redirectConf[$viewType]['host'];
+        $host = $this->redirectConf[$viewType]['host'] ?? null;
+
+        // The host may come from an env var resolved at runtime: never redirect to an invalid URL
+        if (!\is_string($host) || false === filter_var($host, \FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        return $request->getSchemeAndHttpHost() !== $host;
     }
 
     protected function getRoutingOption(string $routeName, string $optionName): ?string
