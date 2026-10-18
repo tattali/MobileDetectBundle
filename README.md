@@ -3,10 +3,14 @@
 MobileDetectBundle
 ==================
 
-Symfony 3.4.x-6.0.x bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+[![CI](https://img.shields.io/github/actions/workflow/status/tattali/MobileDetectBundle/ci.yml?branch=6.x&label=CI)](https://github.com/tattali/MobileDetectBundle/actions/workflows/ci.yml?query=branch%3A6.x)
+[![Latest Version](https://img.shields.io/packagist/v/tattali/mobile-detect-bundle)](https://packagist.org/packages/tattali/mobile-detect-bundle)
+[![Downloads](https://img.shields.io/packagist/dt/tattali/mobile-detect-bundle)](https://packagist.org/packages/tattali/mobile-detect-bundle/stats)
+[![License](https://img.shields.io/packagist/l/tattali/mobile-detect-bundle)](src/Resources/meta/LICENSE)
 
-[![Github Actions Status](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml/badge.svg?branch=main
-)](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml?query=branch%3Amain) [![Latest Stable Version](http://poser.pugx.org/tattali/mobile-detect-bundle/v)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![Total Downloads](http://poser.pugx.org/tattali/mobile-detect-bundle/downloads)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![codecov](https://codecov.io/gh/tattali/MobileDetectBundle/branch/main/graph/badge.svg?token=HWV1OYRSD9)](https://codecov.io/gh/tattali/MobileDetectBundle) [![License](http://poser.pugx.org/tattali/mobile-detect-bundle/license)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![PHP Version Require](http://poser.pugx.org/tattali/mobile-detect-bundle/require/php)](https://packagist.org/packages/tattali/mobile-detect-bundle)
+Symfony 6.4 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+
+This is the 6.x branch: it supports Symfony 6.4 on PHP 8.1 or later and gets bug fixes only. For newer Symfony versions, use the newer major versions of the bundle (see the `main` branch).
 
 *This bundle is a fork of [suncat2000/MobileDetectBundle](https://github.com/suncat2000/MobileDetectBundle). As this project doesn't look maintained anymore, we decided to create & maintain a fork. For more information read our [manifest](https://github.com/tattali/MobileDetectBundle/issues/8).*
 
