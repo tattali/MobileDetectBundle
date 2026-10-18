@@ -3,10 +3,14 @@
 MobileDetectBundle
 ==================
 
-Symfony 5.4.x-7.0 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+[![CI](https://img.shields.io/github/actions/workflow/status/tattali/MobileDetectBundle/ci.yml?branch=7.x&label=CI)](https://github.com/tattali/MobileDetectBundle/actions/workflows/ci.yml?query=branch%3A7.x)
+[![Latest Version](https://img.shields.io/packagist/v/tattali/mobile-detect-bundle)](https://packagist.org/packages/tattali/mobile-detect-bundle)
+[![Downloads](https://img.shields.io/packagist/dt/tattali/mobile-detect-bundle)](https://packagist.org/packages/tattali/mobile-detect-bundle/stats)
+[![License](https://img.shields.io/packagist/l/tattali/mobile-detect-bundle)](LICENSE)
 
-[![Github Actions Status](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml/badge.svg?branch=main
-)](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml?query=branch%3Amain) [![Latest Stable Version](https://poser.pugx.org/tattali/mobile-detect-bundle/v)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![Total Downloads](https://poser.pugx.org/tattali/mobile-detect-bundle/downloads)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![codecov](https://codecov.io/gh/tattali/MobileDetectBundle/branch/main/graph/badge.svg?token=HWV1OYRSD9)](https://codecov.io/gh/tattali/MobileDetectBundle) [![License](https://poser.pugx.org/tattali/mobile-detect-bundle/license)](https://packagist.org/packages/tattali/mobile-detect-bundle) [![PHP Version Require](https://poser.pugx.org/tattali/mobile-detect-bundle/require/php)](https://packagist.org/packages/tattali/mobile-detect-bundle)
+Symfony 7 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+
+This is the 7.x branch: it supports Symfony 7.0 to 7.4 on PHP 8.2 or later and gets bug fixes only. For Symfony 8, use the newer major version of the bundle (see the `main` branch).
 
 *This bundle is a fork of [suncat2000/MobileDetectBundle](https://github.com/suncat2000/MobileDetectBundle). As this project doesn't look maintained anymore, we decided to create & maintain a fork. For more information read our [manifest](https://github.com/tattali/MobileDetectBundle/issues/8).*
 
@@ -24,8 +28,10 @@ Documentation
 
 ### Installation
 ```sh
-composer require tattali/mobile-detect-bundle
+composer require 'tattali/mobile-detect-bundle:^7.1'
 ```
+Keep the `^7.1` constraint: on Symfony 7.4, a plain `composer require` installs 8.0.0, which gets no more fixes.
+
 *Install with Symfony legacy versions: [here](src/Resources/doc/legacy-versions.md)*
 ### Usage
 

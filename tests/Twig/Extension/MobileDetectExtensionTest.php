@@ -379,11 +379,9 @@ final class MobileDetectExtensionTest extends TestCase
                     return false;
                 }
 
-                // if (1 === $matcher->numberOfInvocations()) {
-                //     self::assertSame('isWindowsPhoneOS', $parameters);
+                self::assertSame('isWindowsPhoneOS', $parameters);
 
-                //     return false;
-                // }
+                return false;
             })
         ;
 
