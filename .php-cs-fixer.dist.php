@@ -6,12 +6,12 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 
-$finder = (new Finder())
+$finder = new Finder()
     ->in([__DIR__.'/src', __DIR__.'/tests'])
     ->append([__FILE__])
 ;
 
-return (new Config())
+return new Config()
     ->setRiskyAllowed(true)
     ->setParallelConfig(ParallelConfigFactory::detect())
     ->setRules([

@@ -4,40 +4,29 @@ Installation
 Composer
 --------
 
-### Latest Symfony >= 7.4 (including 8.x)
+On Symfony 8, install the latest version:
 
 ```sh
 composer require tattali/mobile-detect-bundle
 ```
 
-### For Symfony 7.2 and 7.3
+On older Symfony versions, require the bundle version made for your Symfony version.
+On Symfony 7 (7.4 included), require `^7.1`: a plain `composer require` on Symfony 7.4 installs 8.0.0,
+which allows Symfony 7.4 but gets no more fixes.
 
-```sh
-composer require 'tattali/mobile-detect-bundle:7.0.*'
-```
+| Symfony | Command |
+|---------|---------|
+| 8 | `composer require 'tattali/mobile-detect-bundle:^8.1'` |
+| 7 | `composer require 'tattali/mobile-detect-bundle:^7.1'` |
+| 6.4 | `composer require 'tattali/mobile-detect-bundle:^6.0'` |
+| 5.4 | `composer require 'tattali/mobile-detect-bundle:^5.0'` (security fixes only) |
+| 5.0 to 6.3 | `composer require 'tattali/mobile-detect-bundle:2.2.*'` (no longer maintained) |
+| 3.4 to 4.4 | `composer require 'tattali/mobile-detect-bundle:2.1.*'` (no longer maintained) |
 
-### For Symfony 7.0 and 7.1
-
-```sh
-composer require 'tattali/mobile-detect-bundle:2.3.*'
-```
-
-### Latest Symfony >= 5.1 || <= 6.4
-
-```sh
-composer require 'tattali/mobile-detect-bundle:2.2.*'
-```
-
-### For Symfony >= 3.4 || <= 4.4
-
-```sh
-composer require 'tattali/mobile-detect-bundle:2.1.*'
-```
-
-Or add to `composer.json` in your project to `require` section:
+Or add the version to the `require` section of your project's `composer.json`:
 ```json
 {
-    "tattali/mobile-detect-bundle": "2.1.*"
+    "tattali/mobile-detect-bundle": "^8.1"
 }
 ```
 

@@ -12,7 +12,18 @@ MobileDetectBundle
 [![Symfony](https://img.shields.io/packagist/dependency-v/tattali/mobile-detect-bundle/symfony/http-kernel?label=symfony)](https://packagist.org/packages/tattali/mobile-detect-bundle)
 [![License](https://img.shields.io/packagist/l/tattali/mobile-detect-bundle)](LICENSE)
 
-Symfony 7.4 LTS and 8.x bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+Symfony 8 bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+
+Each major version of the bundle supports one Symfony major version. `main` gets the new features; the older branches get bug fixes only.
+
+| Bundle | Symfony | PHP | Branch |
+|--------|---------|-----|--------|
+| 8.x | 8 | 8.4+ | `main` |
+| 7.x | 7 | 8.2+ | `7.x` |
+| 6.x | 6.4 | 8.1+ | `6.x` |
+| 5.x | 5.4 | 7.2.5+ | `5.x` (security fixes only) |
+
+For older Symfony versions, see [legacy versions](src/Resources/doc/legacy-versions.md).
 
 *This bundle is a fork of [suncat2000/MobileDetectBundle](https://github.com/suncat2000/MobileDetectBundle). As this project doesn't look maintained anymore, we decided to create & maintain a fork. For more information read our [manifest](https://github.com/tattali/MobileDetectBundle/issues/8).*
 
