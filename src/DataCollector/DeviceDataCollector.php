@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\DataCollector;
 
+use MobileDetectBundle\DependencyInjection\Configuration;
 use MobileDetectBundle\EventListener\RequestResponseListener;
 use MobileDetectBundle\Helper\DeviceView;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,11 +23,13 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Jonas HAOUZI <haouzijonas@gmail.com>
+ *
+ * @phpstan-import-type RedirectConfig from Configuration
  */
 class DeviceDataCollector extends DataCollector
 {
     /**
-     * @param array<string, mixed> $redirectConfig
+     * @param RedirectConfig $redirectConfig
      */
     public function __construct(
         protected readonly DeviceView $deviceView,
@@ -79,15 +82,19 @@ class DeviceDataCollector extends DataCollector
 
     public function getCurrentView(): string
     {
-        return $this->data['currentView'];
+        $currentView = $this->data['currentView'] ?? null;
+
+        return \is_string($currentView) ? $currentView : '';
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<mixed>
      */
     public function getViews(): array
     {
-        return $this->data['views'];
+        $views = $this->data['views'] ?? null;
+
+        return \is_array($views) ? $views : [];
     }
 
     public function getName(): string
@@ -96,7 +103,7 @@ class DeviceDataCollector extends DataCollector
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<mixed>|Data
      */
     public function getData(): array|Data
     {
@@ -110,21 +117,21 @@ class DeviceDataCollector extends DataCollector
 
     protected function canUseView(string $view, ?string $host): bool
     {
-        if (!isset($this->redirectConfig[$view])
-            || !isset($this->redirectConfig[$view]['is_enabled'])
-            || false === $this->redirectConfig[$view]['is_enabled']
-        ) {
+        $viewConfig = $this->redirectConfig[$view] ?? null;
+        if (!\is_array($viewConfig) || true !== ($viewConfig['is_enabled'] ?? false)) {
             return true;
         }
 
-        if (true === $this->redirectConfig[$view]['is_enabled']
-            && isset($this->redirectConfig[$view]['host'], $this->redirectConfig[$view]['action'])
-            && !empty($this->redirectConfig[$view]['host'])
-            && \in_array($this->redirectConfig[$view]['action'], [RequestResponseListener::REDIRECT, RequestResponseListener::REDIRECT_WITHOUT_PATH], true)
+        $configHost = $viewConfig['host'] ?? null;
+        if (null !== $configHost && '' !== $configHost && '0' !== $configHost
+            && \in_array($viewConfig['action'] ?? null, [RequestResponseListener::REDIRECT, RequestResponseListener::REDIRECT_WITHOUT_PATH], true)
         ) {
-            $parseHost = parse_url($this->redirectConfig[$view]['host']);
+            $parseHost = parse_url($configHost);
+            if (false === $parseHost) {
+                $parseHost = [];
+            }
             $redirectHost = ($parseHost['scheme'] ?? '').'://'.($parseHost['host'] ?? '');
-            if (!empty($parseHost['port'])) {
+            if (isset($parseHost['port']) && 0 !== $parseHost['port']) {
                 $redirectHost .= ':'.$parseHost['port'];
             }
 

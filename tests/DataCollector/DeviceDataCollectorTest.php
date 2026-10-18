@@ -52,11 +52,13 @@ final class DeviceDataCollectorTest extends TestCase
 
     public function testCollectCurrentViewMobileIsCurrent(): void
     {
-        $redirectConfig['tablet'] = [
-            'is_enabled' => true,
-            'host' => 'http://t.testsite.com',
-            'status_code' => Response::HTTP_FOUND,
-            'action' => RequestResponseListener::REDIRECT,
+        $redirectConfig = [
+            'tablet' => [
+                'is_enabled' => true,
+                'host' => 'http://t.testsite.com',
+                'status_code' => Response::HTTP_FOUND,
+                'action' => RequestResponseListener::REDIRECT,
+            ],
         ];
         $this->initRequest(cookies: [DeviceView::COOKIE_KEY_DEFAULT => DeviceView::VIEW_MOBILE]);
         $deviceView = new DeviceView($this->requestStack);
@@ -85,11 +87,13 @@ final class DeviceDataCollectorTest extends TestCase
 
     public function testCollectCurrentViewMobileCanUseTablet(): void
     {
-        $redirectConfig['tablet'] = [
-            'is_enabled' => true,
-            'host' => 'http://t.testsite.com',
-            'status_code' => Response::HTTP_FOUND,
-            'action' => RequestResponseListener::REDIRECT,
+        $redirectConfig = [
+            'tablet' => [
+                'is_enabled' => true,
+                'host' => 'http://t.testsite.com',
+                'status_code' => Response::HTTP_FOUND,
+                'action' => RequestResponseListener::REDIRECT,
+            ],
         ];
         $this->initRequest(query: ['param1' => 'value1']);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
@@ -97,7 +101,8 @@ final class DeviceDataCollectorTest extends TestCase
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
         $test = $this;
         $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(static function () use ($test) {
-            $qs = Request::normalizeQueryString($test->request->server->get('QUERY_STRING'));
+            $queryString = $test->request->server->get('QUERY_STRING');
+            $qs = Request::normalizeQueryString(\is_string($queryString) ? $queryString : null);
 
             return '' === $qs ? null : $qs;
         });
@@ -147,11 +152,13 @@ final class DeviceDataCollectorTest extends TestCase
 
     public function testCollectCurrentViewDesktopCanUseMobile(): void
     {
-        $redirectConfig['tablet'] = [
-            'is_enabled' => true,
-            'host' => 'http://t.testsite.com',
-            'status_code' => Response::HTTP_FOUND,
-            'action' => RequestResponseListener::REDIRECT,
+        $redirectConfig = [
+            'tablet' => [
+                'is_enabled' => true,
+                'host' => 'http://t.testsite.com',
+                'status_code' => Response::HTTP_FOUND,
+                'action' => RequestResponseListener::REDIRECT,
+            ],
         ];
         $this->initRequest(query: ['param1' => 'value1']);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://t.testsite.com');
@@ -159,7 +166,8 @@ final class DeviceDataCollectorTest extends TestCase
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
         $test = $this;
         $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(static function () use ($test) {
-            $qs = Request::normalizeQueryString($test->request->server->get('QUERY_STRING'));
+            $queryString = $test->request->server->get('QUERY_STRING');
+            $qs = Request::normalizeQueryString(\is_string($queryString) ? $queryString : null);
 
             return '' === $qs ? null : $qs;
         });
@@ -209,11 +217,13 @@ final class DeviceDataCollectorTest extends TestCase
 
     public function testCollectCurrentViewDesktopCantUseMobile(): void
     {
-        $redirectConfig['mobile'] = [
-            'is_enabled' => true,
-            'host' => 'http://m.testsite.com',
-            'status_code' => Response::HTTP_FOUND,
-            'action' => RequestResponseListener::REDIRECT,
+        $redirectConfig = [
+            'mobile' => [
+                'is_enabled' => true,
+                'host' => 'http://m.testsite.com',
+                'status_code' => Response::HTTP_FOUND,
+                'action' => RequestResponseListener::REDIRECT,
+            ],
         ];
         $this->initRequest(query: ['param1' => 'value1']);
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://testsite.com');
@@ -221,7 +231,8 @@ final class DeviceDataCollectorTest extends TestCase
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/path-info');
         $test = $this;
         $this->request->expects(self::any())->method('getQueryString')->willReturnCallback(static function () use ($test) {
-            $qs = Request::normalizeQueryString($test->request->server->get('QUERY_STRING'));
+            $queryString = $test->request->server->get('QUERY_STRING');
+            $qs = Request::normalizeQueryString(\is_string($queryString) ? $queryString : null);
 
             return '' === $qs ? null : $qs;
         });
@@ -282,6 +293,63 @@ final class DeviceDataCollectorTest extends TestCase
         $deviceView = new DeviceView($this->requestStack);
         $deviceDataCollector = new DeviceDataCollector($deviceView);
         self::assertSame('device.collector', $deviceDataCollector->getName());
+    }
+
+    public function testCollectWithoutViewReportsAnEmptyCurrentView(): void
+    {
+        // The request listener did not run (e.g. the router answered 404 first) and
+        // neither the switch param nor the cookie are set: the view is unknown.
+        $request = Request::create('http://testsite.com/page');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $deviceView = new DeviceView($requestStack);
+        $deviceDataCollector = new DeviceDataCollector($deviceView);
+        $deviceDataCollector->collect($request, new Response());
+
+        self::assertNull($deviceView->getViewType());
+        self::assertSame('', $deviceDataCollector->getCurrentView());
+    }
+
+    public function testCollectWithRedirectHostWithoutSchemeMarksTheViewExternal(): void
+    {
+        $request = Request::create('http://testsite.com/page');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $deviceDataCollector = new DeviceDataCollector(new DeviceView($requestStack), [
+            DeviceView::VIEW_MOBILE => [
+                'is_enabled' => true,
+                'host' => 'm.testsite.com',
+                'status_code' => Response::HTTP_FOUND,
+                'action' => RequestResponseListener::REDIRECT,
+            ],
+        ]);
+        $deviceDataCollector->collect($request, new Response());
+
+        $mobileViews = array_values(array_filter(
+            $deviceDataCollector->getViews(),
+            static fn (mixed $view): bool => \is_array($view) && DeviceView::VIEW_MOBILE === $view['type'],
+        ));
+        self::assertCount(1, $mobileViews);
+        self::assertFalse($mobileViews[0]['enabled']);
+    }
+
+    public function testGetViewsBeforeCollect(): void
+    {
+        $deviceDataCollector = new DeviceDataCollector(new DeviceView($this->requestStack));
+
+        self::assertSame([], $deviceDataCollector->getViews());
+    }
+
+    public function testGetViewsAfterReset(): void
+    {
+        $request = Request::create('http://testsite.com/page');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $deviceDataCollector = new DeviceDataCollector(new DeviceView($requestStack));
+        $deviceDataCollector->collect($request, new Response());
+        $deviceDataCollector->reset();
+
+        self::assertSame([], $deviceDataCollector->getViews());
     }
 
     /**
