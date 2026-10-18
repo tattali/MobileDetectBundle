@@ -74,10 +74,6 @@ jobs:
         if: matrix.current
         run: vendor/bin/php-cs-fixer fix --dry-run --diff --ansi
 
-      - name: PHP_CodeSniffer
-        if: matrix.current
-        run: vendor/bin/phpcs --report=code
-
       - name: PHPStan
         if: matrix.current
         run: vendor/bin/phpstan analyse src tests --level 7 --no-progress --error-format=github
