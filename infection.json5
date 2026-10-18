@@ -1,0 +1,15 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": ["src"]
+    },
+    "logs": {
+        "text": "build/infection.log"
+    },
+    "mutators": {
+        "@default": true
+    },
+    // measured on 2026-10-18: MSI 82.3%, covered code MSI 82.3%; raise them when tests improve
+    "minMsi": 82,
+    "minCoveredMsi": 82
+}
