@@ -44,6 +44,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4 || ^3.8",
+        "infection/infection": "^0.29",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-phpunit": "^2.0",
@@ -58,7 +59,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "phpstan/extension-installer": true,
-            "symfony/flex": true
+            "symfony/flex": true,
+            "infection/extension-installer": true
         },
         "policy": {
             "advisories": {
