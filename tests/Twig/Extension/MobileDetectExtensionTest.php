@@ -97,8 +97,12 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testDeviceVersion(): void
     {
-        $versionTypeString = MobileDetect::VERSION_TYPE_STRING;
-        $versionTypeFloat = MobileDetect::VERSION_TYPE_FLOAT;
+        // the constants are private in mobiledetectlib 4.8.0, the lowest release this line allows
+        $reflection = new \ReflectionClass(MobileDetect::class);
+        $versionTypeString = $reflection->getConstant('VERSION_TYPE_STRING');
+        $versionTypeFloat = $reflection->getConstant('VERSION_TYPE_FLOAT');
+        self::assertIsString($versionTypeString);
+        self::assertIsString($versionTypeFloat);
 
         $matcher = self::exactly(3);
         $this->mobileDetect->expects($matcher)
