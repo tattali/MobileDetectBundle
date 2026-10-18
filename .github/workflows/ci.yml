@@ -1,7 +1,7 @@
 # Supported: PHP >=8.2, Symfony ^7.4 || ^8.0 (Symfony 8 needs PHP 8.4).
 # The lowest job installs the oldest allowed versions. The current job runs the linters,
 # coverage and SonarCloud; the other jobs only run the tests. The nightly job tries the next
-# PHP version and may fail without failing the workflow.
+# PHP and Symfony versions in development and may fail without failing the workflow.
 name: CI
 
 on:
@@ -34,7 +34,7 @@ jobs:
           - { php: '8.3', symfony: '7.4.*' }
           - { php: '8.4', symfony: '8.*', current: true }
           - { php: '8.5', symfony: '8.*' }
-          - { php: '8.6', symfony: '8.*', nightly: true }
+          - { php: '8.6', symfony: 'next', nightly: true }
     steps:
       - uses: actions/checkout@v6
         with:
@@ -60,6 +60,12 @@ jobs:
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
         run: |
+          if [ "${{ matrix.symfony }}" = next ]; then
+            # the Symfony version in development, read from symfony.com so it follows each release
+            SYMFONY_REQUIRE="$(curl -fsS https://symfony.com/releases.json | jq -r '.symfony_versions.next | split(".")[:2] | join(".")').*"
+            export SYMFONY_REQUIRE
+            composer config minimum-stability dev
+          fi
           # php-cs-fixer cannot install on the lowest Symfony versions, and only the current job lints
           if [ "${{ matrix.current }}" != "true" ]; then composer remove --dev --no-update friendsofphp/php-cs-fixer; fi
           composer update --no-interaction --no-progress --prefer-dist --prefer-stable ${{ matrix.lowest && '--prefer-lowest --no-security-blocking' || '' }} ${{ matrix.nightly && '--ignore-platform-req=php+' || '' }}
