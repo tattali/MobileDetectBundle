@@ -58,6 +58,13 @@
         "allow-plugins": {
             "phpstan/extension-installer": true,
             "symfony/flex": true
+        },
+        "policy": {
+            "advisories": {
+                "ignore": {
+                    "twig/twig": "Every Twig release without a known advisory needs PHP 8.1 or newer; ignoring them lets CI install Twig on PHP 7.2 to 8.0, which this line supports. Jobs on PHP 8.1+ still resolve the newest Twig."
+                }
+            }
         }
     },
     "autoload": {
