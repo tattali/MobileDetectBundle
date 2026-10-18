@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace MobileDetectBundle\Tests\Helper;
 
 use MobileDetectBundle\Helper\DeviceView;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -322,5 +324,38 @@ final class DeviceViewTest extends TestCase
         $this->request->query = new InputBag();
         $deviceView = new DeviceView($this->requestStack);
         self::assertSame($this->switchParam, $deviceView->getSwitchParam());
+    }
+
+    /**
+     * @return iterable<string, array{string|null, string|null}>
+     */
+    public static function provideCookieSameSite(): iterable
+    {
+        yield 'lax' => [Cookie::SAMESITE_LAX, Cookie::SAMESITE_LAX];
+        yield 'strict in another case' => ['Strict', Cookie::SAMESITE_STRICT];
+        yield 'none' => [Cookie::SAMESITE_NONE, Cookie::SAMESITE_NONE];
+        yield 'empty' => ['', null];
+        yield 'null' => [null, null];
+    }
+
+    #[DataProvider('provideCookieSameSite')]
+    public function testGetRedirectResponseCookieSameSite(?string $sameSite, ?string $expected): void
+    {
+        $deviceView = new DeviceView($this->requestStack);
+        $deviceView->setCookieSameSite($sameSite);
+
+        $cookies = $deviceView->getRedirectResponse(DeviceView::VIEW_MOBILE, 'http://mobilesite.com', Response::HTTP_FOUND)->headers->getCookies();
+        self::assertCount(1, $cookies);
+        self::assertSame($expected, $cookies[0]->getSameSite());
+    }
+
+    public function testGetRedirectResponseWithInvalidCookieSameSite(): void
+    {
+        $deviceView = new DeviceView($this->requestStack);
+        $deviceView->setCookieSameSite('sometimes');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "sameSite" parameter value is not valid.');
+        $deviceView->getRedirectResponse(DeviceView::VIEW_MOBILE, 'http://mobilesite.com', Response::HTTP_FOUND);
     }
 }

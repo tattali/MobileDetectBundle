@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MobileDetectBundle\Tests\Twig\Extension;
 
 use Detection\MobileDetect;
+use MobileDetectBundle\DependencyInjection\Configuration;
 use MobileDetectBundle\Helper\DeviceView;
 use MobileDetectBundle\Twig\Extension\MobileDetectExtension;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -14,6 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @phpstan-import-type RedirectConfig from Configuration
+ */
 final class MobileDetectExtensionTest extends TestCase
 {
     private MockObject&MobileDetect $mobileDetect;
@@ -23,7 +27,7 @@ final class MobileDetectExtensionTest extends TestCase
     private MockObject&Request $request;
 
     /**
-     * @var array<string, mixed>
+     * @var RedirectConfig
      */
     private array $config;
 
@@ -93,9 +97,12 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testDeviceVersion(): void
     {
+        // the constants are private in mobiledetectlib 4.8.0, the lowest release this line allows
         $reflection = new \ReflectionClass(MobileDetect::class);
         $versionTypeString = $reflection->getConstant('VERSION_TYPE_STRING');
         $versionTypeFloat = $reflection->getConstant('VERSION_TYPE_FLOAT');
+        self::assertIsString($versionTypeString);
+        self::assertIsString($versionTypeFloat);
 
         $matcher = self::exactly(3);
         $this->mobileDetect->expects($matcher)
@@ -131,6 +138,15 @@ final class MobileDetectExtensionTest extends TestCase
     public function testDesktopViewUrlHostNull(): void
     {
         $this->config['desktop'] = ['is_enabled' => true, 'host' => null];
+
+        $deviceView = new DeviceView($this->requestStack);
+        $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
+        self::assertNull($extension->desktopViewUrl());
+    }
+
+    public function testDesktopViewUrlWithoutDesktopConfig(): void
+    {
+        unset($this->config['desktop']);
 
         $deviceView = new DeviceView($this->requestStack);
         $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
