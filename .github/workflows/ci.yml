@@ -80,7 +80,7 @@ jobs:
 
       - name: PHPUnit
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
+          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=2
         run: vendor/bin/phpunit ${{ matrix.current && '--coverage-clover=build/coverage.xml' || '--no-coverage' }}
 
       - name: SonarCloud
