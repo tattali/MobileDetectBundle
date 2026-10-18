@@ -3,15 +3,16 @@
 MobileDetectBundle
 ==================
 
-Symfony 7.4 LTS and 8.x bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
+[![CI](https://img.shields.io/github/actions/workflow/status/tattali/MobileDetectBundle/ci.yml?branch=main&label=CI)](https://github.com/tattali/MobileDetectBundle/actions/workflows/ci.yml?query=branch%3Amain)
+[![Quality Gate](https://img.shields.io/sonar/quality_gate/tattali_MobileDetectBundle?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/new_code?id=tattali_MobileDetectBundle)
+[![Coverage](https://img.shields.io/sonar/coverage/tattali_MobileDetectBundle?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/summary/new_code?id=tattali_MobileDetectBundle)
+[![Latest Version](https://img.shields.io/packagist/v/tattali/mobile-detect-bundle)](https://packagist.org/packages/tattali/mobile-detect-bundle)
+[![Downloads](https://img.shields.io/packagist/dt/tattali/mobile-detect-bundle)](https://packagist.org/packages/tattali/mobile-detect-bundle/stats)
+[![PHP](https://img.shields.io/packagist/dependency-v/tattali/mobile-detect-bundle/php)](https://packagist.org/packages/tattali/mobile-detect-bundle)
+[![Symfony](https://img.shields.io/packagist/dependency-v/tattali/mobile-detect-bundle/symfony/http-kernel?label=symfony)](https://packagist.org/packages/tattali/mobile-detect-bundle)
+[![License](https://img.shields.io/packagist/l/tattali/mobile-detect-bundle)](LICENSE)
 
-[![Github Actions Status](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml/badge.svg?branch=main
-)](https://github.com/tattali/MobileDetectBundle/actions/workflows/main.yml?query=branch%3Amain)
-[![Latest Stable Version](https://poser.pugx.org/tattali/mobile-detect-bundle/v)](https://packagist.org/packages/tattali/mobile-detect-bundle)
-[![Packagist Downloads](https://img.shields.io/packagist/dm/tattali/mobile-detect-bundle)](https://packagist.org/packages/tattali/mobile-detect-bundle)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=tattali_MobileDetectBundle&metric=coverage)](https://sonarcloud.io/summary/new_code?id=tattali_MobileDetectBundle)
-[![Packagist License](https://img.shields.io/packagist/l/tattali/mobile-detect-bundle)](https://packagist.org/packages/tattali/mobile-detect-bundle)
-[![Packagist Dependency Version](https://img.shields.io/packagist/dependency-v/tattali/mobile-detect-bundle/php)](https://packagist.org/packages/tattali/mobile-detect-bundle)
+Symfony 7.4 LTS and 8.x bundle to detect mobile devices, manage mobile view and redirect to the mobile and tablet version.
 
 *This bundle is a fork of [suncat2000/MobileDetectBundle](https://github.com/suncat2000/MobileDetectBundle). As this project doesn't look maintained anymore, we decided to create & maintain a fork. For more information read our [manifest](https://github.com/tattali/MobileDetectBundle/issues/8).*
 
