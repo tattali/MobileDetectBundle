@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\DependencyInjection;
 
+use MobileDetectBundle\EventListener\RequestResponseListener;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -28,19 +29,13 @@ class MobileDetectExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yaml');
 
-        // valid mobile host
-        if ($config['redirect']['mobile']['is_enabled'] && !$this->validHost($config['redirect']['mobile']['host'])) {
-            $config['redirect']['mobile']['is_enabled'] = false;
-        }
-
-        // valid tablet host
-        if ($config['redirect']['tablet']['is_enabled'] && !$this->validHost($config['redirect']['tablet']['host'])) {
-            $config['redirect']['tablet']['is_enabled'] = false;
-        }
-
-        // valid desktop host
-        if ($config['redirect']['desktop']['is_enabled'] && !$this->validHost($config['redirect']['desktop']['host'])) {
-            $config['redirect']['desktop']['is_enabled'] = false;
+        // Disable redirections whose host is not a valid URL. A host read from an
+        // env var (%env(...)%) is only known at runtime, so it is checked there.
+        foreach ([RequestResponseListener::MOBILE, RequestResponseListener::TABLET, RequestResponseListener::DESKTOP] as $view) {
+            $host = $config['redirect'][$view]['host'];
+            if ($config['redirect'][$view]['is_enabled'] && !$this->usesEnvVar($container, $host) && !$this->validHost($host)) {
+                $config['redirect'][$view]['is_enabled'] = false;
+            }
         }
 
         $container->setParameter('mobile_detect.redirect', $config['redirect']);
@@ -53,6 +48,18 @@ class MobileDetectExtension extends Extension
         $container->setParameter('mobile_detect.cookie_httpOnly', $config['cookie_httpOnly']);
         $container->setParameter('mobile_detect.cookie_expire_datetime_modifier', $config['cookie_expire_datetime_modifier']);
         $container->setParameter('mobile_detect.switch_param', $config['switch_param']);
+    }
+
+    protected function usesEnvVar(ContainerBuilder $container, ?string $value): bool
+    {
+        if (null === $value) {
+            return false;
+        }
+
+        $usedEnvs = [];
+        $container->resolveEnvPlaceholders($value, null, $usedEnvs);
+
+        return [] !== $usedEnvs;
     }
 
     protected function validHost(?string $url): bool
