@@ -144,6 +144,15 @@ final class MobileDetectExtensionTest extends TestCase
         self::assertNull($extension->desktopViewUrl());
     }
 
+    public function testDesktopViewUrlWithoutDesktopConfig(): void
+    {
+        unset($this->config['desktop']);
+
+        $deviceView = new DeviceView($this->requestStack);
+        $extension = new MobileDetectExtension($this->requestStack, $this->mobileDetect, $deviceView, $this->config);
+        self::assertNull($extension->desktopViewUrl());
+    }
+
     public function testDesktopViewUrlHostEmpty(): void
     {
         $this->config['desktop'] = ['is_enabled' => true, 'host' => ''];

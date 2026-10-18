@@ -63,11 +63,6 @@
             "infection/extension-installer": true,
             "phpstan/extension-installer": true,
             "symfony/flex": true
-        },
-        "policy": {
-            "advisories": {
-                "block": false
-            }
         }
     },
     "autoload": {

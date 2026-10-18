@@ -213,8 +213,8 @@ class RequestResponseListener
     {
         $host = $this->getViewRedirectConf($view)['host'] ?? null;
         $routingOption = $this->getRoutingOption($this->getRouteName($request), $view);
-        if (null !== $host && null !== $routingOption) {
-            if (self::REDIRECT === $routingOption) {
+        if (null !== $routingOption) {
+            if (self::REDIRECT === $routingOption && null !== $host) {
                 // Make sure to hint at the device override, otherwise infinite loop
                 // redirection may occur if different device views are hosted on
                 // different domains (since the cookie can't be shared across domains)
@@ -227,7 +227,7 @@ class RequestResponseListener
                 // Make sure to hint at the device override, otherwise infinite loop
                 // redirections may occur if different device views are hosted on
                 // different domains (since the cookie can't be shared across domains)
-                return $host.'?'.$this->deviceView->getSwitchParam().'='.$view;
+                return ($host ?? '').'?'.$this->deviceView->getSwitchParam().'='.$view;
             }
 
             return null;

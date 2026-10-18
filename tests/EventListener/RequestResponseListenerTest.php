@@ -703,6 +703,71 @@ final class RequestResponseListenerTest extends TestCase
         return $routeCollection;
     }
 
+    public function testHandleRequestWithoutTheTabletAsMobileSettingDetectsTabletsAsMobile(): void
+    {
+        $this->mobileDetect->expects(self::any())->method('isTablet')->willReturn(true);
+        $this->mobileDetect->expects(self::any())->method('isMobile')->willReturn(true);
+        $request = Request::create('http://testhost.com/page');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $deviceView = new DeviceView($requestStack);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, []);
+
+        $listener->handleRequest(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        self::assertSame(DeviceView::VIEW_MOBILE, $deviceView->getViewType());
+        self::assertTrue($listener->needsResponseModification());
+    }
+
+    public function testHandleRequestRedirectsWithFoundWhenTheViewHasNoStatusCode(): void
+    {
+        $this->mobileDetect->expects(self::any())->method('isMobile')->willReturn(true);
+        $response = $this->handleRealRequest(Request::create('http://testhost.com/page'), [
+            DeviceView::VIEW_MOBILE => ['is_enabled' => true, 'host' => 'http://m.testhost.com', 'action' => RequestResponseListener::REDIRECT],
+            'detect_tablet_as_mobile' => false,
+        ]);
+
+        self::assertInstanceOf(RedirectResponseWithCookie::class, $response);
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        self::assertSame('http://m.testhost.com/page?device_view=mobile', $response->getTargetUrl());
+    }
+
+    public function testHandleRequestWithADeviceViewThatSetsNoViewLeavesTheResponseAlone(): void
+    {
+        // a DeviceView subclass may leave the view unset after detection
+        $deviceView = $this->createMock(DeviceView::class);
+        $deviceView->expects(self::any())->method('getViewType')->willReturn(null);
+        $deviceView->expects(self::any())->method('getRequestedViewType')->willReturn(null);
+        $listener = new RequestResponseListener($this->mobileDetect, $deviceView, $this->router, $this->config);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), Request::create('http://testhost.com/page'), HttpKernelInterface::MAIN_REQUEST);
+
+        $listener->handleRequest($event);
+
+        self::assertNull($event->getResponse());
+        self::assertFalse($listener->needsResponseModification());
+    }
+
+    public function testGetRedirectUrlWithoutHost(): void
+    {
+        $request = Request::create('http://testhost.com/page');
+        $request->attributes->set('_route', 'page');
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('page', new Route('/page', [], [], [DeviceView::VIEW_MOBILE => RequestResponseListener::REDIRECT]));
+        $routeCollection->add('home', new Route('/', [], [], [DeviceView::VIEW_MOBILE => RequestResponseListener::REDIRECT_WITHOUT_PATH]));
+        $this->router->expects(self::any())->method('getRouteCollection')->willReturn($routeCollection);
+        $listener = new class($this->mobileDetect, new DeviceView(), $this->router, $this->config) extends RequestResponseListener {
+            public function redirectUrl(Request $request, string $view): ?string
+            {
+                return $this->getRedirectUrl($request, $view);
+            }
+        };
+
+        self::assertNull($listener->redirectUrl($request, DeviceView::VIEW_MOBILE));
+
+        $request->attributes->set('_route', 'home');
+        self::assertSame('?device_view=mobile', $listener->redirectUrl($request, DeviceView::VIEW_MOBILE));
+    }
+
     /**
      * @param array<string, list<string|null>> $headers
      */
