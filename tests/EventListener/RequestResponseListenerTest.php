@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MobileDetectBundle\Tests\EventListener;
 
 use Detection\MobileDetect;
+use MobileDetectBundle\DependencyInjection\Configuration;
 use MobileDetectBundle\EventListener\RequestResponseListener;
 use MobileDetectBundle\Helper\DeviceView;
 use MobileDetectBundle\Helper\RedirectResponseWithCookie;
@@ -24,6 +25,9 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @phpstan-import-type RedirectConfig from Configuration
+ */
 final class RequestResponseListenerTest extends TestCase
 {
     private MockObject&MobileDetect $mobileDetect;
@@ -35,7 +39,7 @@ final class RequestResponseListenerTest extends TestCase
     private MockObject&RouterInterface $router;
 
     /**
-     * @var array<string, mixed>
+     * @var RedirectConfig
      */
     private array $config;
 
@@ -716,7 +720,7 @@ final class RequestResponseListenerTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param RedirectConfig $config
      */
     private function handleRealRequest(Request $request, array $config): ?Response
     {

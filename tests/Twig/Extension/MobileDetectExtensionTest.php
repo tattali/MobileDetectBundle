@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MobileDetectBundle\Tests\Twig\Extension;
 
 use Detection\MobileDetect;
+use MobileDetectBundle\DependencyInjection\Configuration;
 use MobileDetectBundle\Helper\DeviceView;
 use MobileDetectBundle\Twig\Extension\MobileDetectExtension;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -14,6 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @phpstan-import-type RedirectConfig from Configuration
+ */
 final class MobileDetectExtensionTest extends TestCase
 {
     private MockObject&MobileDetect $mobileDetect;
@@ -23,7 +27,7 @@ final class MobileDetectExtensionTest extends TestCase
     private MockObject&Request $request;
 
     /**
-     * @var array<string, mixed>
+     * @var RedirectConfig
      */
     private array $config;
 
@@ -93,9 +97,8 @@ final class MobileDetectExtensionTest extends TestCase
 
     public function testDeviceVersion(): void
     {
-        $reflection = new \ReflectionClass(MobileDetect::class);
-        $versionTypeString = $reflection->getConstant('VERSION_TYPE_STRING');
-        $versionTypeFloat = $reflection->getConstant('VERSION_TYPE_FLOAT');
+        $versionTypeString = MobileDetect::VERSION_TYPE_STRING;
+        $versionTypeFloat = MobileDetect::VERSION_TYPE_FLOAT;
 
         $matcher = self::exactly(3);
         $this->mobileDetect->expects($matcher)

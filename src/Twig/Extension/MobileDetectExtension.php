@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MobileDetectBundle\Twig\Extension;
 
 use Detection\MobileDetect;
+use MobileDetectBundle\DependencyInjection\Configuration;
 use MobileDetectBundle\Helper\DeviceView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,13 +23,15 @@ use Twig\TwigFunction;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
+ *
+ * @phpstan-import-type RedirectConfig from Configuration
  */
 class MobileDetectExtension extends AbstractExtension
 {
     private ?Request $request;
 
     /**
-     * @param array<string, mixed> $redirectConf
+     * @param RedirectConfig $redirectConf
      */
     public function __construct(
         RequestStack $requestStack,
@@ -64,7 +67,7 @@ class MobileDetectExtension extends AbstractExtension
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<mixed>
      */
     public function getRules(): array
     {
@@ -73,7 +76,9 @@ class MobileDetectExtension extends AbstractExtension
 
     public function deviceVersion(string $propertyName, string $type = ''): float|bool|string|null
     {
-        return $this->mobileDetect->version($propertyName, $type) ?: null;
+        $version = $this->mobileDetect->version($propertyName, $type);
+
+        return (bool) $version ? $version : null;
     }
 
     /**
@@ -84,14 +89,14 @@ class MobileDetectExtension extends AbstractExtension
      */
     public function desktopViewUrl(bool $addCurrentPathAndQuery = true): ?string
     {
-        $desktopHost = $this->redirectConf[DeviceView::VIEW_DESKTOP]['host'];
+        $desktopHost = $this->redirectConf[DeviceView::VIEW_DESKTOP]['host'] ?? null;
 
-        if (empty($desktopHost)) {
+        if (false === (bool) $desktopHost) {
             return null;
         }
 
         // If not in request scope, we can only return the base URL to the desktop view
-        if (!$this->request || !$addCurrentPathAndQuery) {
+        if (null === $this->request || !$addCurrentPathAndQuery) {
             return $desktopHost;
         }
 
@@ -99,7 +104,7 @@ class MobileDetectExtension extends AbstractExtension
         $result = rtrim($desktopHost, '/').$this->request->getPathInfo();
 
         $query = Request::normalizeQueryString(http_build_query($this->request->query->all(), '', '&'));
-        if ($query) {
+        if ('' !== $query) {
             $result .= '?'.$query;
         }
 
@@ -121,9 +126,10 @@ class MobileDetectExtension extends AbstractExtension
      */
     public function isDevice(string $deviceName): bool
     {
-        $magicMethodName = 'is'.strtolower((string) $deviceName);
+        // the detector answers every is*() call through __call()
+        $isDevice = [$this->mobileDetect, 'is'.strtolower($deviceName)];
 
-        return $this->mobileDetect->{$magicMethodName}();
+        return \is_callable($isDevice) && true === $isDevice();
     }
 
     public function isDesktopView(): bool
