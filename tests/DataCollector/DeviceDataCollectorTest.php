@@ -300,7 +300,7 @@ final class DeviceDataCollectorTest extends TestCase
      */
     private function initRequest(?array $query = null, ?array $cookies = null, ?array $server = null, ?array $attributes = null): void
     {
-        (new \ReflectionMethod(Request::class, 'initialize'))->invoke(
+        new \ReflectionMethod(Request::class, 'initialize')->invoke(
             $this->request,
             $query ?? $this->request->query->all(),
             [],
