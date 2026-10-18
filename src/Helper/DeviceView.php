@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MobileDetectBundle\Helper;
 
+use MobileDetectBundle\DependencyInjection\Configuration;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
+ *
+ * @phpstan-import-type RedirectConfig from Configuration
  */
 class DeviceView
 {
@@ -63,13 +66,13 @@ class DeviceView
     protected string $switchParam = self::SWITCH_PARAM_DEFAULT;
 
     /**
-     * @param array<string, mixed> $redirectConfig
+     * @param RedirectConfig $redirectConfig
      */
     public function __construct(
         ?RequestStack $requestStack = null,
         protected array $redirectConfig = [],
     ) {
-        if (!$requestStack || !$this->request = $requestStack->getMainRequest()) {
+        if (null === $requestStack || null === $this->request = $requestStack->getMainRequest()) {
             $this->viewType = self::VIEW_NOT_MOBILE;
 
             return;
@@ -133,7 +136,7 @@ class DeviceView
      */
     public function hasSwitchParam(): bool
     {
-        return $this->request && $this->request->query->has($this->switchParam);
+        return null !== $this->request && $this->request->query->has($this->switchParam);
     }
 
     public function setView(string $view): void
@@ -165,7 +168,7 @@ class DeviceView
     }
 
     /**
-     * @return array<string, mixed>
+     * @return RedirectConfig
      */
     public function getRedirectConfig(): array
     {
@@ -201,7 +204,7 @@ class DeviceView
      */
     public function getSwitchParamValue(): ?string
     {
-        if (!$this->request) {
+        if (null === $this->request) {
             return null;
         }
 
@@ -324,8 +327,9 @@ class DeviceView
 
     protected function getStatusCode(string $view): int
     {
-        if (isset($this->getRedirectConfig()[$view]['status_code'])) {
-            return $this->getRedirectConfig()[$view]['status_code'];
+        $viewConfig = $this->getRedirectConfig()[$view] ?? null;
+        if (\is_array($viewConfig) && isset($viewConfig['status_code'])) {
+            return $viewConfig['status_code'];
         }
 
         return Response::HTTP_FOUND;
