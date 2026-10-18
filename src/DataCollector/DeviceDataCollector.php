@@ -79,7 +79,9 @@ class DeviceDataCollector extends DataCollector
 
     public function getCurrentView(): string
     {
-        return $this->data['currentView'];
+        $currentView = $this->data['currentView'] ?? null;
+
+        return \is_string($currentView) ? $currentView : '';
     }
 
     /**
