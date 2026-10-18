@@ -159,7 +159,7 @@ class RequestResponseListener
     {
         if (!isset($this->redirectConf[$viewType])
             || !$this->redirectConf[$viewType]['is_enabled']
-            || (self::NO_REDIRECT === $this->getRoutingOption($request->get('_route'), $viewType))
+            || (self::NO_REDIRECT === $this->getRoutingOption($request->attributes->get('_route'), $viewType))
         ) {
             return false;
         }
@@ -189,7 +189,7 @@ class RequestResponseListener
 
     protected function getRedirectUrl(Request $request, string $view): ?string
     {
-        if ($routingOption = $this->getRoutingOption($request->get('_route'), $view)) {
+        if ($routingOption = $this->getRoutingOption($request->attributes->get('_route'), $view)) {
             if (self::REDIRECT === $routingOption) {
                 // Make sure to hint at the device override, otherwise infinite loop
                 // redirection may occur if different device views are hosted on

@@ -12,6 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,8 +49,10 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->request = $this->getMockBuilder(Request::class)->getMock();
         $this->request->expects(self::any())->method('getSchemeAndHttpHost')->willReturn('http://testhost.com');
-        $this->request->expects(self::any())->method('get')->willReturn('value');
+        // Request::get() is deprecated since Symfony 7.4: the route name must be read from the attributes
+        $this->request->expects(self::never())->method('get');
         $this->request->expects(self::any())->method('getUriForPath')->willReturn('/');
+        $this->request->attributes = new ParameterBag(['_route' => 'value']);
         $this->request->query = new InputBag();
         $this->request->cookies = new InputBag();
 
@@ -119,7 +122,6 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->request->query = new InputBag(['myparam' => 'myvalue', $this->switchParam => DeviceView::VIEW_MOBILE]);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/');
-        $this->request->expects(self::any())->method('get')->willReturn('value');
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
             $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
         );
@@ -215,7 +217,6 @@ final class RequestResponseListenerTest extends TestCase
 
         $this->request->query = new InputBag(['some' => 'param']);
         $this->request->expects(self::any())->method('getPathInfo')->willReturn('/some/parameters');
-        $this->request->expects(self::any())->method('get')->willReturn('value');
         $this->router->expects(self::exactly(2))->method('getRouteCollection')->willReturn(
             $this->createRouteCollectionWithRouteAndRoutingOption(RequestResponseListener::REDIRECT, 2),
         );
