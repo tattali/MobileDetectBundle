@@ -14,12 +14,16 @@ declare(strict_types=1);
 namespace MobileDetectBundle\Tests\DependencyInjection;
 
 use Detection\MobileDetect;
+use MobileDetectBundle\DataCollector\DeviceDataCollector;
 use MobileDetectBundle\DependencyInjection\MobileDetectExtension;
 use MobileDetectBundle\Helper\DeviceView;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @author suncat2000 <nikolay.kotovsky@gmail.com>
@@ -246,5 +250,36 @@ final class MobileDetectExtensionTest extends TestCase
         /** @var array<string, array<string, mixed>> $redirect */
         $redirect = $this->container->getParameter('mobile_detect.redirect');
         self::assertFalse($redirect['mobile']['is_enabled']);
+    }
+
+    public function testDeviceViewAndCollectorGetTheRedirectConfig(): void
+    {
+        $config = [
+            'mobile_detect' => [
+                'redirect' => [
+                    'mobile' => ['is_enabled' => true, 'host' => 'http://m.testsite.com', 'status_code' => Response::HTTP_MOVED_PERMANENTLY, 'action' => 'redirect'],
+                    'detect_tablet_as_mobile' => true,
+                ],
+            ],
+        ];
+        $this->extension->load($config, $this->container);
+        $this->container->register('request_stack', RequestStack::class);
+        $this->container->register('router', RouterInterface::class)->setSynthetic(true);
+        $this->container->getDefinition(DeviceView::class)->setPublic(true);
+        $this->container->getDefinition(DeviceDataCollector::class)->setPublic(true);
+        $this->container->compile();
+
+        $redirect = $this->container->getParameter('mobile_detect.redirect');
+        $deviceView = $this->container->get(DeviceView::class);
+        self::assertInstanceOf(DeviceView::class, $deviceView);
+        self::assertSame($redirect, $deviceView->getRedirectConfig());
+
+        // the collector reads the same configuration: an enabled mobile host other than the current one is external
+        $collector = $this->container->get(DeviceDataCollector::class);
+        self::assertInstanceOf(DeviceDataCollector::class, $collector);
+        $request = Request::create('http://testsite.com/page');
+        $collector->collect($request, new Response());
+        $views = array_column($collector->getViews(), 'enabled', 'type');
+        self::assertFalse($views[DeviceView::VIEW_MOBILE]);
     }
 }
